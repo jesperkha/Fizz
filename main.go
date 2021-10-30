@@ -24,7 +24,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	for idx, token := range tokens {
-		fmt.Println(idx, token.Lexeme)
+	for _, token := range tokens {
+		fmt.Println(token)
 	}
 }

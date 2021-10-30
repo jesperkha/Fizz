@@ -1,1 +1,1 @@
-var name = "John";
+var age = getAge("John"); # 32

@@ -3,6 +3,8 @@ package lexer
 import (
 	"errors"
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -10,9 +12,8 @@ import (
 
 var (
 	ErrUnexpectedToken    = errors.New("unexpeted token: '%s', line: %d")
-	ErrInvalidSyntax	  = errors.New("invalid syntax: '%s', line: %d")
 	ErrUnterminatedString = errors.New("unterminated string, line %d")
-	ErrSyntaxError		  = errors.New("invalid syntax, line %d")
+	ErrInvalidIdentifier  = errors.New("invalid identifier '%s', line %d")
 )
 
 type Token struct {
@@ -25,6 +26,8 @@ type Token struct {
 func GetTokens(input string) (tokens []Token, err error) {
 	currentIdx  := 0
 	currentLine := 0
+	alphaNumRegex := regexp.MustCompile("^[a-zA-Z_0-9]*$")
+	variableRegex := regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*$")
 
 	for currentIdx < len(input) {
 		startIndex := currentIdx
@@ -32,13 +35,13 @@ func GetTokens(input string) (tokens []Token, err error) {
 		nextChar, _ := getNextCharacter(input, currentIdx)
 
 		tokenType, isSymbol := tokenLookup[rune(char)]
-		lexeme := string(char)
+		token := Token{Type: tokenType, Lexeme: string(char)}
 		
 		if isSymbol {
 			// Check for double symbol (!=, >= etc)
 			if nextType, ok := tokenLookup[nextChar]; ok && nextType == EQUAL {
 				jointSymbol := strings.Join([]string{string(char), string(nextChar)}, "")
-				lexeme = jointSymbol
+				token.Lexeme = jointSymbol
 				tokenType = doubleTokenLookup[jointSymbol]
 				currentIdx++ // Skip next char
 			}
@@ -46,6 +49,8 @@ func GetTokens(input string) (tokens []Token, err error) {
 			// Goto new line
 			if tokenType == NEWLINE {
 				currentLine++
+				currentIdx++
+				continue
 			}
 
 			// Skip token generation
@@ -54,24 +59,64 @@ func GetTokens(input string) (tokens []Token, err error) {
 				continue
 			}
 
+			// Skip comment
+			if tokenType == COMMENT {
+				seekCharacter(input, &currentIdx, '\n')
+				currentLine++
+				continue
+			}
+
 			// Seek closing string
 			if tokenType == STRING {
-				eof := seekCharacter(input, &currentIdx, '"')
-				if eof {
+				if seekCharacter(input, &currentIdx, '"') {
 					return tokens, fmt.Errorf(ErrUnterminatedString.Error(), currentLine)
 				}
 
-				lexeme = intervalToString(input, startIndex, currentIdx)
+				token.Lexeme = intervalToString(input, startIndex, currentIdx)
+			}
+
+			tokens = append(tokens, token)
+			currentIdx++
+			continue
+		}
+
+		// Not alpha numeric (a-z 0-9 _)
+		if !alphaNumRegex.MatchString(string(char)) {
+			return tokens, fmt.Errorf(ErrUnexpectedToken.Error(), string(char), currentLine)
+		}
+
+		// Char is not a symbol and is the start of an identifier, keyword, or number
+		seekFunc(input, &currentIdx, func(c rune) bool {
+			return !alphaNumRegex.MatchString(string(c))
+		})
+		
+		identifier := intervalToString(input, startIndex, currentIdx)
+		number, err := strconv.Atoi(identifier)
+		token.Lexeme = identifier
+
+		isNumber := err == nil
+		isAlphaNum := variableRegex.MatchString(identifier)
+
+		if !isNumber && !isAlphaNum {
+			return tokens, fmt.Errorf(ErrInvalidIdentifier.Error(), identifier, currentLine)
+		}
+
+		if isNumber {
+			token.Literal = number
+			token.Type = NUMBER
+		}
+		
+		if isAlphaNum {
+			token.Type = IDENTIFIER
+			if keywordType, isKeyword := keyWordLookup[identifier]; isKeyword {
+				token.Type = keywordType
 			}
 		}
 
-		// For loop checks if alphanumeric and also checks + assigns keyword token
-
-		tokens = append(tokens, Token{Type: tokenType, Lexeme: lexeme, Line: currentLine})
+		tokens = append(tokens, token)
 		currentIdx++
 	}
 
-	// tokens = append(tokens, Token{Type: EOF})
 	return tokens, err
 }
 
@@ -84,12 +129,12 @@ func getNextCharacter(input string, curIdx int) (nextChar rune, eof bool) {
 	return nextChar, true
 }
 
-// Consumes characters until it reaches the target. If the it reaches eof it is returned true. Consumes target.
-func seekCharacter(input string, curIdx *int, target rune) (eof bool) {
+// Consumes characters until the matchFunc returns true. If eof is reached true is returned.
+// Modifies curIdx value. Does not consume final character.
+func seekFunc(input string, curIdx *int, matchFunc func(char rune) bool) (eof bool) {
 	for {
 		if nextChar, isEOF := getNextCharacter(input, *curIdx); !isEOF {
-			if nextChar == target {
-				*curIdx++ // Skip final char
+			if matchFunc(nextChar) {
 				return false
 			}
 
@@ -101,7 +146,17 @@ func seekCharacter(input string, curIdx *int, target rune) (eof bool) {
 	}
 }
 
-// Takes an index interval in the input and returns the string.
+// Calls seekFunc to match the target character. Consumes final character.
+func seekCharacter(input string, curIdx *int, target rune) (eof bool) {
+	eof = seekFunc(input, curIdx, func(char rune) bool {
+		return char == target
+	})
+
+	*curIdx++
+	return eof
+}
+
+// Takes an index interval in the input and returns the string
 func intervalToString(input string, startIdx int, endIdx int) string {
 	result := ""
 	for i := startIdx; i <= endIdx; i++ {
