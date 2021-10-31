@@ -1,5 +1,8 @@
 package lexer
 
+// Tokenizes text input into slice. Errors can be raised
+// for invalid tokens, identifiers, or unlosed strings.
+
 import (
 	"errors"
 	"fmt"
@@ -7,8 +10,6 @@ import (
 	"strconv"
 	"strings"
 )
-
-// Tokenize input text
 
 var (
 	ErrUnexpectedToken    = errors.New("unexpeted token: '%s', line: %d")
@@ -38,32 +39,30 @@ func GetTokens(input string) (tokens []Token, err error) {
 		token := Token{Type: tokenType, Lexeme: string(char)}
 		
 		if isSymbol {
+			// Token exception cases
+			switch (tokenType) {
+				case NEWLINE: {
+					currentLine++
+					currentIdx++
+					continue
+				}
+				case WHITESPACE: {
+					currentIdx++
+					continue
+				}
+				case COMMENT: {
+					seekCharacter(input, &currentIdx, '\n')
+					currentLine++
+					continue
+				}
+			}
+
 			// Check for double symbol (!=, >= etc)
 			if nextType, ok := tokenLookup[nextChar]; ok && nextType == EQUAL {
 				jointSymbol := strings.Join([]string{string(char), string(nextChar)}, "")
 				token.Lexeme = jointSymbol
-				tokenType = doubleTokenLookup[jointSymbol]
+				token.Type = doubleTokenLookup[jointSymbol]
 				currentIdx++ // Skip next char
-			}
-			
-			// Goto new line
-			if tokenType == NEWLINE {
-				currentLine++
-				currentIdx++
-				continue
-			}
-
-			// Skip token generation
-			if tokenType == WHITESPACE {
-				currentIdx++
-				continue
-			}
-
-			// Skip comment
-			if tokenType == COMMENT {
-				seekCharacter(input, &currentIdx, '\n')
-				currentLine++
-				continue
 			}
 
 			// Seek closing string

@@ -1,9 +1,28 @@
 package lexer
 
 const (
+	// Ordered by precedence lo -> hi
 	NOT_TOKEN = iota
+	EQUAL_EQUAL
+	NOT_EQUAL
 
-	// Single character types
+	GREATER
+	LESS
+	GREATER_EQUAL
+	LESS_EQUAL
+
+	PLUS
+	MINUS
+
+	STAR
+	SLASH
+
+	NOT
+
+	IDENTIFIER
+	STRING
+	NUMBER
+
 	LEFT_PAREN
 	RIGHT_PAREN
 	LEFT_BRACE
@@ -11,30 +30,10 @@ const (
 	COMMA
 	DOT
 	SEMICOLON
-	PLUS
-	MINUS
-	STAR
-	SLASH
 	COMMENT
-
-	// Double char
 	EQUAL
-	NOT
-	LESS
-	GREATER
-	EQUAL_EQUAL
-	NOT_EQUAL
-	LESS_EQUAL
-	GREATER_EQUAL
 	AND
 	OR
-
-	// Literals
-	IDENTIFIER
-	STRING
-	NUMBER
-
-	// Keywords
 	FUNC
 	CLASS
 	RETURN
@@ -49,8 +48,6 @@ const (
 	FALSE
 	VAR
 	WHILE
-
-	// Other
 	WHITESPACE
 	NEWLINE
 	EOF

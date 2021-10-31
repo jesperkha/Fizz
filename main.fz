@@ -1,1 +1,0 @@
-var age = getAge("John"); # 32
