@@ -108,6 +108,13 @@ func GetTokens(input string) (tokens []Token, err error) {
 		if isAlphaNum {
 			token.Type = IDENTIFIER
 			if keywordType, isKeyword := keyWordLookup[identifier]; isKeyword {
+				// Set literal values for keyword types
+				switch (keywordType) {
+					case FALSE: token.Literal = false
+					case TRUE: token.Literal = true
+					case NIL: token.Literal = nil
+				}
+
 				token.Type = keywordType
 			}
 		}

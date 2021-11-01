@@ -17,27 +17,44 @@ func handleError(err error) {
 	}
 }
 
-func check(expected string, value interface{}) {
-	fmt.Printf("Expected value: %s. Got: %s\n", expected, value)
+// func check(expected string, value interface{}) {
+// 	fmt.Printf("Expected value: %s. Got: %s\n", expected, value)
+// }
+
+func Exec(input string) (value interface{}, err error) {
+	tokens, err := lexer.GetTokens(input)
+	if err != nil || len(tokens) == 0 {
+		return nil, err
+	}
+
+	ptokens, err := parser.GenerateParseTokens(tokens)
+	if err != nil {
+		return nil, err
+	}
+	
+	val, err := parser.EvaluateExpression(parser.ParseExpression(ptokens))
+	if err != nil {
+		return nil, err
+	}
+
+	return val, nil
+}
+
+func runFile(filename string) {
+	file, err := os.Open(filename)
+	handleError(err)
+	var buf bytes.Buffer
+	bufio.NewReader(file).WriteTo(&buf)
+	fmt.Println(Exec(buf.String()))
 }
 
 func main() {
-	file, err := os.Open("./main.fz")
-	handleError(err)
+	runFile("./main.fz")
+	// input := strings.Join(os.Args[1:], "")
+	// val, err := Exec(input)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	var buf bytes.Buffer
-	bufio.NewReader(file).WriteTo(&buf)
-
-	tokens, err := lexer.GetTokens(buf.String())
-	handleError(err)
-
-	ptokens, err := parser.GenerateParseTokens(tokens)
-	handleError(err)
-
-	expr := parser.ParseExpression(ptokens)
-	check("1", expr.Left.Value.Lexeme)
-	check("+", expr.Operand.Lexeme)
-	check("2", expr.Right.Inner.Left.Value.Lexeme)
-	check("-", expr.Right.Inner.Operand.Lexeme)
-	check("3", expr.Right.Inner.Right.Value.Lexeme)
+	// fmt.Println(val)
 }

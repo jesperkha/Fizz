@@ -104,7 +104,7 @@ func ParseExpression(tokens []ParseToken) *Expression {
 
 	// Unary expression
 	if len(tokens) == 2 {
-		return &Expression{Type: Unary, Operand: tokens[0].Token, Value: tokens[1].Token}
+		return &Expression{Type: Unary, Operand: tokens[0].Token, Right: ParseExpression(tokens[1:])}
 	}
 
 	// Binary expression

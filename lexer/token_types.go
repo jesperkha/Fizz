@@ -6,6 +6,8 @@ const (
 	EQUAL_EQUAL
 	NOT_EQUAL
 
+	AND
+	OR
 	GREATER
 	LESS
 	GREATER_EQUAL
@@ -16,6 +18,7 @@ const (
 
 	STAR
 	SLASH
+	HAT
 
 	NOT
 
@@ -32,8 +35,6 @@ const (
 	SEMICOLON
 	COMMENT
 	EQUAL
-	AND
-	OR
 	FUNC
 	CLASS
 	RETURN
@@ -68,6 +69,7 @@ var tokenLookup = map[rune]int{
 	'/': SLASH,
 	'-': MINUS,
 	'+': PLUS,
+	'^': HAT,
 
 	';': SEMICOLON,
 	',': COMMA,
@@ -79,6 +81,8 @@ var tokenLookup = map[rune]int{
 	'!': NOT,
 	'>': GREATER,
 	'<': LESS,
+	'&': AND,
+	':': OR,
 }
 
 var doubleTokenLookup = map[string]int{
@@ -92,7 +96,6 @@ var keyWordLookup = map[string]int{
 	"if":     IF,
 	"else":   ELSE,
 	"nil":    NIL,
-	"or":     OR,
 	"print":  PRINT,
 	"return": RETURN,
 	"class":  CLASS,
