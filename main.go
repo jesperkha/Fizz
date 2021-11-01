@@ -45,16 +45,11 @@ func runFile(filename string) {
 	handleError(err)
 	var buf bytes.Buffer
 	bufio.NewReader(file).WriteTo(&buf)
-	fmt.Println(Exec(buf.String()))
+	val, err := Exec(buf.String())
+	handleError(err)
+	fmt.Println(val)
 }
 
 func main() {
 	runFile("./main.fz")
-	// input := strings.Join(os.Args[1:], "")
-	// val, err := Exec(input)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// fmt.Println(val)
 }

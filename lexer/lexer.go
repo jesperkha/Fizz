@@ -27,7 +27,7 @@ type Token struct {
 func GetTokens(input string) (tokens []Token, err error) {
 	currentIdx  := 0
 	currentLine := 0
-	alphaNumRegex := regexp.MustCompile("^[a-zA-Z_0-9]*$")
+	alphaNumRegex := regexp.MustCompile("^[a-zA-Z_0-9.]*$")
 	variableRegex := regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*$")
 
 	for currentIdx < len(input) {
@@ -71,7 +71,9 @@ func GetTokens(input string) (tokens []Token, err error) {
 					return tokens, fmt.Errorf(ErrUnterminatedString.Error(), currentLine)
 				}
 
-				token.Lexeme = intervalToString(input, startIndex, currentIdx)
+				str := intervalToString(input, startIndex, currentIdx)
+				token.Lexeme = str
+				token.Literal = str[1:len(str) - 1]
 			}
 
 			tokens = append(tokens, token)
@@ -90,7 +92,7 @@ func GetTokens(input string) (tokens []Token, err error) {
 		})
 		
 		identifier := intervalToString(input, startIndex, currentIdx)
-		number, err := strconv.Atoi(identifier)
+		number, err := strconv.ParseFloat(identifier, 32)
 		token.Lexeme = identifier
 
 		isNumber := err == nil

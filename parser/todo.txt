@@ -1,0 +1,13 @@
+Statement parser:
+
+0. Add seekToken() for pokens and ltokens
+1. Make Parse() method to put the return value of ParseStatement() into list of statements
+2. In ParseStatement() check the token type and call return call to helpers
+3. When parsing a statement consume until end token (;) and add to list. (Raise ; error)
+
+Print:
+Assume any tokens after is expression and print out return of ParseExpression()
+
+program     → declaration* EOF ;
+declaration → varDecl | statement ;
+statement   → exprStmt | printStmt ;

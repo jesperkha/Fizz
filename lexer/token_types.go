@@ -15,6 +15,7 @@ const (
 
 	PLUS
 	MINUS
+	TYPE
 
 	STAR
 	SLASH
@@ -107,4 +108,5 @@ var keyWordLookup = map[string]int{
 	"false":  FALSE,
 	"while":  WHILE,
 	"func":   FUNC,
+	"type":   TYPE,
 }

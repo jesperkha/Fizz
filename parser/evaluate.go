@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"reflect"
 
 	"github.com/jesperkha/Fizz/lexer"
 )
@@ -14,8 +15,6 @@ var (
 	ErrInvalidOperatorTypes = errors.New("invalid operator '%s' for types '%s' and '%s', line %d")
 	ErrDivideByZero			= errors.New("division by 0, line %d")
 )
-
-// Todo: handle floats (also in lexer/parser)
 
 // Evaluates expression. Hands off to helper methods which can also recursively call to 
 // resolve nested expressions. Returned value is result of expression and is Go literal.
@@ -35,6 +34,8 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 	return expr, nil
 }
 
+// Helper for any unary expression with a valid operator. Returns an error
+// if the type does not match the operator or the operator is invalid.
 func handleUnary(unary *Expression) (value interface{}, err error) {
 	right, err := EvaluateExpression(unary.Right)
 
@@ -48,12 +49,15 @@ func handleUnary(unary *Expression) (value interface{}, err error) {
 			return nil, fmt.Errorf(ErrInvalidOperatorType.Error(), op, typ, line)
 		}
 		case lexer.NOT: return !isTruthy(right), err
+		case lexer.TYPE: return getType(right), err
 	}
 
 	op, line := unary.Operand.Lexeme, unary.Operand.Line
 	return value, fmt.Errorf(ErrInvalidUnaryOperator.Error(), op, line)
 }
 
+// Helper for evaluation for any binary expression with a valid operator.
+// If the types do not match or the operator is invalid an error is returned.
 func handleBinary(binary *Expression) (value interface{}, err error) {
 	left, err := EvaluateExpression(binary.Left)
 	if err != nil {
@@ -65,13 +69,14 @@ func handleBinary(binary *Expression) (value interface{}, err error) {
 		return nil, err
 	}
 
+	// Numbers are float64, set from lexer
 	if isNumber(right) && isNumber(left) {
-		vl, vr := left.(int), right.(int)
+		vl, vr := left.(float64), right.(float64)
 		switch (binary.Operand.Type) {
 		case lexer.PLUS: return vl + vr, err
 		case lexer.MINUS: return vl - vr, err
 		case lexer.STAR: return vl * vr, err
-		case lexer.HAT: return math.Pow(float64(vl), float64(vr)), err
+		case lexer.HAT: return math.Pow(vl, vr), err
 		case lexer.GREATER: return vl > vr, err
 		case lexer.LESS: return vl < vr, err
 		case lexer.LESS_EQUAL: return vl <= vr, err
@@ -80,6 +85,7 @@ func handleBinary(binary *Expression) (value interface{}, err error) {
 			if vr == 0 {
 				return nil, fmt.Errorf(ErrDivideByZero.Error(), binary.Operand.Line)
 			}
+
 			return vl / vr, err
 		}
 	}
@@ -115,13 +121,9 @@ func isNumber(value interface{}) bool {
 }
 
 func getType(value interface{}) string {
-	if isNumber(value) {
-		return "number"
+	if value == nil {
+		return "nil"
 	}
 
-	if isBool(value) {
-		return fmt.Sprintf("%v", value)
-	}
-
-	return "identifier"
+	return reflect.TypeOf(value).Name()
 }
