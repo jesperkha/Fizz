@@ -1,0 +1,2 @@
+Bugs:
+Statement parser doesnt recognise last semicolon when parsing multiple statements

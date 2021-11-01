@@ -1,43 +1,20 @@
-package parser
+package expr
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/jesperkha/Fizz/lexer"
 )
 
-const (
-	Literal = iota
-	Unary
-	Binary
-	Group
-)
+// Generates ptokens and parses them into an expression.
+func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
+	ptokens, err := generateParseTokens(tokens)
+	if err != nil {
+		return expr, err
+	}
 
-type Expression struct {
-	Type     int
-	Operand  lexer.Token
-	Terminal lexer.Token
-	Value    lexer.Token
-	Left	 *Expression
-	Right 	 *Expression
-	Inner 	 *Expression
+	return *parsePTokens(ptokens), err
 }
-
-const (
-	Single = iota
-	TokenGroup
-)
-
-type ParseToken struct {
-	Type   int
-	Token  lexer.Token
-	Inner  []ParseToken
-}
-
-var (
-	ErrParenError = errors.New("unmatched parenthesies, line %d")
-)
 
 // Creates new ParseTokens from lexer tokens to simplify expression parsing. The ParseTokens can
 // either be of type Single or TokenGroup. Symbols and identifiers are of the Single type while any
@@ -46,7 +23,7 @@ var (
 // calling this method. The result is that any parenthesized expression is put in a nested object to
 // minimize operations and complexity when evaluating the actual expressions later.
 // Example: 1, +, (, 2, +, 3, ) turns into 1, +, [2, +, 3]
-func GenerateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error) {
+func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error) {
 	currentIdx := 0
 
 	for currentIdx < len(tokens) {
@@ -67,7 +44,7 @@ func GenerateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 			}
 
 			// Generate ptokens between start and end paren
-			tokenGroup, err := GenerateParseTokens(tokens[currentIdx + 1:endIdx])
+			tokenGroup, err := generateParseTokens(tokens[currentIdx + 1:endIdx])
 			if err != nil {
 				return ptokens, err
 			}
@@ -91,12 +68,12 @@ func GenerateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 }
 
 // Parses slice of ParseTokens into final AST
-func ParseExpression(tokens []ParseToken) *Expression {
+func parsePTokens(tokens []ParseToken) *Expression {
 	// Literal or Group expression
 	if len(tokens) == 1 {
 		token := tokens[0]
 		if token.Type == TokenGroup {
-			return &Expression{Type: Group, Inner: ParseExpression(token.Inner)}
+			return &Expression{Type: Group, Inner: parsePTokens(token.Inner)}
 		}
 
 		return &Expression{Type: Literal, Value: token.Token}
@@ -104,7 +81,7 @@ func ParseExpression(tokens []ParseToken) *Expression {
 
 	// Unary expression
 	if len(tokens) == 2 {
-		return &Expression{Type: Unary, Operand: tokens[0].Token, Right: ParseExpression(tokens[1:])}
+		return &Expression{Type: Unary, Operand: tokens[0].Token, Right: parsePTokens(tokens[1:])}
 	}
 
 	// Binary expression
@@ -117,6 +94,6 @@ func ParseExpression(tokens []ParseToken) *Expression {
 		}
 	}
 
-	right, left := ParseExpression(tokens[lowestIdx + 1:]), ParseExpression(tokens[:lowestIdx])
+	right, left := parsePTokens(tokens[lowestIdx + 1:]), parsePTokens(tokens[:lowestIdx])
 	return &Expression{Type: Binary, Operand: lowest, Left: left, Right: right}
 }

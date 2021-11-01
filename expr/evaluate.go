@@ -1,31 +1,24 @@
-package parser
+package expr
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"reflect"
+	"strings"
 
 	"github.com/jesperkha/Fizz/lexer"
 )
 
-var (
-	ErrInvalidUnaryOperator = errors.New("invalid unary operator '%s', line %d")
-	ErrInvalidOperatorType  = errors.New("invalid operator '%s' for type '%s', line %d")
-	ErrInvalidOperatorTypes = errors.New("invalid operator '%s' for types '%s' and '%s', line %d")
-	ErrDivideByZero			= errors.New("division by 0, line %d")
-)
-
-// Evaluates expression. Hands off to helper methods which can also recursively call to 
+// Evaluates expression tree. Hands off to helper methods which can also recursively call to
 // resolve nested expressions. Returned value is result of expression and is Go literal.
 func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 	switch expr.Type {
 	case Literal:
 		return expr.Value.Literal, err
 	case Unary:
-		return handleUnary(expr)
+		return evalUnary(expr)
 	case Binary:
-		return handleBinary(expr)
+		return evalBinary(expr)
 	case Group:
 		return EvaluateExpression(expr.Inner)
 	}
@@ -36,7 +29,7 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 
 // Helper for any unary expression with a valid operator. Returns an error
 // if the type does not match the operator or the operator is invalid.
-func handleUnary(unary *Expression) (value interface{}, err error) {
+func evalUnary(unary *Expression) (value interface{}, err error) {
 	right, err := EvaluateExpression(unary.Right)
 
 	switch (unary.Operand.Type) {
@@ -58,7 +51,7 @@ func handleUnary(unary *Expression) (value interface{}, err error) {
 
 // Helper for evaluation for any binary expression with a valid operator.
 // If the types do not match or the operator is invalid an error is returned.
-func handleBinary(binary *Expression) (value interface{}, err error) {
+func evalBinary(binary *Expression) (value interface{}, err error) {
 	left, err := EvaluateExpression(binary.Left)
 	if err != nil {
 		return nil, err
@@ -73,23 +66,23 @@ func handleBinary(binary *Expression) (value interface{}, err error) {
 	if isNumber(right) && isNumber(left) {
 		vl, vr := left.(float64), right.(float64)
 		switch (binary.Operand.Type) {
-		case lexer.PLUS: return vl + vr, err
-		case lexer.MINUS: return vl - vr, err
-		case lexer.STAR: return vl * vr, err
-		case lexer.HAT: return math.Pow(vl, vr), err
-		case lexer.GREATER: return vl > vr, err
-		case lexer.LESS: return vl < vr, err
-		case lexer.LESS_EQUAL: return vl <= vr, err
-		case lexer.GREATER_EQUAL: return vl >= vr, err
+			case lexer.PLUS: return vl + vr, err
+			case lexer.MINUS: return vl - vr, err
+			case lexer.STAR: return vl * vr, err
+			case lexer.HAT: return math.Pow(vl, vr), err
+			case lexer.GREATER: return vl > vr, err
+			case lexer.LESS: return vl < vr, err
+			case lexer.LESS_EQUAL: return vl <= vr, err
+			case lexer.GREATER_EQUAL: return vl >= vr, err
 		case lexer.SLASH:
 			if vr == 0 {
 				return nil, fmt.Errorf(ErrDivideByZero.Error(), binary.Operand.Line)
 			}
-
+			
 			return vl / vr, err
 		}
 	}
-
+	
 	switch (binary.Operand.Type) {
 		case lexer.EQUAL_EQUAL: return left == right, err
 		case lexer.NOT_EQUAL: return left != right, err
@@ -97,6 +90,11 @@ func handleBinary(binary *Expression) (value interface{}, err error) {
 		case lexer.OR: return isTruthy(left) || isTruthy(right), err
 	}
 
+	// Support string addition
+	if getType(left) == "string" && getType(right) == "string" && binary.Operand.Type == lexer.PLUS {
+		return strings.Join([]string{left.(string), right.(string)}, ""), err
+	}
+	
 	typeLeft, typeRight := getType(left), getType(right)
 	op, line := binary.Operand.Lexeme, binary.Operand.Line
 	return nil, fmt.Errorf(ErrInvalidOperatorTypes.Error(), op, typeLeft, typeRight, line)

@@ -26,7 +26,7 @@ type Token struct {
 
 func GetTokens(input string) (tokens []Token, err error) {
 	currentIdx  := 0
-	currentLine := 0
+	currentLine := 1 // Start at line 1 for editors
 	alphaNumRegex := regexp.MustCompile("^[a-zA-Z_0-9.]*$")
 	variableRegex := regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*$")
 
