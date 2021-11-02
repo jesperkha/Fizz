@@ -20,6 +20,7 @@ const (
 	Unary
 	Binary
 	Group
+	Variable
 
 	// ParseToken types
 	Single
@@ -28,6 +29,7 @@ const (
 
 type Expression struct {
 	Type     int
+	Name	 string
 	Operand  lexer.Token
 	Terminal lexer.Token
 	Value    lexer.Token

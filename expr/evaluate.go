@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/lexer"
 )
 
@@ -21,6 +22,8 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 		return evalBinary(expr)
 	case Group:
 		return EvaluateExpression(expr.Inner)
+	case Variable:
+		return env.Get(expr.Name)
 	}
 
 	// Wont be reached

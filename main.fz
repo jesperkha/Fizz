@@ -1,1 +1,3 @@
-print "hello";
+var myString = "Hello World";
+
+print myString;

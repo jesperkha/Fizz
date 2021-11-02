@@ -69,11 +69,15 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 // Parses slice of ParseTokens into final AST
 func parsePTokens(tokens []ParseToken) *Expression {
-	// Literal or Group expression
+	// Literal, Variable, or Group expression
 	if len(tokens) == 1 {
 		token := tokens[0]
 		if token.Type == TokenGroup {
 			return &Expression{Type: Group, Inner: parsePTokens(token.Inner)}
+		}
+
+		if token.Token.Type == lexer.IDENTIFIER {
+			return &Expression{Type: Variable, Name: token.Token.Lexeme}
 		}
 
 		return &Expression{Type: Literal, Value: token.Token}

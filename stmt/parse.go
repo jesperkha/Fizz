@@ -12,11 +12,10 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 	currentIdx := 0
 
 	for currentIdx < len(tokens) {
-		first := tokens[currentIdx]
-		startIndex := currentIdx
-		currentStmt := Statement{}
+		startIndex  := currentIdx
+		firstToken  := tokens[currentIdx]
+		currentLine := firstToken.Line
 
-		// Todo swap to using map for funcs
 		// Seeks a semicolon since all statements end with a semicolon
 		foundSemicolon := false
 		for i := startIndex; i < len(tokens); i++ {
@@ -28,31 +27,28 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		}
 
 		if !foundSemicolon {
-			return statements, fmt.Errorf(ErrNoSemicolon.Error(), first.Line)
+			return statements, fmt.Errorf(ErrNoSemicolon.Error(), currentLine)
 		}
 
-		tokenInterval := tokens[startIndex + 1:currentIdx]
-
-		switch first.Type {
-		case lexer.PRINT: // Print statement
-			expr, err := expr.ParseExpression(tokenInterval)
-			if err != nil {
-				return statements, err
-			}
-
-			currentStmt.Type = Print
-			currentStmt.Expression = &expr
+		// Get tokens in interval between last semicolon and current one
+		var currentStmt Statement
+		tokenInterval := tokens[startIndex:currentIdx]
+		if len(tokenInterval) == 0 {
+			return statements, fmt.Errorf(ErrNoStatement.Error(), currentLine)
+		}
 		
-		default: // Default to parsing expression statement
-			expr, err := expr.ParseExpression(tokenInterval)
-			if err != nil {
-				return statements, err
-			}
-	
-			currentStmt.Type = ExpressionStmt
-			currentStmt.Expression = &expr
+		if parseFunc, ok := parseTable[firstToken.Type]; ok {
+			currentStmt, err = parseFunc(tokenInterval)
+		} else {
+			// Default to parsing expression statement
+			currentStmt, err = parseExpression(tokenInterval)
 		}
 
+		if err != nil {
+			return statements, fmt.Errorf(err.Error(), currentLine)
+		}
+
+		currentStmt.Line = currentLine
 		statements = append(statements, currentStmt)
 		currentIdx++
 	}
@@ -60,17 +56,52 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 	return statements, err
 }
 
-var parseTable = map[int]func(tokens []lexer.Token, curIdx *int) (stmt Statement, err error) {
-	Print: parsePrint,
-	ExpressionStmt: parseExpression,
+func parseExpression(tokens []lexer.Token) (stmt Statement, err error) {
+	expr, err := expr.ParseExpression(tokens)
+	return Statement{Type: ExpressionStmt, Expression: &expr}, err
 }
 
-func parsePrint(tokens []lexer.Token, curIdx *int) (stmt Statement, err error) {
-
-	return stmt, err
+var parseTable = map[int]func(tokens []lexer.Token) (stmt Statement, err error) {
+	lexer.PRINT: parsePrint,
+	lexer.VAR: 	 parseVariable,
 }
 
-func parseExpression(tokens []lexer.Token, curIdx *int) (stmt Statement, err error) {
+// Parses print statement followed by expression
+func parsePrint(tokens []lexer.Token) (stmt Statement, err error) {
+	if len(tokens) == 1 {
+		return stmt, ErrExpectedExpression
+	}
 
-	return stmt, err
+	expr, err := expr.ParseExpression(tokens[1:])
+	return Statement{Type: Print, Expression: &expr}, err
+}
+
+// Parses variable delcaration statement with either nil value init or expression
+func parseVariable(tokens []lexer.Token) (stmt Statement, err error) {
+	numTokens := len(tokens)
+	if numTokens == 1 {
+		return stmt, ErrExpectedExpression
+	}
+
+	if numTokens == 2 {
+		name := tokens[1]
+		if name.Type == lexer.IDENTIFIER {
+			return Statement{Type: Variable}, err
+		}
+
+		return stmt, ErrExpectedIdentifier
+	}
+
+	if numTokens >= 4 {
+		name := tokens[1]
+		exprTokens := tokens[3:]
+		equals := tokens[2].Type == lexer.EQUAL
+
+		if name.Type == lexer.IDENTIFIER && equals {
+			initExpr, err := expr.ParseExpression(exprTokens)
+			return Statement{Type: Variable, Name: name.Lexeme, InitExpression: &initExpr}, err
+		}
+	}
+
+	return stmt, ErrInvalidStatement
 }

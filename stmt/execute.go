@@ -3,6 +3,7 @@ package stmt
 import (
 	"fmt"
 
+	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
 )
 
@@ -12,14 +13,19 @@ func ExecuteStatements(stmts []Statement) (err error) {
 
 	for currentIdx < len(stmts) {
 		statement := stmts[currentIdx]
+		currentIdx++
+
+		// Ignore expression statements
+		if statement.Type == ExpressionStmt {
+			continue
+		}
 
 		if execMethod, ok := statementTable[statement.Type]; ok {
 			err = execMethod(statement)
 			if err != nil {
-				return err
+				return fmt.Errorf(err.Error(), statement.Line)
 			}
 			
-			currentIdx++
 			continue
 		}
 
@@ -33,7 +39,8 @@ func ExecuteStatements(stmts []Statement) (err error) {
 }
 
 var statementTable = map[int]func(stmt Statement) error {
-	Print: execPrint,
+	Print: 	  execPrint,
+	Variable: execVariable,
 }
 
 // Evaluates statement expression and prints out to terminal
@@ -47,3 +54,16 @@ func execPrint(stmt Statement) (err error) {
 	return nil
 }
 
+// Adds variable init value to global environment table
+func execVariable(stmt Statement) (err error) {
+	if stmt.InitExpression != nil {
+		val, err := expr.EvaluateExpression(stmt.InitExpression)
+		if err != nil {
+			return err
+		}
+
+		return env.Declare(stmt.Name, val)
+	}
+
+	return env.Declare(stmt.Name, nil)
+}

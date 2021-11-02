@@ -36,7 +36,7 @@ func GetTokens(input string) (tokens []Token, err error) {
 		nextChar, _ := getNextCharacter(input, currentIdx)
 
 		tokenType, isSymbol := tokenLookup[rune(char)]
-		token := Token{Type: tokenType, Lexeme: string(char)}
+		token := Token{Type: tokenType, Lexeme: string(char), Line: currentLine}
 		
 		if isSymbol {
 			// Token exception cases
