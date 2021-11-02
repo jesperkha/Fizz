@@ -15,20 +15,50 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		startIndex  := currentIdx
 		firstToken  := tokens[currentIdx]
 		currentLine := firstToken.Line
+		
+		// Check and parse block statement first to not seek semicolon
+		if firstToken.Type == lexer.LEFT_BRACE {
+			numEndBraces := 0
+			foundEndBrace := false
 
-		// Seeks a semicolon since all statements end with a semicolon
-		foundSemicolon := false
-		for i := startIndex; i < len(tokens); i++ {
-			if tokens[i].Type == lexer.SEMICOLON {
-				currentIdx = i
-				foundSemicolon = true
-				break
+			// Loop over until finds brace ending a nested block
+			for currentIdx < len(tokens) {
+				switch tokens[currentIdx].Type {
+					case lexer.LEFT_BRACE: numEndBraces++
+					case lexer.RIGHT_BRACE: numEndBraces--
+				}
+				
+				if numEndBraces == 0 {
+					foundEndBrace = true
+					break
+				}
+
+				currentIdx++
 			}
-		}
 
-		if !foundSemicolon {
+			if !foundEndBrace {
+				return statements, fmt.Errorf(ErrNoBrace.Error(), currentLine)
+			}
+			
+			blockTokens := tokens[startIndex + 1:currentIdx]
+			stmt, err := parseBlock(blockTokens)
+			if err != nil {
+				return statements, err // already formatted from this function
+			}
+			
+			stmt.Line = currentLine
+			statements = append(statements, stmt)
+			currentIdx++
+			continue
+		}
+		
+		// Seeks a semicolon since all other statements end with a semicolon
+		endIdx, eof := seekToken(tokens, startIndex, lexer.SEMICOLON)
+		if eof {
 			return statements, fmt.Errorf(ErrNoSemicolon.Error(), currentLine)
 		}
+
+		currentIdx = endIdx
 
 		// Get tokens in interval between last semicolon and current one
 		var currentStmt Statement
@@ -56,14 +86,26 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 	return statements, err
 }
 
+// Seeks target token type and returns the end index and eof
+func seekToken(tokens []lexer.Token, start int, target int) (endIdx int, eof bool) {
+	for i := start; i < len(tokens); i++ {
+		if tokens[i].Type == target {
+			return i, false
+		}
+	}
+
+	return 0, true
+} 
+
 func parseExpression(tokens []lexer.Token) (stmt Statement, err error) {
 	expr, err := expr.ParseExpression(tokens)
 	return Statement{Type: ExpressionStmt, Expression: &expr}, err
 }
 
 var parseTable = map[int]func(tokens []lexer.Token) (stmt Statement, err error) {
-	lexer.PRINT: parsePrint,
-	lexer.VAR: 	 parseVariable,
+	lexer.PRINT: 	  parsePrint,
+	lexer.VAR: 	 	  parseVariable,
+	lexer.IDENTIFIER: parseAssignment,
 }
 
 // Parses print statement followed by expression
@@ -104,4 +146,26 @@ func parseVariable(tokens []lexer.Token) (stmt Statement, err error) {
 	}
 
 	return stmt, ErrInvalidStatement
+}
+
+// Assigns right hand expression value to variable name
+func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
+	if len(tokens) < 3 || tokens[1].Type != lexer.EQUAL {
+		return stmt, ErrInvalidStatement
+	}
+
+	name := tokens[0].Lexeme
+	rightExpr := tokens[2:]
+	expr, err := expr.ParseExpression(rightExpr)
+	return Statement{Type: Assignment, Name: name, Expression: &expr}, err
+}
+
+// Parses all statements within block
+func parseBlock(tokens []lexer.Token) (stmt Statement, err error) {
+	statements, err := ParseStatements(tokens)
+	if err != nil {
+		return stmt, err
+	}
+
+	return Statement{Type: Block, Statements: statements}, err
 }

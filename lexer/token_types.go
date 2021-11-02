@@ -63,8 +63,8 @@ var tokenLookup = map[rune]int{
 
 	')': RIGHT_PAREN,
 	'(': LEFT_PAREN,
-	'}': LEFT_BRACE,
-	'{': RIGHT_BRACE,
+	'{': LEFT_BRACE,
+	'}': RIGHT_BRACE,
 
 	'*': STAR,
 	'/': SLASH,

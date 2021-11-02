@@ -20,6 +20,17 @@ func ExecuteStatements(stmts []Statement) (err error) {
 			continue
 		}
 
+		// Check block statement seperatly because go maps are gay
+		if statement.Type == Block {
+			err = execBlock(statement)
+			if err != nil {
+				return fmt.Errorf(err.Error(), statement.Line)
+			}
+
+			continue
+		}
+
+		// Check ramining statement types
 		if execMethod, ok := statementTable[statement.Type]; ok {
 			err = execMethod(statement)
 			if err != nil {
@@ -39,8 +50,9 @@ func ExecuteStatements(stmts []Statement) (err error) {
 }
 
 var statementTable = map[int]func(stmt Statement) error {
-	Print: 	  execPrint,
-	Variable: execVariable,
+	Print: 	    execPrint,
+	Variable:   execVariable,
+	Assignment: execAssignment,
 }
 
 // Evaluates statement expression and prints out to terminal
@@ -54,7 +66,7 @@ func execPrint(stmt Statement) (err error) {
 	return nil
 }
 
-// Adds variable init value to global environment table
+// Adds variable init value to current environment table
 func execVariable(stmt Statement) (err error) {
 	if stmt.InitExpression != nil {
 		val, err := expr.EvaluateExpression(stmt.InitExpression)
@@ -66,4 +78,22 @@ func execVariable(stmt Statement) (err error) {
 	}
 
 	return env.Declare(stmt.Name, nil)
+}
+
+// Assigns right side expression value to variable
+func execAssignment(stmt Statement) (err error) {
+	val, err := expr.EvaluateExpression(stmt.Expression)
+	if err != nil {
+		return err
+	}
+
+	return env.Assign(stmt.Name, val)
+}
+
+// Executes all statements within block scope
+func execBlock(stmt Statement) (err error) {
+	env.PushScope()
+	err = ExecuteStatements(stmt.Statements)
+	env.PopScope()
+	return err
 }
