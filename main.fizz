@@ -1,5 +1,5 @@
-var age = 20;
+var name = "John";
 
-if age >= 18 {
-    print "Over 18";
+if name == "John" {
+	print name;
 }

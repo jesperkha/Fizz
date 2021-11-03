@@ -1,0 +1,25 @@
+{
+    "name": "fizz-language-support",
+    "displayName": "Fizz Language Support",
+    "description": "",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.61.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "fizz",
+            "aliases": ["Fizz", "fizz"],
+            "extensions": [".fizz"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "fizz",
+            "scopeName": "source.fizz",
+            "path": "./syntaxes/fizz.tmLanguage.json"
+        }]
+    }
+}
