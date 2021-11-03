@@ -20,10 +20,18 @@ func ExecuteStatements(stmts []Statement) (err error) {
 			continue
 		}
 
-		// Check block statement seperatly because go maps are gay
+		// Check conditional statements
+		if execFunc, ok := execConitionTable[statement.Type]; ok {
+			if err = execFunc(statement, &currentIdx); err != nil {
+				return fmt.Errorf(err.Error(), statement.Line)
+			}
+
+			continue
+		}
+		
+		// Check block sepeartly because go maps are gay
 		if statement.Type == Block {
-			err = execBlock(statement)
-			if err != nil {
+			if err = execBlock(statement); err != nil {
 				return fmt.Errorf(err.Error(), statement.Line)
 			}
 
@@ -31,15 +39,14 @@ func ExecuteStatements(stmts []Statement) (err error) {
 		}
 
 		// Check ramining statement types
-		if execMethod, ok := statementTable[statement.Type]; ok {
-			err = execMethod(statement)
-			if err != nil {
+		if execFunc, ok := execStatementTable[statement.Type]; ok {
+			if err = execFunc(statement); err != nil {
 				return fmt.Errorf(err.Error(), statement.Line)
 			}
-			
+
 			continue
 		}
-
+		
 		// Will never be returned since all types are pre-defined.
 		// However it is nice to have in case reword is done and types
 		// get mixed up or new types are only partially added.
@@ -49,10 +56,17 @@ func ExecuteStatements(stmts []Statement) (err error) {
 	return err
 }
 
-var statementTable = map[int]func(stmt Statement) error {
+type execTable map[int]func(stmt Statement) error 
+
+var execStatementTable = execTable {
 	Print: 	    execPrint,
 	Variable:   execVariable,
 	Assignment: execAssignment,
+}
+
+var execConitionTable = map[int]func(stmt Statement, idx *int) error {
+	If:   execIf,
+	Else: execElse,
 }
 
 // Evaluates statement expression and prints out to terminal
@@ -96,4 +110,23 @@ func execBlock(stmt Statement) (err error) {
 	err = ExecuteStatements(stmt.Statements)
 	env.PopScope()
 	return err
+}
+
+// Skips trailing block statement if expression is false
+func execIf(stmt Statement, idx *int) (err error) {
+	val, err := expr.EvaluateExpression(stmt.Expression)
+	if err != nil {
+		return err
+	}
+
+	if val == nil || val == false {
+		*idx++
+	} 
+	
+	return err
+}
+
+// Else is handled by if so if there is a lone else block its an error
+func execElse(stmt Statement, idx *int) (err error) {
+	return ErrExpectedIf
 }

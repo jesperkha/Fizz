@@ -14,15 +14,18 @@ var (
 	ErrExpectedIdentifier = errors.New("expected identifier at variable declaration, line %d")
 	ErrInvalidStatement	  = errors.New("invalid statement, line %d")
 	ErrNoBrace			  = errors.New("expected } after block statement, line %d")
+	ErrExpectedBlock	  = errors.New("expected block after statememt, line %d")
+	ErrExpectedIf		  = errors.New("expected if statement before else, line %d")
 )
 
 const (
-	// Statement types
 	ExpressionStmt = iota
 	Print
 	Variable
 	Assignment
 	Block
+	If
+	Else
 )
 
 type Statement struct {

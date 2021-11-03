@@ -1,2 +1,3 @@
-Bugs:
-Statement parser doesnt recognise last semicolon when parsing multiple statements
+Todo:
+
+Add else block (in parsing) (maybe make map *func to avoid circular shit)

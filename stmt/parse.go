@@ -14,7 +14,10 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 	for currentIdx < len(tokens) {
 		startIndex  := currentIdx
 		firstToken  := tokens[currentIdx]
+		
+		var currentStmt Statement
 		currentLine := firstToken.Line
+		currentStmt.Line = currentLine
 		
 		// Check and parse block statement first to not seek semicolon
 		if firstToken.Type == lexer.LEFT_BRACE {
@@ -41,17 +44,36 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 			}
 			
 			blockTokens := tokens[startIndex + 1:currentIdx]
-			stmt, err := parseBlock(blockTokens)
+			currentStmt, err = parseBlock(blockTokens)
 			if err != nil {
 				return statements, err // already formatted from this function
 			}
 			
-			stmt.Line = currentLine
-			statements = append(statements, stmt)
+			statements = append(statements, currentStmt)
 			currentIdx++
 			continue
 		}
-		
+
+		// Check conditional statements second and seek left brace
+		if parseFunc, ok := parseConditionTable[firstToken.Type]; ok {
+			endIdx, eof := seekToken(tokens, startIndex, lexer.LEFT_BRACE)
+			if eof {
+				return statements, fmt.Errorf(ErrExpectedBlock.Error(), currentLine)
+			}
+
+			currentIdx = endIdx
+
+			currentStmt, err = parseFunc(tokens[startIndex:currentIdx])
+			if err != nil {
+				return statements, fmt.Errorf(err.Error(), currentLine)
+			}
+
+			// Doesnt increment currentIdx to not skip over left brace
+			statements = append(statements, currentStmt)
+			continue
+		}
+
+		// Finally parse remainig statements.
 		// Seeks a semicolon since all other statements end with a semicolon
 		endIdx, eof := seekToken(tokens, startIndex, lexer.SEMICOLON)
 		if eof {
@@ -61,13 +83,12 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		currentIdx = endIdx
 
 		// Get tokens in interval between last semicolon and current one
-		var currentStmt Statement
 		tokenInterval := tokens[startIndex:currentIdx]
 		if len(tokenInterval) == 0 {
 			return statements, fmt.Errorf(ErrNoStatement.Error(), currentLine)
 		}
 		
-		if parseFunc, ok := parseTable[firstToken.Type]; ok {
+		if parseFunc, ok := parseStatementTable[firstToken.Type]; ok {
 			currentStmt, err = parseFunc(tokenInterval)
 		} else {
 			// Default to parsing expression statement
@@ -78,7 +99,6 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 			return statements, fmt.Errorf(err.Error(), currentLine)
 		}
 
-		currentStmt.Line = currentLine
 		statements = append(statements, currentStmt)
 		currentIdx++
 	}
@@ -102,10 +122,17 @@ func parseExpression(tokens []lexer.Token) (stmt Statement, err error) {
 	return Statement{Type: ExpressionStmt, Expression: &expr}, err
 }
 
-var parseTable = map[int]func(tokens []lexer.Token) (stmt Statement, err error) {
+type parseTable map[int]func(tokens []lexer.Token) (stmt Statement, err error)
+
+var parseStatementTable = parseTable {
 	lexer.PRINT: 	  parsePrint,
 	lexer.VAR: 	 	  parseVariable,
 	lexer.IDENTIFIER: parseAssignment,
+}
+
+var parseConditionTable = parseTable {
+	lexer.IF: 	parseIf,
+	lexer.ELSE: parseElse,
 }
 
 // Parses print statement followed by expression
@@ -163,9 +190,24 @@ func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 // Parses all statements within block
 func parseBlock(tokens []lexer.Token) (stmt Statement, err error) {
 	statements, err := ParseStatements(tokens)
-	if err != nil {
-		return stmt, err
+	return Statement{Type: Block, Statements: statements}, err
+}
+
+// Parses if stament and adds trailing block
+func parseIf(tokens []lexer.Token) (stmt Statement, err error) {
+	if len(tokens) == 1 {
+		return stmt, ErrExpectedExpression
 	}
 
-	return Statement{Type: Block, Statements: statements}, err
+	expr, err := expr.ParseExpression(tokens[1:])
+	return Statement{Type: If, Expression: &expr}, err
+}
+
+// Just returns a simple elese statement. Handled in exec
+func parseElse(tokens []lexer.Token) (stmt Statement, err error) {
+	if len(tokens) > 1 {
+		return stmt, ErrInvalidStatement
+	}
+
+	return Statement{Type: Else}, err
 }
