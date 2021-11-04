@@ -65,6 +65,12 @@ var execStatementTable = execTable {
 	Print: 	    execPrint,
 	Variable:   execVariable,
 	Assignment: execAssignment,
+	Break:		execBreak,
+}
+
+// Do nothing. Handled in loop exec functions
+func execBreak(stmt Statement) (err error) {
+	return ErrBreakStatement{}
 }
 
 // Evaluates statement expression and prints out to terminal
@@ -123,5 +129,29 @@ func execIf(stmt Statement, idx *int) (err error) {
 		return ExecuteStatements(stmt.Else.Statements)
 	}
 	
+	return err
+}
+
+// Runs block if expression is true or no expression
+func execWhile(stmt Statement, idx *int) (err error) {
+	for {
+		if stmt.Expression != nil {
+			val, err := expr.EvaluateExpression(stmt.Expression)
+			if err != nil {
+				return err
+			}
+		
+			if val == nil || val == false {
+				break
+			}
+		}
+
+		err = ExecuteStatements(stmt.Then.Statements)
+		// Todo Handle break here
+		if err != nil {
+			return err
+		}
+	}
+
 	return err
 }

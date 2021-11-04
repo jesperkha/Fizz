@@ -21,6 +21,12 @@ var (
 	ErrExpectedIf		  = errors.New("expected if statement before else, line %d")
 )
 
+type ErrBreakStatement struct {}
+
+func (e ErrBreakStatement) Error() string {
+	return "cannot use break statement outside of loop, line %d"
+}
+
 const (
 	ExpressionStmt = iota
 	Print
@@ -28,7 +34,8 @@ const (
 	Assignment
 	Block
 	If
-	Else
+	While
+	Break
 )
 
 type Statement struct {
@@ -58,7 +65,9 @@ func formatError(err error, line int) error {
 
 func init() {
 	execConTable[If] = execIf
+	execConTable[While] = execWhile
 
 	pconTable[lexer.IF] = parseIf
+	pconTable[lexer.WHILE] = parseWhile
 	pconTable[lexer.LEFT_BRACE] = parseBlock
 }

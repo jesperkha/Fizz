@@ -51,6 +51,7 @@ const (
 	FALSE
 	VAR
 	WHILE
+	BREAK
 	WHITESPACE
 	NEWLINE
 	EOF
@@ -110,4 +111,5 @@ var keyWordLookup = map[string]int{
 	"while":  WHILE,
 	"func":   FUNC,
 	"type":   TYPE,
+	"break":  BREAK,
 }

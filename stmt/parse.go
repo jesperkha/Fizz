@@ -87,6 +87,7 @@ var parseStatementTable = parseTable {
 	lexer.VAR: 	 	  parseVariable,
 	lexer.IDENTIFIER: parseAssignment,
 	lexer.ELSE:		  parseElse,
+	lexer.BREAK:	  parseBreak,
 }
 
 // Does literally nothing lol
@@ -98,6 +99,11 @@ func parseExpression(tokens []lexer.Token) (stmt Statement, err error) {
 // Else statements are consumed by the if parser so if one is found its an error
 func parseElse(tokens []lexer.Token) (stmt Statement, err error) {
 	return stmt, ErrExpectedIf
+}
+
+// Just returns the statement. Handled in exec
+func parseBreak(tokens []lexer.Token) (stmt Statement, err error) {
+	return Statement{Type: Break}, err
 }
 
 // Parses print statement followed by expression
@@ -228,4 +234,28 @@ func parseIf(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	}
 
 	return Statement{Type: If, Expression: &expr, Then: &thenBlock}, err
+}
+
+// Parses while with expression and block. No expression means always true
+func parseWhile(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
+	if len(tokens) == 1 {
+		return stmt, ErrExpectedExpression
+	}
+
+	startBlock, eof := seekToken(tokens, *idx, lexer.LEFT_BRACE)
+	if eof {
+		return stmt, ErrExpectedBlock
+	}
+
+	// No expression between while and block
+	startExpr := *idx
+	*idx = startBlock
+	thenBlock, err := getBlockStatement(tokens, idx)
+
+	if startBlock - startExpr <= 1 {
+		return Statement{Type: While, Then: &thenBlock}, err
+	}
+
+	expr, err := expr.ParseExpression(tokens[startExpr + 1:startBlock])
+	return Statement{Type: While, Expression: &expr, Then: &thenBlock}, err
 }
