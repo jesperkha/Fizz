@@ -196,12 +196,29 @@ func parseIf(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 		return stmt, ErrExpectedBlock
 	}
 
+	// No expression between if and block
+	if startBlock - *idx <= 1 {
+		return stmt, ErrExpectedExpression
+	}
+
 	expr, err := expr.ParseExpression(tokens[*idx + 1:startBlock])
 	if err != nil {
 		return stmt, err
 	}
 	
 	*idx = startBlock
-	block, err := getBlockStatement(tokens, idx)
-	return Statement{Type: If, Expression: &expr, Then: &block}, err
+	thenBlock, err := getBlockStatement(tokens, idx)
+	
+	// Check for else statement
+	if *idx + 1 < len(tokens) && tokens[*idx + 1].Type == lexer.ELSE {
+		if *idx + 2 >= len(tokens) {
+			return stmt, ErrExpectedBlock
+		}
+
+		*idx += 2 // Skip to block
+		elseBlock, err := getBlockStatement(tokens, idx)
+		return Statement{Type: If, Expression: &expr, Then: &thenBlock, Else: &elseBlock}, err
+	}
+
+	return Statement{Type: If, Expression: &expr, Then: &thenBlock}, err
 }

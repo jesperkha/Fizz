@@ -38,7 +38,7 @@ func evalUnary(unary *Expression) (value interface{}, err error) {
 	switch (unary.Operand.Type) {
 		case lexer.MINUS: {
 			if !isBool(right) {
-				return -right.(int), err
+				return -right.(float64), err
 			}
 
 			op, typ, line := unary.Operand.Lexeme, getType(right), unary.Operand.Line

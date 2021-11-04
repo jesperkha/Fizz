@@ -119,6 +119,8 @@ func execIf(stmt Statement, idx *int) (err error) {
 
 	if val != nil && val != false {
 		return ExecuteStatements(stmt.Then.Statements)
+	} else if stmt.Else != nil {
+		return ExecuteStatements(stmt.Else.Statements)
 	}
 	
 	return err

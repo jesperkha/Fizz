@@ -1,0 +1,8 @@
+var name = "Zhong Xina";
+var socialCredit = -999;
+
+if socialCredit > 0 {
+    print "Good citizen!";
+} else {
+    print "Bad citizen >:(";
+}
