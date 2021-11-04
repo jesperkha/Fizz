@@ -28,15 +28,14 @@ func Interperate(input string) (err error) {
 	}
 	
 	// Lexical tokens are analysed and put into statement tokens. These statements
-	// contain all the information they need for exxecution and error handling.
+	// contain all the information they need for execution and error handling.
 	statements, err := stmt.ParseStatements(lexicalTokens)
 	if err != nil {
 		return err
 	}
 
-
 	// Finally executes statement tokens. This is the only step that has any effect
-	// on the actual input program as the others were just braking it up into parseble
+	// on the actual input program as the others were just braking it up into usable
 	// pieces. While the interpreter is still running, the values of variables will be
 	// remembered as the environments are never reset at runtime.
 	return stmt.ExecuteStatements(statements)
