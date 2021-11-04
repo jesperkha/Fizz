@@ -3,11 +3,12 @@ package lexer
 const (
 	// Ordered by precedence lo -> hi
 	NOT_TOKEN = iota
+	AND
+	OR
+
 	EQUAL_EQUAL
 	NOT_EQUAL
 
-	AND
-	OR
 	GREATER
 	LESS
 	GREATER_EQUAL

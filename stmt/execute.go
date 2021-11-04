@@ -2,6 +2,7 @@ package stmt
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
@@ -13,6 +14,7 @@ func ExecuteStatements(stmts []Statement) (err error) {
 
 	for currentIdx < len(stmts) {
 		statement := stmts[currentIdx]
+		line := statement.Line
 		currentIdx++
 
 		// Ignore expression statements
@@ -23,7 +25,7 @@ func ExecuteStatements(stmts []Statement) (err error) {
 		// Check conditional statements
 		if execFunc, ok := execConitionTable[statement.Type]; ok {
 			if err = execFunc(statement, &currentIdx); err != nil {
-				return fmt.Errorf(err.Error(), statement.Line)
+				return formatError(err, line)
 			}
 
 			continue
@@ -32,7 +34,7 @@ func ExecuteStatements(stmts []Statement) (err error) {
 		// Check block sepeartly because go maps are gay
 		if statement.Type == Block {
 			if err = execBlock(statement); err != nil {
-				return fmt.Errorf(err.Error(), statement.Line)
+				return formatError(err, line)
 			}
 
 			continue
@@ -41,7 +43,7 @@ func ExecuteStatements(stmts []Statement) (err error) {
 		// Check ramining statement types
 		if execFunc, ok := execStatementTable[statement.Type]; ok {
 			if err = execFunc(statement); err != nil {
-				return fmt.Errorf(err.Error(), statement.Line)
+				return formatError(err, line)
 			}
 
 			continue
@@ -51,6 +53,16 @@ func ExecuteStatements(stmts []Statement) (err error) {
 		// However it is nice to have in case reword is done and types
 		// get mixed up or new types are only partially added.
 		return ErrInvalidStmtType
+	}
+
+	return err
+}
+
+// Format error with line numbers for local errors, but ignore for errors passed from
+// expression parsing as they are already formatted with line numbers.
+func formatError(err error, line int) error {
+	if strings.Contains(err.Error(), "%d") {
+		return fmt.Errorf(err.Error(), line)
 	}
 
 	return err

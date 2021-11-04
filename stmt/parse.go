@@ -17,7 +17,6 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		
 		var currentStmt Statement
 		currentLine := firstToken.Line
-		currentStmt.Line = currentLine
 		
 		// Check and parse block statement first to not seek semicolon
 		if firstToken.Type == lexer.LEFT_BRACE {
@@ -49,6 +48,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 				return statements, err // already formatted from this function
 			}
 			
+			currentStmt.Line = currentLine
 			statements = append(statements, currentStmt)
 			currentIdx++
 			continue
@@ -69,6 +69,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 			}
 
 			// Doesnt increment currentIdx to not skip over left brace
+			currentStmt.Line = currentLine
 			statements = append(statements, currentStmt)
 			continue
 		}
@@ -99,6 +100,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 			return statements, fmt.Errorf(err.Error(), currentLine)
 		}
 
+		currentStmt.Line = currentLine
 		statements = append(statements, currentStmt)
 		currentIdx++
 	}

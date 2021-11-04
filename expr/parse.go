@@ -33,8 +33,9 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 		if token.Type == lexer.LEFT_PAREN {
 			endIdx := currentIdx
 			for i := currentIdx; i < len(tokens); i++ {
-				if tokens[i].Type == lexer.RIGHT_PAREN && i > endIdx {
+				if tokens[i].Type == lexer.RIGHT_PAREN {
 					endIdx = i
+					break
 				}
 			}
 
@@ -51,7 +52,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 			ptokens = append(ptokens, ParseToken{Type: TokenGroup, Inner: tokenGroup})
 			// Skip past parenthesized section, +1 to skip closing paren
-			currentIdx += (endIdx - currentIdx) + 1
+			currentIdx = endIdx + 1
 			continue
 		}
 

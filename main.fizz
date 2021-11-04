@@ -1,6 +1,0 @@
-var name = "John";
-print name;
-
-if name == "John" {
-    print 10;
-}
