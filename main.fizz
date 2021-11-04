@@ -1,5 +1,6 @@
 var name = "John";
+print name;
 
 if name == "John" {
-	print name;
+    print 10;
 }
