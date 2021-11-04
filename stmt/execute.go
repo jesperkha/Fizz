@@ -2,7 +2,6 @@ package stmt
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
@@ -23,7 +22,7 @@ func ExecuteStatements(stmts []Statement) (err error) {
 		}
 
 		// Check conditional statements
-		if execFunc, ok := execConitionTable[statement.Type]; ok {
+		if execFunc, ok := execConTable[statement.Type]; ok {
 			if err = execFunc(statement, &currentIdx); err != nil {
 				return formatError(err, line)
 			}
@@ -58,27 +57,14 @@ func ExecuteStatements(stmts []Statement) (err error) {
 	return err
 }
 
-// Format error with line numbers for local errors, but ignore for errors passed from
-// expression parsing as they are already formatted with line numbers.
-func formatError(err error, line int) error {
-	if strings.Contains(err.Error(), "%d") {
-		return fmt.Errorf(err.Error(), line)
-	}
-
-	return err
-}
-
 type execTable map[int]func(stmt Statement) error 
+
+var execConTable = map[int]func(stmt Statement, idx *int) error {}
 
 var execStatementTable = execTable {
 	Print: 	    execPrint,
 	Variable:   execVariable,
 	Assignment: execAssignment,
-}
-
-var execConitionTable = map[int]func(stmt Statement, idx *int) error {
-	If:   execIf,
-	Else: execElse,
 }
 
 // Evaluates statement expression and prints out to terminal
@@ -131,14 +117,9 @@ func execIf(stmt Statement, idx *int) (err error) {
 		return err
 	}
 
-	if val == nil || val == false {
-		*idx++
-	} 
+	if val != nil && val != false {
+		return ExecuteStatements(stmt.Then.Statements)
+	}
 	
 	return err
-}
-
-// Else is handled by if so if there is a lone else block its an error
-func execElse(stmt Statement, idx *int) (err error) {
-	return ErrExpectedIf
 }

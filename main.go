@@ -90,7 +90,12 @@ func main() {
 		}
 
 		// Run fizz file
-		if err := RunFile(os.Args[1]); err != nil {
+		filename := os.Args[1]
+		if !strings.HasSuffix(filename, ".fizz") {
+			filename += ".fizz"
+		}
+
+		if err := RunFile(filename); err != nil {
 			fmt.Println(err)
 		}
 

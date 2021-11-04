@@ -1,8 +1,6 @@
 package stmt
 
 import (
-	"fmt"
-
 	"github.com/jesperkha/Fizz/expr"
 	"github.com/jesperkha/Fizz/lexer"
 )
@@ -17,35 +15,13 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		
 		var currentStmt Statement
 		currentLine := firstToken.Line
-		
-		// Check and parse block statement first to not seek semicolon
-		if firstToken.Type == lexer.LEFT_BRACE {
-			numEndBraces := 0
-			foundEndBrace := false
 
-			// Loop over until finds brace ending a nested block
-			for currentIdx < len(tokens) {
-				switch tokens[currentIdx].Type {
-					case lexer.LEFT_BRACE: numEndBraces++
-					case lexer.RIGHT_BRACE: numEndBraces--
-				}
-				
-				if numEndBraces == 0 {
-					foundEndBrace = true
-					break
-				}
-
-				currentIdx++
-			}
-
-			if !foundEndBrace {
-				return statements, fmt.Errorf(ErrNoBrace.Error(), currentLine)
-			}
-			
-			blockTokens := tokens[startIndex + 1:currentIdx]
-			currentStmt, err = parseBlock(blockTokens)
+		// Check conditional statements seperatly because the parse funcs need
+		// a currentIndex pointer
+		if parseFunc, ok := pconTable[firstToken.Type]; ok {
+			currentStmt, err = parseFunc(tokens, &currentIdx)
 			if err != nil {
-				return statements, err // already formatted from this function
+				return statements, formatError(err, currentLine)
 			}
 			
 			currentStmt.Line = currentLine
@@ -54,31 +30,11 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 			continue
 		}
 
-		// Check conditional statements second and seek left brace
-		if parseFunc, ok := parseConditionTable[firstToken.Type]; ok {
-			endIdx, eof := seekToken(tokens, startIndex, lexer.LEFT_BRACE)
-			if eof {
-				return statements, fmt.Errorf(ErrExpectedBlock.Error(), currentLine)
-			}
-
-			currentIdx = endIdx
-
-			currentStmt, err = parseFunc(tokens[startIndex:currentIdx])
-			if err != nil {
-				return statements, fmt.Errorf(err.Error(), currentLine)
-			}
-
-			// Doesnt increment currentIdx to not skip over left brace
-			currentStmt.Line = currentLine
-			statements = append(statements, currentStmt)
-			continue
-		}
-
 		// Finally parse remainig statements.
 		// Seeks a semicolon since all other statements end with a semicolon
 		endIdx, eof := seekToken(tokens, startIndex, lexer.SEMICOLON)
 		if eof {
-			return statements, fmt.Errorf(ErrNoSemicolon.Error(), currentLine)
+			return statements, formatError(ErrNoSemicolon, currentLine)
 		}
 
 		currentIdx = endIdx
@@ -86,7 +42,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		// Get tokens in interval between last semicolon and current one
 		tokenInterval := tokens[startIndex:currentIdx]
 		if len(tokenInterval) == 0 {
-			return statements, fmt.Errorf(ErrNoStatement.Error(), currentLine)
+			return statements, formatError(err, currentLine)
 		}
 		
 		if parseFunc, ok := parseStatementTable[firstToken.Type]; ok {
@@ -97,7 +53,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		}
 
 		if err != nil {
-			return statements, fmt.Errorf(err.Error(), currentLine)
+			return statements, formatError(err, currentLine)
 		}
 
 		currentStmt.Line = currentLine
@@ -108,7 +64,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 	return statements, err
 }
 
-// Seeks target token type and returns the end index and eof
+// Seeks target token type and returns the index of target and eof
 func seekToken(tokens []lexer.Token, start int, target int) (endIdx int, eof bool) {
 	for i := start; i < len(tokens); i++ {
 		if tokens[i].Type == target {
@@ -117,14 +73,14 @@ func seekToken(tokens []lexer.Token, start int, target int) (endIdx int, eof boo
 	}
 
 	return 0, true
-} 
-
-func parseExpression(tokens []lexer.Token) (stmt Statement, err error) {
-	expr, err := expr.ParseExpression(tokens)
-	return Statement{Type: ExpressionStmt, Expression: &expr}, err
 }
 
 type parseTable map[int]func(tokens []lexer.Token) (stmt Statement, err error)
+
+// For the functions in this map the tokens are passed as the complete list
+// This is to ensure that the result of seekToken mathes up with the current
+// index value.
+var pconTable = map[int]func([]lexer.Token, *int)(Statement, error){}
 
 var parseStatementTable = parseTable {
 	lexer.PRINT: 	  parsePrint,
@@ -132,9 +88,9 @@ var parseStatementTable = parseTable {
 	lexer.IDENTIFIER: parseAssignment,
 }
 
-var parseConditionTable = parseTable {
-	lexer.IF: 	parseIf,
-	lexer.ELSE: parseElse,
+func parseExpression(tokens []lexer.Token) (stmt Statement, err error) {
+	expr, err := expr.ParseExpression(tokens)
+	return Statement{Type: ExpressionStmt, Expression: &expr}, err
 }
 
 // Parses print statement followed by expression
@@ -189,27 +145,63 @@ func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 	return Statement{Type: Assignment, Name: name, Expression: &expr}, err
 }
 
-// Parses all statements within block
-func parseBlock(tokens []lexer.Token) (stmt Statement, err error) {
-	statements, err := ParseStatements(tokens)
+// Gets a trailing block statement
+func getBlockStatement(tokens []lexer.Token, idx *int) (block Statement, err error) {
+	start := *idx
+	if tokens[start].Type != lexer.LEFT_BRACE {
+		return block, ErrExpectedBlock
+	}
+
+	numEndBraces := 0
+	foundEndBrace := false
+
+	// Loop over until finds brace ending a nested block
+	for *idx < len(tokens) {
+		switch tokens[*idx].Type {
+			case lexer.LEFT_BRACE: numEndBraces++
+			case lexer.RIGHT_BRACE: numEndBraces--
+		}
+		
+		if numEndBraces == 0 {
+			foundEndBrace = true
+			break
+		}
+
+		*idx++
+	}
+
+	if !foundEndBrace {
+		return block, ErrNoBrace
+	}
+
+	blockTokens := tokens[start + 1:*idx]
+	statements, err := ParseStatements(blockTokens)
 	return Statement{Type: Block, Statements: statements}, err
 }
 
-// Parses if stament and adds trailing block
-func parseIf(tokens []lexer.Token) (stmt Statement, err error) {
+// Parses all statements within block
+func parseBlock(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
+	return getBlockStatement(tokens, idx)
+}
+
+// Finds trailing block and parses expression between block and if token
+// as well as the block. Adds else statement if found
+func parseIf(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	if len(tokens) == 1 {
 		return stmt, ErrExpectedExpression
 	}
 
-	expr, err := expr.ParseExpression(tokens[1:])
-	return Statement{Type: If, Expression: &expr}, err
-}
-
-// Just returns a simple elese statement. Handled in exec
-func parseElse(tokens []lexer.Token) (stmt Statement, err error) {
-	if len(tokens) > 1 {
-		return stmt, ErrInvalidStatement
+	startBlock, eof := seekToken(tokens, *idx, lexer.LEFT_BRACE)
+	if eof {
+		return stmt, ErrExpectedBlock
 	}
 
-	return Statement{Type: Else}, err
+	expr, err := expr.ParseExpression(tokens[*idx + 1:startBlock])
+	if err != nil {
+		return stmt, err
+	}
+	
+	*idx = startBlock
+	block, err := getBlockStatement(tokens, idx)
+	return Statement{Type: If, Expression: &expr, Then: &block}, err
 }
