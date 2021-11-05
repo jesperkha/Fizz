@@ -3,6 +3,8 @@ package lexer
 const (
 	// Ordered by precedence lo -> hi
 	NOT_TOKEN = iota
+
+	// Expression types
 	AND
 	OR
 
@@ -24,10 +26,11 @@ const (
 
 	NOT
 
-	IDENTIFIER
 	STRING
 	NUMBER
+	IDENTIFIER
 
+	// Not valid expression types
 	LEFT_PAREN
 	RIGHT_PAREN
 	LEFT_BRACE
@@ -37,6 +40,8 @@ const (
 	SEMICOLON
 	COMMENT
 	EQUAL
+	PLUS_EQUAL
+	MINUS_EQUAL
 	FUNC
 	CLASS
 	RETURN
@@ -93,6 +98,8 @@ var doubleTokenLookup = map[string]int{
 	"!=": NOT_EQUAL,
 	">=": GREATER_EQUAL,
 	"<=": LESS_EQUAL,
+	"+=": PLUS_EQUAL,
+	"-=": MINUS_EQUAL,
 }
 
 var keyWordLookup = map[string]int{

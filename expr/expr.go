@@ -12,6 +12,7 @@ var (
 	ErrInvalidOperatorType  = errors.New("invalid operator '%s' for type '%s', line %d")
 	ErrInvalidOperatorTypes = errors.New("invalid operator '%s' for types '%s' and '%s', line %d")
 	ErrDivideByZero			= errors.New("division by 0, line %d")
+	ErrInvalidExpression   = errors.New("invalid expression, line %d")
 )
 
 const (

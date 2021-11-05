@@ -19,13 +19,9 @@ var (
 	ErrNoBrace			  = errors.New("expected } after block statement, line %d")
 	ErrExpectedBlock	  = errors.New("expected block after statememt, line %d")
 	ErrExpectedIf		  = errors.New("expected if statement before else, line %d")
+	ErrInvalidOperator	  = errors.New("invalid statement operator, line %d")
+	ErrDifferentTypes	  = errors.New("different types in statement, line %d")
 )
-
-type ErrBreakStatement struct {}
-
-func (e ErrBreakStatement) Error() string {
-	return "cannot use break statement outside of loop, line %d"
-}
 
 const (
 	ExpressionStmt = iota
@@ -41,6 +37,7 @@ const (
 type Statement struct {
 	Type 	  	   int
 	Line	   	   int
+	Operator	   int
 	Name	  	   string
 	Expression 	   *expr.Expression
 	InitExpression *expr.Expression

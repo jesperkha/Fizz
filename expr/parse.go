@@ -60,6 +60,11 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 		if token.Type == lexer.RIGHT_PAREN {
 			return ptokens, fmt.Errorf(ErrParenError.Error(), token.Line)
 		}
+		
+		// Not a token type allowed in expression
+		if token.Type > lexer.IDENTIFIER {
+			return ptokens, fmt.Errorf(ErrInvalidExpression.Error(), token.Line)
+		}
 
 		ptokens = append(ptokens, ParseToken{Type: Single, Token: token})
 		currentIdx++

@@ -2,9 +2,11 @@ package stmt
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
+	"github.com/jesperkha/Fizz/lexer"
 )
 
 // Goes through list of statements and executes them. Error is returned from statements exec method.
@@ -65,13 +67,13 @@ var execStatementTable = execTable {
 	Print: 	    execPrint,
 	Variable:   execVariable,
 	Assignment: execAssignment,
-	Break:		execBreak,
+	// Break:		execBreak,
 }
 
 // Do nothing. Handled in loop exec functions
-func execBreak(stmt Statement) (err error) {
-	return ErrBreakStatement{}
-}
+// func execBreak(stmt Statement) (err error) {
+// 	return ErrBreakStatement{}
+// }
 
 // Evaluates statement expression and prints out to terminal
 func execPrint(stmt Statement) (err error) {
@@ -105,7 +107,43 @@ func execAssignment(stmt Statement) (err error) {
 		return err
 	}
 
-	return env.Assign(stmt.Name, val)
+	// Plain assignment
+	if stmt.Operator == lexer.EQUAL {
+		return env.Assign(stmt.Name, val)
+	}
+
+	// Plus equals
+	oldVal, err := env.Get(stmt.Name)
+	if err != nil {
+		return err
+	}
+
+	// Not same type
+	if reflect.TypeOf(oldVal) != reflect.TypeOf(val) {
+		return ErrInvalidStatement
+	}
+
+	// String addition
+	if reflect.TypeOf(val) == reflect.TypeOf("") {
+		if stmt.Operator == lexer.MINUS_EQUAL {
+			return ErrInvalidOperator
+		} 
+
+		return env.Assign(stmt.Name, oldVal.(string) + val.(string))
+	}
+
+	// Float addition / subtraction
+	if reflect.TypeOf(val) == reflect.TypeOf(float64(1)) {
+		a := val.(float64)
+		b := oldVal.(float64)
+		if stmt.Operator == lexer.MINUS_EQUAL {
+			a *= -1
+		}
+	
+		return env.Assign(stmt.Name, a + b)
+	}
+
+	return ErrDifferentTypes
 }
 
 // Executes all statements within block scope

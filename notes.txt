@@ -1,3 +1,6 @@
-Todo:
+To implement:
+- File import
+- Namespaces for files
 
+Todo:
 Add else block (in parsing) (maybe make map *func to avoid circular shit)

@@ -148,14 +148,19 @@ func parseVariable(tokens []lexer.Token) (stmt Statement, err error) {
 
 // Assigns right hand expression value to variable name
 func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
-	if len(tokens) < 3 || tokens[1].Type != lexer.EQUAL {
+	if len(tokens) < 3 {
 		return stmt, ErrInvalidStatement
+	}
+
+	t := tokens[1].Type
+	if t != lexer.EQUAL && t != lexer.PLUS_EQUAL && t != lexer.MINUS_EQUAL {
+		return stmt, ErrInvalidOperator
 	}
 
 	name := tokens[0].Lexeme
 	rightExpr := tokens[2:]
 	expr, err := expr.ParseExpression(rightExpr)
-	return Statement{Type: Assignment, Name: name, Expression: &expr}, err
+	return Statement{Type: Assignment, Name: name, Expression: &expr, Operator: t}, err
 }
 
 // Gets a trailing block statement
@@ -196,6 +201,8 @@ func getBlockStatement(tokens []lexer.Token, idx *int) (block Statement, err err
 func parseBlock(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	return getBlockStatement(tokens, idx)
 }
+
+// Todo reword getting block to reduce repetition
 
 // Finds trailing block and parses expression between block and if token
 // as well as the block. Adds else statement if found
