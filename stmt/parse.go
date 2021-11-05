@@ -87,7 +87,6 @@ var parseStatementTable = parseTable {
 	lexer.VAR: 	 	  parseVariable,
 	lexer.IDENTIFIER: parseAssignment,
 	lexer.ELSE:		  parseElse,
-	lexer.BREAK:	  parseBreak,
 }
 
 // Does literally nothing lol
@@ -99,11 +98,6 @@ func parseExpression(tokens []lexer.Token) (stmt Statement, err error) {
 // Else statements are consumed by the if parser so if one is found its an error
 func parseElse(tokens []lexer.Token) (stmt Statement, err error) {
 	return stmt, ErrExpectedIf
-}
-
-// Just returns the statement. Handled in exec
-func parseBreak(tokens []lexer.Token) (stmt Statement, err error) {
-	return Statement{Type: Break}, err
 }
 
 // Parses print statement followed by expression

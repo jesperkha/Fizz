@@ -67,13 +67,7 @@ var execStatementTable = execTable {
 	Print: 	    execPrint,
 	Variable:   execVariable,
 	Assignment: execAssignment,
-	// Break:		execBreak,
 }
-
-// Do nothing. Handled in loop exec functions
-// func execBreak(stmt Statement) (err error) {
-// 	return ErrBreakStatement{}
-// }
 
 // Evaluates statement expression and prints out to terminal
 func execPrint(stmt Statement) (err error) {

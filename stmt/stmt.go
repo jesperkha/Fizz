@@ -31,7 +31,6 @@ const (
 	Block
 	If
 	While
-	Break
 )
 
 type Statement struct {

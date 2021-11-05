@@ -57,6 +57,7 @@ const (
 	VAR
 	WHILE
 	BREAK
+	IMPORT
 	WHITESPACE
 	NEWLINE
 	EOF
@@ -119,4 +120,5 @@ var keyWordLookup = map[string]int{
 	"func":   FUNC,
 	"type":   TYPE,
 	"break":  BREAK,
+	"import": IMPORT,
 }

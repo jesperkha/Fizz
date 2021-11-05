@@ -1,4 +1,4 @@
-package main
+package run
 
 import (
 	"github.com/jesperkha/Fizz/lexer"
