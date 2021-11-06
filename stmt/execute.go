@@ -187,3 +187,34 @@ func execWhile(stmt Statement, idx *int) (err error) {
 
 	return err
 }
+
+// Runs loop while expression is true
+func execRepeat(stmt Statement, idx *int) (err error) {
+	name := stmt.Expression.Left.Name
+	env.PushScope() // Avoid clashin when defining new variable
+	env.Declare(name, float64(0))
+
+	for {
+		val, err := expr.EvaluateExpression(stmt.Expression)
+		if err != nil {
+			return err
+		}
+
+		if val == true {
+			err = ExecuteStatements(stmt.Then.Statements)
+			if err != nil {
+				return err
+			}
+
+			if oldVal, err := env.Get(name); err == nil {
+				env.Assign(name, oldVal.(float64) + 1)
+			}
+
+			continue
+		}
+
+		break
+	}
+
+	return err
+}

@@ -196,32 +196,30 @@ func parseBlock(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	return getBlockStatement(tokens, idx)
 }
 
-// Todo reword getting block to reduce repetition
+// Gets statements between keyword and block, also gets block
+func getStatementAndBlock(tokens []lexer.Token, idx *int) (stmt Statement, block Statement, err error) {
+	startBlock, eof := seekToken(tokens, *idx, lexer.LEFT_BRACE)
+	if eof {
+		return stmt, block, ErrExpectedBlock
+	}
+
+	stmt, err = parseExpression(tokens[*idx + 1:startBlock])
+	if err != nil {
+		return stmt, block, err
+	}
+
+	*idx = startBlock
+	block, err = getBlockStatement(tokens, idx)
+	return stmt, block, err
+}
 
 // Finds trailing block and parses expression between block and if token
 // as well as the block. Adds else statement if found
 func parseIf(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
-	if len(tokens) == 1 {
+	stmt, block, err := getStatementAndBlock(tokens, idx)
+	if stmt.Expression == nil {
 		return stmt, ErrExpectedExpression
 	}
-
-	startBlock, eof := seekToken(tokens, *idx, lexer.LEFT_BRACE)
-	if eof {
-		return stmt, ErrExpectedBlock
-	}
-
-	// No expression between if and block
-	if startBlock - *idx <= 1 {
-		return stmt, ErrExpectedExpression
-	}
-
-	expr, err := expr.ParseExpression(tokens[*idx + 1:startBlock])
-	if err != nil {
-		return stmt, err
-	}
-	
-	*idx = startBlock
-	thenBlock, err := getBlockStatement(tokens, idx)
 	
 	// Check for else statement
 	if *idx + 1 < len(tokens) && tokens[*idx + 1].Type == lexer.ELSE {
@@ -231,32 +229,43 @@ func parseIf(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 
 		*idx += 2 // Skip to block
 		elseBlock, err := getBlockStatement(tokens, idx)
-		return Statement{Type: If, Expression: &expr, Then: &thenBlock, Else: &elseBlock}, err
+		return Statement{Type: If, Expression: stmt.Expression, Then: &block, Else: &elseBlock}, err
 	}
 
-	return Statement{Type: If, Expression: &expr, Then: &thenBlock}, err
+	return Statement{Type: If, Expression: stmt.Expression, Then: &block}, err
 }
 
 // Parses while with expression and block. No expression means always true
 func parseWhile(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
-	if len(tokens) == 1 {
+	stmt, block, err := getStatementAndBlock(tokens, idx)
+	if err != nil {
+		return stmt, err
+	}
+
+	if stmt.Expression == nil {
+		return Statement{Type: While, Then: &block}, err
+	}
+
+	if stmt.Type == ExpressionStmt {
+		return Statement{Type: While, Expression: stmt.Expression, Then: &block}, err
+	}
+
+	return stmt, ErrExpectedExpression
+}
+
+// Parses repeat loop expression and checks if it is correct
+func parseRepeat(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
+	stmt, block, err := getStatementAndBlock(tokens, idx)
+	if stmt.Expression == nil {
 		return stmt, ErrExpectedExpression
 	}
 
-	startBlock, eof := seekToken(tokens, *idx, lexer.LEFT_BRACE)
-	if eof {
-		return stmt, ErrExpectedBlock
+	notBinary := stmt.Expression.Type != expr.Binary
+	notLess := stmt.Expression.Operand.Type != lexer.LESS
+	notIdentifier := stmt.Expression.Left.Type != expr.Variable
+	if notBinary || notLess || notIdentifier {
+		return stmt, ErrInvalidStatement
 	}
 
-	// No expression between while and block
-	startExpr := *idx
-	*idx = startBlock
-	thenBlock, err := getBlockStatement(tokens, idx)
-
-	if startBlock - startExpr <= 1 {
-		return Statement{Type: While, Then: &thenBlock}, err
-	}
-
-	expr, err := expr.ParseExpression(tokens[startExpr + 1:startBlock])
-	return Statement{Type: While, Expression: &expr, Then: &thenBlock}, err
+	return Statement{Type: Repeat, Expression: stmt.Expression, Then: &block}, err
 }

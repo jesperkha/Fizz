@@ -31,6 +31,7 @@ const (
 	Block
 	If
 	While
+	Repeat
 )
 
 type Statement struct {
@@ -62,8 +63,10 @@ func formatError(err error, line int) error {
 func init() {
 	execConTable[If] = execIf
 	execConTable[While] = execWhile
+	execConTable[Repeat] = execRepeat
 
 	pconTable[lexer.IF] = parseIf
 	pconTable[lexer.WHILE] = parseWhile
 	pconTable[lexer.LEFT_BRACE] = parseBlock
+	pconTable[lexer.REPEAT] = parseRepeat
 }

@@ -77,6 +77,7 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 			case lexer.LESS: return vl < vr, err
 			case lexer.LESS_EQUAL: return vl <= vr, err
 			case lexer.GREATER_EQUAL: return vl >= vr, err
+			case lexer.MODULO: return float64(int(vl) % int(vr)), err
 		case lexer.SLASH:
 			if vr == 0 {
 				return nil, fmt.Errorf(ErrDivideByZero.Error(), binary.Operand.Line)

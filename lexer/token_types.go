@@ -22,6 +22,7 @@ const (
 
 	STAR
 	SLASH
+	MODULO
 	HAT
 
 	NOT
@@ -47,7 +48,6 @@ const (
 	RETURN
 	IF
 	ELSE
-	FOR
 	NIL
 	PRINT
 	SUPER
@@ -58,6 +58,7 @@ const (
 	WHILE
 	BREAK
 	IMPORT
+	REPEAT
 	WHITESPACE
 	NEWLINE
 	EOF
@@ -79,6 +80,7 @@ var tokenLookup = map[rune]int{
 	'-': MINUS,
 	'+': PLUS,
 	'^': HAT,
+	'%': MODULO,
 
 	';': SEMICOLON,
 	',': COMMA,
@@ -110,7 +112,6 @@ var keyWordLookup = map[string]int{
 	"print":  PRINT,
 	"return": RETURN,
 	"class":  CLASS,
-	"for":    FOR,
 	"super":  SUPER,
 	"this":   THIS,
 	"var":    VAR,
@@ -121,4 +122,5 @@ var keyWordLookup = map[string]int{
 	"type":   TYPE,
 	"break":  BREAK,
 	"import": IMPORT,
+	"repeat": REPEAT,
 }
