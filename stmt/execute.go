@@ -1,6 +1,7 @@
 package stmt
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -17,11 +18,6 @@ func ExecuteStatements(stmts []Statement) (err error) {
 		statement := stmts[currentIdx]
 		line := statement.Line
 		currentIdx++
-
-		// Ignore expression statements
-		if statement.Type == ExpressionStmt {
-			continue
-		}
 
 		// Check conditional statements
 		if execFunc, ok := execConTable[statement.Type]; ok {
@@ -67,7 +63,27 @@ var execStatementTable = execTable {
 	Print: 	    execPrint,
 	Variable:   execVariable,
 	Assignment: execAssignment,
+	Break:		execBreak,
+	Skip: 		execSkip,
+	ExpressionStmt: execExpression,
 }
+
+// Just checks for errors
+func execExpression(stmt Statement) (err error) {
+	_, err = expr.EvaluateExpression(stmt.Expression)
+	return err
+}
+
+// Error is handled in loop exec methods
+func execBreak(stmt Statement) (err error) {
+	return ErrBeakOutsideLoop
+}
+
+// Same as break
+func execSkip(stmt Statement) (err error) {
+	return ErrSkipOutsideLoop
+}
+
 
 // Evaluates statement expression and prints out to terminal
 func execPrint(stmt Statement) (err error) {
@@ -179,7 +195,14 @@ func execWhile(stmt Statement, idx *int) (err error) {
 		}
 
 		err = ExecuteStatements(stmt.Then.Statements)
-		// Todo Handle break here
+		if errors.Is(err, ErrBeakOutsideLoop) {
+			return nil
+		}
+
+		if errors.Is(err, ErrSkipOutsideLoop) {
+			continue
+		}
+
 		if err != nil {
 			return err
 		}
@@ -202,19 +225,24 @@ func execRepeat(stmt Statement, idx *int) (err error) {
 
 		if val == true {
 			err = ExecuteStatements(stmt.Then.Statements)
-			if err != nil {
-				return err
+			if errors.Is(err, ErrBeakOutsideLoop) {
+				return nil
 			}
 
-			if oldVal, err := env.Get(name); err == nil {
-				env.Assign(name, oldVal.(float64) + 1)
+			if err == nil || errors.Is(err, ErrSkipOutsideLoop) {
+				if oldVal, err := env.Get(name); err == nil {
+					env.Assign(name, oldVal.(float64) + 1)
+				}
+				
+				continue
 			}
-
-			continue
+			
+			return err
 		}
 
 		break
 	}
 
+	env.PopScope()
 	return err
 }

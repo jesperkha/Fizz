@@ -24,6 +24,8 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 		return EvaluateExpression(expr.Inner)
 	case Variable:
 		return env.Get(expr.Name)
+	case Call:
+		return evalCall(expr)
 	}
 
 	// Wont be reached
@@ -102,6 +104,11 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 	typeLeft, typeRight := getType(left), getType(right)
 	op, line := binary.Operand.Lexeme, binary.Operand.Line
 	return nil, fmt.Errorf(ErrInvalidOperatorTypes.Error(), op, typeLeft, typeRight, line)
+}
+
+func evalCall(call *Expression) (value interface{}, err error) {
+
+	return value, err
 }
 
 func isTruthy(value interface{}) bool {

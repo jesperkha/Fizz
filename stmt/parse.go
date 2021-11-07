@@ -87,10 +87,34 @@ var parseStatementTable = parseTable {
 	lexer.VAR: 	 	  parseVariable,
 	lexer.IDENTIFIER: parseAssignment,
 	lexer.ELSE:		  parseElse,
+	lexer.BREAK: 	  parseBreak,
+	lexer.SKIP: 	  parseSkip,
+}
+
+// Just returns the statement with a type. Implementation is handled in exec.
+func parseBreak(tokens []lexer.Token) (stmt Statement, err error) {
+	if len(tokens) > 1 {
+		return stmt, ErrInvalidStatement
+	}
+
+	return Statement{Type: Break}, err
+}
+
+// Same as break
+func parseSkip(tokens []lexer.Token) (stmt Statement, err error) {
+	if len(tokens) > 1 {
+		return stmt, ErrInvalidStatement
+	}
+
+	return Statement{Type: Skip}, err
 }
 
 // Does literally nothing lol
 func parseExpression(tokens []lexer.Token) (stmt Statement, err error) {
+	if len(tokens) == 0 {
+		return Statement{Type: ExpressionStmt}, err
+	}
+
 	expr, err := expr.ParseExpression(tokens)
 	return Statement{Type: ExpressionStmt, Expression: &expr}, err
 }
@@ -143,12 +167,12 @@ func parseVariable(tokens []lexer.Token) (stmt Statement, err error) {
 // Assigns right hand expression value to variable name
 func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 	if len(tokens) < 3 {
-		return stmt, ErrInvalidStatement
+		return parseExpression(tokens)
 	}
 
 	t := tokens[1].Type
 	if t != lexer.EQUAL && t != lexer.PLUS_EQUAL && t != lexer.MINUS_EQUAL {
-		return stmt, ErrInvalidOperator
+		return parseExpression(tokens)
 	}
 
 	name := tokens[0].Lexeme
@@ -217,6 +241,10 @@ func getStatementAndBlock(tokens []lexer.Token, idx *int) (stmt Statement, block
 // as well as the block. Adds else statement if found
 func parseIf(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	stmt, block, err := getStatementAndBlock(tokens, idx)
+	if err != nil {
+		return stmt, err
+	}
+	
 	if stmt.Expression == nil {
 		return stmt, ErrExpectedExpression
 	}

@@ -21,6 +21,8 @@ var (
 	ErrExpectedIf		  = errors.New("expected if statement before else, line %d")
 	ErrInvalidOperator	  = errors.New("invalid statement operator, line %d")
 	ErrDifferentTypes	  = errors.New("different types in statement, line %d")
+	ErrBeakOutsideLoop    = errors.New("cannot use break outside of a loop")
+	ErrSkipOutsideLoop    = errors.New("cannot use skip outside of a loop")
 )
 
 const (
@@ -32,6 +34,8 @@ const (
 	If
 	While
 	Repeat
+	Break
+	Skip
 )
 
 type Statement struct {

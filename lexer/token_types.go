@@ -29,6 +29,8 @@ const (
 
 	STRING
 	NUMBER
+	TRUE
+	FALSE
 	IDENTIFIER
 
 	// Not valid expression types
@@ -52,11 +54,10 @@ const (
 	PRINT
 	SUPER
 	THIS
-	TRUE
-	FALSE
 	VAR
 	WHILE
 	BREAK
+	SKIP
 	IMPORT
 	REPEAT
 	WHITESPACE
@@ -123,4 +124,5 @@ var keyWordLookup = map[string]int{
 	"break":  BREAK,
 	"import": IMPORT,
 	"repeat": REPEAT,
+	"skip":   SKIP,
 }

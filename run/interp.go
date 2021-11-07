@@ -26,7 +26,7 @@ func Interperate(input string) (err error) {
 	if err != nil {
 		return err
 	}
-	
+
 	// Lexical tokens are analysed and put into statement tokens. These statements
 	// contain all the information they need for execution and error handling.
 	statements, err := stmt.ParseStatements(lexicalTokens)
