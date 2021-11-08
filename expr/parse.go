@@ -74,7 +74,6 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 		// Todo check for function call expression
 		// if token.Type == lexer.IDENTIFIER && tokens[currentIdx+1].Type == lexer.LEFT_PAREN {
-		// 	log.Fatal("func")
 		// }
 
 		ptokens = append(ptokens, ParseToken{Type: Single, Token: token})
