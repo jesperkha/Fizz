@@ -3,11 +3,14 @@ package lexer
 const (
 	// Ordered by precedence lo -> hi
 	NOT_TOKEN = iota
+
+	// Expression types
+	AND
+	OR
+
 	EQUAL_EQUAL
 	NOT_EQUAL
 
-	AND
-	OR
 	GREATER
 	LESS
 	GREATER_EQUAL
@@ -19,14 +22,18 @@ const (
 
 	STAR
 	SLASH
+	MODULO
 	HAT
 
 	NOT
 
-	IDENTIFIER
 	STRING
 	NUMBER
+	TRUE
+	FALSE
+	IDENTIFIER
 
+	// Not valid expression types
 	LEFT_PAREN
 	RIGHT_PAREN
 	LEFT_BRACE
@@ -36,20 +43,23 @@ const (
 	SEMICOLON
 	COMMENT
 	EQUAL
+	PLUS_EQUAL
+	MINUS_EQUAL
 	FUNC
 	CLASS
 	RETURN
 	IF
 	ELSE
-	FOR
 	NIL
 	PRINT
 	SUPER
 	THIS
-	TRUE
-	FALSE
 	VAR
 	WHILE
+	BREAK
+	SKIP
+	IMPORT
+	REPEAT
 	WHITESPACE
 	NEWLINE
 	EOF
@@ -71,6 +81,7 @@ var tokenLookup = map[rune]int{
 	'-': MINUS,
 	'+': PLUS,
 	'^': HAT,
+	'%': MODULO,
 
 	';': SEMICOLON,
 	',': COMMA,
@@ -91,6 +102,8 @@ var doubleTokenLookup = map[string]int{
 	"!=": NOT_EQUAL,
 	">=": GREATER_EQUAL,
 	"<=": LESS_EQUAL,
+	"+=": PLUS_EQUAL,
+	"-=": MINUS_EQUAL,
 }
 
 var keyWordLookup = map[string]int{
@@ -100,7 +113,6 @@ var keyWordLookup = map[string]int{
 	"print":  PRINT,
 	"return": RETURN,
 	"class":  CLASS,
-	"for":    FOR,
 	"super":  SUPER,
 	"this":   THIS,
 	"var":    VAR,
@@ -109,4 +121,8 @@ var keyWordLookup = map[string]int{
 	"while":  WHILE,
 	"func":   FUNC,
 	"type":   TYPE,
+	"break":  BREAK,
+	"import": IMPORT,
+	"repeat": REPEAT,
+	"skip":   SKIP,
 }

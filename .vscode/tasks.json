@@ -4,7 +4,7 @@
 		{
 			"label": "Run",
 			"type": "shell",
-			"command": "go run ."
+			"command": "go run . main"
 		}
 	]
 }

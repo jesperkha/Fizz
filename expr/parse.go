@@ -1,8 +1,6 @@
 package expr
 
 import (
-	"fmt"
-
 	"github.com/jesperkha/Fizz/lexer"
 )
 
@@ -14,6 +12,22 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	}
 
 	return *parsePTokens(ptokens), err
+}
+
+func seekEndParen(tokens []lexer.Token, start int) (endIdx int, eof bool) {
+	numParen := 0
+	for i := start; i < len(tokens); i++ {
+		switch tokens[i].Type {
+		case lexer.LEFT_PAREN: numParen++
+		case lexer.RIGHT_PAREN: numParen--
+		}
+
+		if numParen == 0 {
+			return i, false
+		}
+	}
+
+	return endIdx, true
 }
 
 // Creates new ParseTokens from lexer tokens to simplify expression parsing. The ParseTokens can
@@ -28,19 +42,17 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 	for currentIdx < len(tokens) {
 		token := tokens[currentIdx]
-
+		line := token.Line
+		
 		// Find end paren and call recursive for inner part
 		if token.Type == lexer.LEFT_PAREN {
-			endIdx := currentIdx
-			for i := currentIdx; i < len(tokens); i++ {
-				if tokens[i].Type == lexer.RIGHT_PAREN && i > endIdx {
-					endIdx = i
-				}
+			endIdx, eof := seekEndParen(tokens, currentIdx)
+			if eof {
+				return ptokens, formatError(ErrParenError, line)
 			}
 
-			// Error for no closing paren
-			if endIdx == currentIdx {
-				return ptokens, fmt.Errorf(ErrParenError.Error(), token.Line)
+			if endIdx - currentIdx == 1 {
+				return ptokens, formatError(ErrExpectedExpression, line)
 			}
 
 			// Generate ptokens between start and end paren
@@ -51,14 +63,18 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 			ptokens = append(ptokens, ParseToken{Type: TokenGroup, Inner: tokenGroup})
 			// Skip past parenthesized section, +1 to skip closing paren
-			currentIdx += (endIdx - currentIdx) + 1
+			currentIdx = endIdx + 1
 			continue
 		}
 
 		// Unmatched open and closing parens
 		if token.Type == lexer.RIGHT_PAREN {
-			return ptokens, fmt.Errorf(ErrParenError.Error(), token.Line)
+			return ptokens, formatError(ErrParenError, line)
 		}
+
+		// Todo check for function call expression
+		// if token.Type == lexer.IDENTIFIER && tokens[currentIdx+1].Type == lexer.LEFT_PAREN {
+		// }
 
 		ptokens = append(ptokens, ParseToken{Type: Single, Token: token})
 		currentIdx++

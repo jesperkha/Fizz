@@ -1,10 +1,13 @@
 package stmt
 
 import (
+	"errors"
 	"fmt"
+	"reflect"
 
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
+	"github.com/jesperkha/Fizz/lexer"
 )
 
 // Goes through list of statements and executes them. Error is returned from statements exec method.
@@ -13,33 +16,36 @@ func ExecuteStatements(stmts []Statement) (err error) {
 
 	for currentIdx < len(stmts) {
 		statement := stmts[currentIdx]
+		line := statement.Line
 		currentIdx++
 
-		// Ignore expression statements
-		if statement.Type == ExpressionStmt {
+		// Check conditional statements
+		if execFunc, ok := execConTable[statement.Type]; ok {
+			if err = execFunc(statement, &currentIdx); err != nil {
+				return formatError(err, line)
+			}
+
 			continue
 		}
-
-		// Check block statement seperatly because go maps are gay
+		
+		// Check block sepeartly because go maps are gay
 		if statement.Type == Block {
-			err = execBlock(statement)
-			if err != nil {
-				return fmt.Errorf(err.Error(), statement.Line)
+			if err = execBlock(statement); err != nil {
+				return formatError(err, line)
 			}
 
 			continue
 		}
 
 		// Check ramining statement types
-		if execMethod, ok := statementTable[statement.Type]; ok {
-			err = execMethod(statement)
-			if err != nil {
-				return fmt.Errorf(err.Error(), statement.Line)
+		if execFunc, ok := execStatementTable[statement.Type]; ok {
+			if err = execFunc(statement); err != nil {
+				return formatError(err, line)
 			}
-			
+
 			continue
 		}
-
+		
 		// Will never be returned since all types are pre-defined.
 		// However it is nice to have in case reword is done and types
 		// get mixed up or new types are only partially added.
@@ -49,11 +55,35 @@ func ExecuteStatements(stmts []Statement) (err error) {
 	return err
 }
 
-var statementTable = map[int]func(stmt Statement) error {
+type execTable map[int]func(stmt Statement) error 
+
+var execConTable = map[int]func(stmt Statement, idx *int) error {}
+
+var execStatementTable = execTable {
 	Print: 	    execPrint,
 	Variable:   execVariable,
 	Assignment: execAssignment,
+	Break:		execBreak,
+	Skip: 		execSkip,
+	ExpressionStmt: execExpression,
 }
+
+// Just checks for errors
+func execExpression(stmt Statement) (err error) {
+	_, err = expr.EvaluateExpression(stmt.Expression)
+	return err
+}
+
+// Error is handled in loop exec methods
+func execBreak(stmt Statement) (err error) {
+	return ErrBeakOutsideLoop
+}
+
+// Same as break
+func execSkip(stmt Statement) (err error) {
+	return ErrSkipOutsideLoop
+}
+
 
 // Evaluates statement expression and prints out to terminal
 func execPrint(stmt Statement) (err error) {
@@ -87,13 +117,132 @@ func execAssignment(stmt Statement) (err error) {
 		return err
 	}
 
-	return env.Assign(stmt.Name, val)
+	// Plain assignment
+	if stmt.Operator == lexer.EQUAL {
+		return env.Assign(stmt.Name, val)
+	}
+
+	// Plus equals
+	oldVal, err := env.Get(stmt.Name)
+	if err != nil {
+		return err
+	}
+
+	// Not same type
+	if reflect.TypeOf(oldVal) != reflect.TypeOf(val) {
+		return ErrInvalidStatement
+	}
+
+	// String addition
+	if reflect.TypeOf(val) == reflect.TypeOf("") {
+		if stmt.Operator == lexer.MINUS_EQUAL {
+			return ErrInvalidOperator
+		} 
+
+		return env.Assign(stmt.Name, oldVal.(string) + val.(string))
+	}
+
+	// Float addition / subtraction
+	if reflect.TypeOf(val) == reflect.TypeOf(float64(1)) {
+		a := val.(float64)
+		b := oldVal.(float64)
+		if stmt.Operator == lexer.MINUS_EQUAL {
+			a *= -1
+		}
+	
+		return env.Assign(stmt.Name, a + b)
+	}
+
+	return ErrDifferentTypes
 }
 
 // Executes all statements within block scope
 func execBlock(stmt Statement) (err error) {
 	env.PushScope()
 	err = ExecuteStatements(stmt.Statements)
+	env.PopScope()
+	return err
+}
+
+// Skips trailing block statement if expression is false
+func execIf(stmt Statement, idx *int) (err error) {
+	val, err := expr.EvaluateExpression(stmt.Expression)
+	if err != nil {
+		return err
+	}
+
+	if val != nil && val != false {
+		return ExecuteStatements(stmt.Then.Statements)
+	} else if stmt.Else != nil {
+		return ExecuteStatements(stmt.Else.Statements)
+	}
+	
+	return err
+}
+
+// Runs block if expression is true or no expression
+func execWhile(stmt Statement, idx *int) (err error) {
+	for {
+		if stmt.Expression != nil {
+			val, err := expr.EvaluateExpression(stmt.Expression)
+			if err != nil {
+				return err
+			}
+		
+			if val == nil || val == false {
+				break
+			}
+		}
+
+		err = ExecuteStatements(stmt.Then.Statements)
+		if errors.Is(err, ErrBeakOutsideLoop) {
+			return nil
+		}
+
+		if errors.Is(err, ErrSkipOutsideLoop) {
+			continue
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return err
+}
+
+// Runs loop while expression is true
+func execRepeat(stmt Statement, idx *int) (err error) {
+	name := stmt.Expression.Left.Name
+	env.PushScope() // Avoid clashin when defining new variable
+	env.Declare(name, float64(0))
+
+	for {
+		val, err := expr.EvaluateExpression(stmt.Expression)
+		if err != nil {
+			return err
+		}
+
+		if val == true {
+			err = ExecuteStatements(stmt.Then.Statements)
+			if errors.Is(err, ErrBeakOutsideLoop) {
+				return nil
+			}
+
+			if err == nil || errors.Is(err, ErrSkipOutsideLoop) {
+				if oldVal, err := env.Get(name); err == nil {
+					env.Assign(name, oldVal.(float64) + 1)
+				}
+				
+				continue
+			}
+			
+			return err
+		}
+
+		break
+	}
+
 	env.PopScope()
 	return err
 }

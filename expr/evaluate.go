@@ -24,6 +24,8 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 		return EvaluateExpression(expr.Inner)
 	case Variable:
 		return env.Get(expr.Name)
+	case Call:
+		return evalCall(expr)
 	}
 
 	// Wont be reached
@@ -38,7 +40,7 @@ func evalUnary(unary *Expression) (value interface{}, err error) {
 	switch (unary.Operand.Type) {
 		case lexer.MINUS: {
 			if !isBool(right) {
-				return -right.(int), err
+				return -right.(float64), err
 			}
 
 			op, typ, line := unary.Operand.Lexeme, getType(right), unary.Operand.Line
@@ -77,6 +79,7 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 			case lexer.LESS: return vl < vr, err
 			case lexer.LESS_EQUAL: return vl <= vr, err
 			case lexer.GREATER_EQUAL: return vl >= vr, err
+			case lexer.MODULO: return float64(int(vl) % int(vr)), err
 		case lexer.SLASH:
 			if vr == 0 {
 				return nil, fmt.Errorf(ErrDivideByZero.Error(), binary.Operand.Line)
@@ -101,6 +104,11 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 	typeLeft, typeRight := getType(left), getType(right)
 	op, line := binary.Operand.Lexeme, binary.Operand.Line
 	return nil, fmt.Errorf(ErrInvalidOperatorTypes.Error(), op, typeLeft, typeRight, line)
+}
+
+func evalCall(call *Expression) (value interface{}, err error) {
+
+	return value, err
 }
 
 func isTruthy(value interface{}) bool {

@@ -2,12 +2,6 @@ package env
 
 import (
 	"errors"
-	"fmt"
-)
-
-var (
-	ErrUndefinedVariable = errors.New("undefined variable '%s', line %d")
-	ErrAlreadyDefined	 = errors.New("variable '%s' is already defined, line %d")
 )
 
 type entryMap map[string]interface{}
@@ -26,7 +20,7 @@ func declareVariable(env *Environment, name string, value interface{}) (err erro
 		return err
 	}
 
-	return fmt.Errorf(ErrAlreadyDefined.Error(), name)
+	return errors.New("variable '" + name + "' is already defined, line %d")
 }
 
 // Reassigns variable value if exists. Returns error otherwise
@@ -40,7 +34,7 @@ func assignVariable(env *Environment, name string, newVal interface{}) (err erro
 		return assignVariable(env.Parent, name, newVal)
 	}
 
-	return fmt.Errorf(ErrUndefinedVariable.Error(), name)
+	return errors.New("undefined variable '" + name + "', line %d")
 }
 
 // Gets variable value by name. Returns error if not defined
@@ -53,7 +47,7 @@ func getVariable(env *Environment, name string) (value interface{}, err error) {
 		return getVariable(env.Parent, name)
 	}
 
-	return value, fmt.Errorf(ErrUndefinedVariable.Error(), name)
+	return value, errors.New("undefined variable '" + name + "', line %d")
 }
 
 // Declares to current scope enviromnent table
