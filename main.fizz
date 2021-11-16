@@ -1,1 +1,13 @@
+<<<<<<< HEAD
 hello(call())
+=======
+var name = "John";
+var age  = 32;
+
+# This is a comment
+if age > 18 {
+	print name + " is old enough...";
+} else {
+	print name + " is not old enough...";
+}
+>>>>>>> d293afd45b9c896da3205c428245373fca2597bc
