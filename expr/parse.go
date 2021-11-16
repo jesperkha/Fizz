@@ -72,9 +72,53 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 			return ptokens, formatError(ErrParenError, line)
 		}
 
-		// Todo check for function call expression
-		// if token.Type == lexer.IDENTIFIER && tokens[currentIdx+1].Type == lexer.LEFT_PAREN {
-		// }
+		// Check and handle function call expression
+		if token.Type == lexer.IDENTIFIER {
+			if currentIdx + 1 >= len(tokens) || tokens[currentIdx + 1].Type != lexer.LEFT_PAREN {
+				ptokens = append(ptokens, ParseToken{Type: Single, Token: token})
+				currentIdx++
+				continue
+			}
+
+			// Increment to skip identifier
+			currentIdx++
+			endIdx, eof := seekEndParen(tokens, currentIdx)
+			if eof {
+				return ptokens, formatError(ErrParenError, line)
+			}
+
+			// +1 to skip start paren
+			interval := tokens[currentIdx + 1:endIdx]
+			// Add end comma to parse last expression
+			if len(interval) != 0 {
+				interval = append(interval, lexer.Token{Type: lexer.COMMA})
+			}
+
+			args := [][]ParseToken{}
+			exprStart := 0 // Start of arg expression (index)
+			for idx, t := range interval {
+				if t.Type != lexer.COMMA {
+					continue
+				}
+				
+				if exprStart == idx {
+					return ptokens, formatError(ErrCommaError, line)
+				}
+
+				argToken, err := generateParseTokens(interval[exprStart:idx])
+				if err != nil {
+					return ptokens, err
+				}
+
+				args = append(args, argToken)
+				exprStart = idx + 1
+			}
+
+			callToken := ParseToken{Type: CallGroup, Token: token, Args: args}
+			ptokens = append(ptokens, callToken)
+			currentIdx = endIdx + 1
+			continue
+		}
 
 		ptokens = append(ptokens, ParseToken{Type: Single, Token: token})
 		currentIdx++
@@ -92,10 +136,22 @@ func parsePTokens(tokens []ParseToken) *Expression {
 			return &Expression{Type: Group, Inner: parsePTokens(token.Inner)}
 		}
 
+		// Parse call expression
+		if token.Type == CallGroup {
+			argExpressions := []Expression{}
+			for _, arg := range token.Args {
+				argExpressions = append(argExpressions, *parsePTokens(arg))
+			}
+
+			return &Expression{Type: Call, Callee: token.Token, Exprs: argExpressions}
+		}
+
+		// Variable
 		if token.Token.Type == lexer.IDENTIFIER {
 			return &Expression{Type: Variable, Name: token.Token.Lexeme}
 		}
 
+		// Defualts to literal
 		return &Expression{Type: Literal, Value: token.Token}
 	}
 

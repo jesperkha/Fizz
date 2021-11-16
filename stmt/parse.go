@@ -83,9 +83,9 @@ type parseTable map[int]func(tokens []lexer.Token) (stmt Statement, err error)
 var pconTable = map[int]func([]lexer.Token, *int)(Statement, error){}
 
 var parseStatementTable = parseTable {
+	lexer.IDENTIFIER: parseAssignment,
 	lexer.PRINT: 	  parsePrint,
 	lexer.VAR: 	 	  parseVariable,
-	lexer.IDENTIFIER: parseAssignment,
 	lexer.ELSE:		  parseElse,
 	lexer.BREAK: 	  parseBreak,
 	lexer.SKIP: 	  parseSkip,

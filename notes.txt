@@ -1,0 +1,6 @@
+Todo:
+Refactor for global error format + seek funcs
+Refactor run method to prevent import loop for using RunInterpreter in any other files
+
+Doing:
+Add parsing for functon call expressions

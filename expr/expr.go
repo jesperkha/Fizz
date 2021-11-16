@@ -16,6 +16,7 @@ var (
 	ErrDivideByZero			= errors.New("division by 0, line %d")
 	ErrInvalidExpression    = errors.New("invalid expression, line %d")
 	ErrExpectedExpression   = errors.New("expected expression in group, line %d")
+	ErrCommaError			= errors.New("comma error, line %d")
 )
 
 const (
@@ -26,7 +27,7 @@ const (
 	Group
 	Variable
 	Call
-
+	
 	// ParseToken types
 	Single
 	TokenGroup
@@ -49,6 +50,7 @@ type ParseToken struct {
 	Type   int
 	Token  lexer.Token
 	Inner  []ParseToken
+	Args   [][]ParseToken
 }
 
 // Format error with line numbers for local errors, but ignore for errors passed from
