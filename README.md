@@ -22,21 +22,20 @@ This roadmap highlights progress for Fizz's development:
 
 <br>
 
-## **Download / Setup**
+## **Setup and use**
 
 > **Disclaimer**: You need to have Go installed on your device to build the executable or run the interpreter.
 
 <br>
 
-First clone the repository to your device. To run the interpreter either build an executable with `build.bat` or run `go run . [filename]`
+After cloning the repo you can:
 
-<br>
+- build an executable with `build.bat`
+- or run `go run . [filename]`
 
 ### **Terminal mode**
 
 Running the interpreter without giving a filename with run the terminal mode where you can run any valid Fizz code live. Errors are printed but the program is not terminated.
-
-<br>
 
 ### **Run file**
 
