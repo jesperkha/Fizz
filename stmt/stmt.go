@@ -2,8 +2,6 @@ package stmt
 
 import (
 	"errors"
-	"fmt"
-	"strings"
 
 	"github.com/jesperkha/Fizz/expr"
 	"github.com/jesperkha/Fizz/lexer"
@@ -50,21 +48,8 @@ type Statement struct {
 	Else		   *Statement
 }
 
-// Format error with line numbers for local errors, but ignore for errors passed from
-// expression parsing as they are already formatted with line numbers.
-func formatError(err error, line int) error {
-	if err == nil {
-		return err
-	}
-
-	if strings.Contains(err.Error(), "%d") {
-		return fmt.Errorf(err.Error(), line)
-	}
-
-	return err
-}
-
 func init() {
+	// Recursive functions set at init because go is weird
 	execConTable[If] = execIf
 	execConTable[While] = execWhile
 	execConTable[Repeat] = execRepeat

@@ -3,6 +3,7 @@ package stmt
 import (
 	"github.com/jesperkha/Fizz/expr"
 	"github.com/jesperkha/Fizz/lexer"
+	"github.com/jesperkha/Fizz/util"
 )
 
 // Parses lexer tokens into list of statements
@@ -21,7 +22,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		if parseFunc, ok := pconTable[firstToken.Type]; ok {
 			currentStmt, err = parseFunc(tokens, &currentIdx)
 			if err != nil {
-				return statements, formatError(err, currentLine)
+				return statements, util.FormatError(err, currentLine)
 			}
 			
 			currentStmt.Line = currentLine
@@ -34,7 +35,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		// Seeks a semicolon since all other statements end with a semicolon
 		endIdx, eof := seekToken(tokens, startIndex, lexer.SEMICOLON)
 		if eof {
-			return statements, formatError(ErrNoSemicolon, currentLine)
+			return statements, util.FormatError(ErrNoSemicolon, currentLine)
 		}
 
 		currentIdx = endIdx
@@ -42,7 +43,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		// Get tokens in interval between last semicolon and current one
 		tokenInterval := tokens[startIndex:currentIdx]
 		if len(tokenInterval) == 0 {
-			return statements, formatError(err, currentLine)
+			return statements, util.FormatError(err, currentLine)
 		}
 		
 		if parseFunc, ok := parseStatementTable[firstToken.Type]; ok {
@@ -53,7 +54,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		}
 
 		if err != nil {
-			return statements, formatError(err, currentLine)
+			return statements, util.FormatError(err, currentLine)
 		}
 
 		currentStmt.Line = currentLine
@@ -288,10 +289,13 @@ func parseRepeat(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 		return stmt, ErrExpectedExpression
 	}
 
-	notBinary := stmt.Expression.Type != expr.Binary
+	if stmt.Expression.Type != expr.Binary {
+		return stmt, ErrInvalidStatement
+	}
+
 	notLess := stmt.Expression.Operand.Type != lexer.LESS
 	notIdentifier := stmt.Expression.Left.Type != expr.Variable
-	if notBinary || notLess || notIdentifier {
+	if notLess || notIdentifier {
 		return stmt, ErrInvalidStatement
 	}
 

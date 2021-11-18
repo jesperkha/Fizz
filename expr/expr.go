@@ -3,7 +3,6 @@ package expr
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/jesperkha/Fizz/lexer"
 )
@@ -38,7 +37,6 @@ type Expression struct {
 	Type     int
 	Name	 string
 	Operand  lexer.Token
-	Callee   lexer.Token
 	Value    lexer.Token
 	Left	 *Expression
 	Right 	 *Expression
@@ -53,16 +51,26 @@ type ParseToken struct {
 	Args   [][]ParseToken
 }
 
-// Format error with line numbers for local errors, but ignore for errors passed from
-// expression parsing as they are already formatted with line numbers.
-func formatError(err error, line int) error {
-	if err == nil {
-		return err
+func PrintExpressionAST(expr Expression) {
+	fmt.Println(printAST(expr))
+}
+
+func printAST(expr Expression) string {
+	switch expr.Type {
+	case Literal:
+		return fmt.Sprintf("literal: %s", expr.Value.Lexeme)
+	case Unary:
+		return fmt.Sprintf("unary: %s [%s]", expr.Operand.Lexeme, printAST(*expr.Right))
+	case Binary:
+		left, right := printAST(*expr.Left), printAST(*expr.Right)
+		return fmt.Sprintf("binary: %s [%s, %s]", expr.Operand.Lexeme, left, right)
+	case Group:
+		return fmt.Sprintf("group: [%s]", printAST(*expr.Inner))
+	case Variable:
+		return fmt.Sprintf("variable: %s", expr.Name)
+	case Call:
+		return fmt.Sprintf("call: %s()", expr.Name)
 	}
 
-	if strings.Contains(err.Error(), "%d") {
-		return fmt.Errorf(err.Error(), line)
-	}
-
-	return err
+	return ""
 }

@@ -2,6 +2,7 @@ package expr
 
 import (
 	"github.com/jesperkha/Fizz/lexer"
+	"github.com/jesperkha/Fizz/util"
 )
 
 // Generates ptokens and parses them into an expression.
@@ -48,11 +49,11 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 		if token.Type == lexer.LEFT_PAREN {
 			endIdx, eof := seekEndParen(tokens, currentIdx)
 			if eof {
-				return ptokens, formatError(ErrParenError, line)
+				return ptokens, util.FormatError(ErrParenError, line)
 			}
 
 			if endIdx - currentIdx == 1 {
-				return ptokens, formatError(ErrExpectedExpression, line)
+				return ptokens, util.FormatError(ErrExpectedExpression, line)
 			}
 
 			// Generate ptokens between start and end paren
@@ -69,7 +70,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 		// Unmatched open and closing parens
 		if token.Type == lexer.RIGHT_PAREN {
-			return ptokens, formatError(ErrParenError, line)
+			return ptokens, util.FormatError(ErrParenError, line)
 		}
 
 		// Check and handle function call expression
@@ -84,7 +85,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 			currentIdx++
 			endIdx, eof := seekEndParen(tokens, currentIdx)
 			if eof {
-				return ptokens, formatError(ErrParenError, line)
+				return ptokens, util.FormatError(ErrParenError, line)
 			}
 
 			// +1 to skip start paren
@@ -102,7 +103,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 				}
 				
 				if exprStart == idx {
-					return ptokens, formatError(ErrCommaError, line)
+					return ptokens, util.FormatError(ErrCommaError, line)
 				}
 
 				argToken, err := generateParseTokens(interval[exprStart:idx])
@@ -143,7 +144,7 @@ func parsePTokens(tokens []ParseToken) *Expression {
 				argExpressions = append(argExpressions, *parsePTokens(arg))
 			}
 
-			return &Expression{Type: Call, Callee: token.Token, Exprs: argExpressions}
+			return &Expression{Type: Call, Name: token.Token.Lexeme, Exprs: argExpressions}
 		}
 
 		// Variable

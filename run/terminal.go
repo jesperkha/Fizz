@@ -26,8 +26,7 @@ func RunTerminal() {
 		}
 
 		// Continue with indent after braces
-		numBlocks += strings.Count(input, "{")
-		numBlocks -= strings.Count(input, "}")
+		numBlocks += strings.Count(input, "{") - strings.Count(input, "}")
 		totalString += input + "\n" // Better error handling
 
 		if numBlocks <= 0 {

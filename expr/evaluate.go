@@ -8,6 +8,7 @@ import (
 
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/lexer"
+	"github.com/jesperkha/Fizz/util"
 )
 
 // Evaluates expression tree. Hands off to helper methods which can also recursively call to
@@ -82,7 +83,7 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 			case lexer.MODULO: return float64(int(vl) % int(vr)), err
 		case lexer.SLASH:
 			if vr == 0 {
-				return nil, fmt.Errorf(ErrDivideByZero.Error(), binary.Operand.Line)
+				return nil, util.FormatError(ErrDivideByZero, binary.Operand.Line)
 			}
 			
 			return vl / vr, err

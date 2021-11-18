@@ -2,35 +2,20 @@
 
 ## **About**
 
-An interpreted scipting language built with Go. The syntax is designed to be easy to understand (coming from other languages) to give a nicer experience. Heres a list of included functionality currently available:
-
-- Standard expressions
-- Variables (declaration, assignment, scope)
-- Conditions and loops (if and else, while, repeat)
-
-As an example, here is a simple demo program for the infamous fizzbuzz problem:
-
-```lua
-repeat n < 10 {
-    if n % 15 == 0 {
-        print "Fizzbuzz";
-        skip;
-    }
-
-    if n % 5 == 0 {
-        print "Buzz";
-        skip;
-    }
-
-    if n % 3 == 0 {
-        print "Buzz";
-        skip;
-    }
-
-    print n;
-}
-```
+Fizz is an interpreted programming language built with Go. The main use cases for Fizz is file management, simple http requests, and general terminal scripting. The built in libraries (not added yet) support all of these features, including documentation with examples.
 
 <br>
 
-## **Install**
+## **Roadmap**
+
+This roadmap highlights progress for Fizz's development:
+
+- ✔️ Expression parsing
+- ✔️ Conditional statements
+- ✔️ Loops
+- ❌ Functions
+- ❌ Classes
+- ❌ Arrays
+- ❌ File import
+- ❌ Go -> Fizz library support
+- ❌ Language documentation

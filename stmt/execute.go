@@ -8,6 +8,7 @@ import (
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
 	"github.com/jesperkha/Fizz/lexer"
+	"github.com/jesperkha/Fizz/util"
 )
 
 // Goes through list of statements and executes them. Error is returned from statements exec method.
@@ -22,7 +23,7 @@ func ExecuteStatements(stmts []Statement) (err error) {
 		// Check conditional statements
 		if execFunc, ok := execConTable[statement.Type]; ok {
 			if err = execFunc(statement, &currentIdx); err != nil {
-				return formatError(err, line)
+				return util.FormatError(err, line)
 			}
 
 			continue
@@ -31,7 +32,7 @@ func ExecuteStatements(stmts []Statement) (err error) {
 		// Check block sepeartly because go maps are gay
 		if statement.Type == Block {
 			if err = execBlock(statement); err != nil {
-				return formatError(err, line)
+				return util.FormatError(err, line)
 			}
 
 			continue
@@ -40,14 +41,14 @@ func ExecuteStatements(stmts []Statement) (err error) {
 		// Check ramining statement types
 		if execFunc, ok := execStatementTable[statement.Type]; ok {
 			if err = execFunc(statement); err != nil {
-				return formatError(err, line)
+				return util.FormatError(err, line)
 			}
 
 			continue
 		}
 		
 		// Will never be returned since all types are pre-defined.
-		// However it is nice to have in case reword is done and types
+		// However it is nice to have in case rework is done and types
 		// get mixed up or new types are only partially added.
 		return ErrInvalidStmtType
 	}
@@ -71,6 +72,7 @@ var execStatementTable = execTable {
 // Just checks for errors
 func execExpression(stmt Statement) (err error) {
 	_, err = expr.EvaluateExpression(stmt.Expression)
+	expr.PrintExpressionAST(*stmt.Expression) // Debug
 	return err
 }
 
