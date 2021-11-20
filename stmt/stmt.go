@@ -21,6 +21,7 @@ var (
 	ErrDifferentTypes	  = errors.New("different types in statement, line %d")
 	ErrBeakOutsideLoop    = errors.New("cannot use break outside of a loop")
 	ErrSkipOutsideLoop    = errors.New("cannot use skip outside of a loop")
+	ErrNonCallable		  = errors.New("cannot call non-callable type, line %d")
 )
 
 const (
@@ -50,6 +51,7 @@ type Statement struct {
 
 func init() {
 	// Recursive functions set at init because go is weird
+	// Todo fix this shit pls
 	execConTable[If] = execIf
 	execConTable[While] = execWhile
 	execConTable[Repeat] = execRepeat

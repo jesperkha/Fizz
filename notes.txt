@@ -1,4 +1,2 @@
 Todo:
-Add debug print functions for ASTs
-Refactor for global error format + seek funcs
-Refactor run method to prevent import loop for using RunInterpreter in any other files
+Fix int to float64 conversion issue for function return values

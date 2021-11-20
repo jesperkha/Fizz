@@ -72,7 +72,6 @@ var execStatementTable = execTable {
 // Just checks for errors
 func execExpression(stmt Statement) (err error) {
 	_, err = expr.EvaluateExpression(stmt.Expression)
-	expr.PrintExpressionAST(*stmt.Expression) // Debug
 	return err
 }
 

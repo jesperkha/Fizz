@@ -121,6 +121,11 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 			continue
 		}
 
+		// Not expression type symbol
+		if token.Type > lexer.IDENTIFIER {
+			return ptokens, ErrInvalidExpression
+		}
+
 		ptokens = append(ptokens, ParseToken{Type: Single, Token: token})
 		currentIdx++
 	}
@@ -130,11 +135,13 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 // Parses slice of ParseTokens into final AST
 func parsePTokens(tokens []ParseToken) *Expression {
+	line := tokens[0].Token.Line
+
 	// Literal, Variable, or Group expression
 	if len(tokens) == 1 {
 		token := tokens[0]
 		if token.Type == TokenGroup {
-			return &Expression{Type: Group, Inner: parsePTokens(token.Inner)}
+			return &Expression{Type: Group, Line: line, Inner: parsePTokens(token.Inner)}
 		}
 
 		// Parse call expression
@@ -144,21 +151,21 @@ func parsePTokens(tokens []ParseToken) *Expression {
 				argExpressions = append(argExpressions, *parsePTokens(arg))
 			}
 
-			return &Expression{Type: Call, Name: token.Token.Lexeme, Exprs: argExpressions}
+			return &Expression{Type: Call, Line: line, Name: token.Token.Lexeme, Exprs: argExpressions}
 		}
 
 		// Variable
 		if token.Token.Type == lexer.IDENTIFIER {
-			return &Expression{Type: Variable, Name: token.Token.Lexeme}
+			return &Expression{Type: Variable, Line: line, Name: token.Token.Lexeme}
 		}
 
 		// Defualts to literal
-		return &Expression{Type: Literal, Value: token.Token}
+		return &Expression{Type: Literal, Line: line, Value: token.Token}
 	}
 
 	// Unary expression
 	if len(tokens) == 2 {
-		return &Expression{Type: Unary, Operand: tokens[0].Token, Right: parsePTokens(tokens[1:])}
+		return &Expression{Type: Unary, Line: line, Operand: tokens[0].Token, Right: parsePTokens(tokens[1:])}
 	}
 
 	// Binary expression
@@ -172,5 +179,5 @@ func parsePTokens(tokens []ParseToken) *Expression {
 	}
 
 	right, left := parsePTokens(tokens[lowestIdx + 1:]), parsePTokens(tokens[:lowestIdx])
-	return &Expression{Type: Binary, Operand: lowest, Left: left, Right: right}
+	return &Expression{Type: Binary, Line: line, Operand: lowest, Left: left, Right: right}
 }

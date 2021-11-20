@@ -130,7 +130,7 @@ func parsePrint(tokens []lexer.Token) (stmt Statement, err error) {
 	if len(tokens) == 1 {
 		return stmt, ErrExpectedExpression
 	}
-
+	
 	expr, err := expr.ParseExpression(tokens[1:])
 	return Statement{Type: Print, Expression: &expr}, err
 }
@@ -141,27 +141,27 @@ func parseVariable(tokens []lexer.Token) (stmt Statement, err error) {
 	if numTokens == 1 {
 		return stmt, ErrExpectedExpression
 	}
-
+	
 	if numTokens == 2 {
 		name := tokens[1]
 		if name.Type == lexer.IDENTIFIER {
 			return Statement{Type: Variable}, err
 		}
-
+		
 		return stmt, ErrExpectedIdentifier
 	}
-
+	
 	if numTokens >= 4 {
 		name := tokens[1]
 		exprTokens := tokens[3:]
 		equals := tokens[2].Type == lexer.EQUAL
-
+		
 		if name.Type == lexer.IDENTIFIER && equals {
 			initExpr, err := expr.ParseExpression(exprTokens)
 			return Statement{Type: Variable, Name: name.Lexeme, InitExpression: &initExpr}, err
 		}
 	}
-
+	
 	return stmt, ErrInvalidStatement
 }
 
@@ -170,12 +170,12 @@ func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 	if len(tokens) < 3 {
 		return parseExpression(tokens)
 	}
-
+	
 	t := tokens[1].Type
 	if t != lexer.EQUAL && t != lexer.PLUS_EQUAL && t != lexer.MINUS_EQUAL {
 		return parseExpression(tokens)
 	}
-
+	
 	name := tokens[0].Lexeme
 	rightExpr := tokens[2:]
 	expr, err := expr.ParseExpression(rightExpr)
@@ -188,10 +188,10 @@ func getBlockStatement(tokens []lexer.Token, idx *int) (block Statement, err err
 	if tokens[start].Type != lexer.LEFT_BRACE {
 		return block, ErrExpectedBlock
 	}
-
+	
 	numEndBraces := 0
 	foundEndBrace := false
-
+	
 	// Loop over until finds brace ending a nested block
 	for *idx < len(tokens) {
 		switch tokens[*idx].Type {

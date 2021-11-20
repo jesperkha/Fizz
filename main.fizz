@@ -1,5 +1,1 @@
-# Loop
-
-repeat n < 2 {
-    print "hello";
-}
+print test() + 2;

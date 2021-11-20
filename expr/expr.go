@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/lexer"
 )
 
@@ -16,6 +17,8 @@ var (
 	ErrInvalidExpression    = errors.New("invalid expression, line %d")
 	ErrExpectedExpression   = errors.New("expected expression in group, line %d")
 	ErrCommaError			= errors.New("comma error, line %d")
+	ErrIncorrectArgs		= errors.New("'%s()' expected %d args, got %d, line %d")
+	ErrNotFunction			= errors.New("'%s' is not a function, line %d")
 )
 
 const (
@@ -35,6 +38,7 @@ const (
 
 type Expression struct {
 	Type     int
+	Line	 int
 	Name	 string
 	Operand  lexer.Token
 	Value    lexer.Token
@@ -49,6 +53,17 @@ type ParseToken struct {
 	Token  lexer.Token
 	Inner  []ParseToken
 	Args   [][]ParseToken
+}
+
+type Callable struct {
+	Call func(...interface{}) (interface{}, error)
+	NumArgs int
+}
+
+func init() {
+	env.Declare("test", Callable{NumArgs: 0, Call: func(i ...interface{}) (interface{}, error) {
+		return 1.0, nil
+	}})
 }
 
 func PrintExpressionAST(expr Expression) {

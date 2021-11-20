@@ -44,14 +44,14 @@ func evalUnary(unary *Expression) (value interface{}, err error) {
 				return -right.(float64), err
 			}
 
-			op, typ, line := unary.Operand.Lexeme, getType(right), unary.Operand.Line
+			op, typ, line := unary.Operand.Lexeme, getType(right), unary.Line
 			return nil, fmt.Errorf(ErrInvalidOperatorType.Error(), op, typ, line)
 		}
 		case lexer.NOT: return !isTruthy(right), err
 		case lexer.TYPE: return getType(right), err
 	}
 
-	op, line := unary.Operand.Lexeme, unary.Operand.Line
+	op, line := unary.Operand.Lexeme, unary.Line
 	return value, fmt.Errorf(ErrInvalidUnaryOperator.Error(), op, line)
 }
 
@@ -83,7 +83,7 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 			case lexer.MODULO: return float64(int(vl) % int(vr)), err
 		case lexer.SLASH:
 			if vr == 0 {
-				return nil, util.FormatError(ErrDivideByZero, binary.Operand.Line)
+				return nil, util.FormatError(ErrDivideByZero, binary.Line)
 			}
 			
 			return vl / vr, err
@@ -103,13 +103,45 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 	}
 	
 	typeLeft, typeRight := getType(left), getType(right)
-	op, line := binary.Operand.Lexeme, binary.Operand.Line
+	op, line := binary.Operand.Lexeme, binary.Line
 	return nil, fmt.Errorf(ErrInvalidOperatorTypes.Error(), op, typeLeft, typeRight, line)
 }
 
+// Calls any defined function with expressions arguments
+// Error is returned for function fail, unmatched arg number, or undefined name
 func evalCall(call *Expression) (value interface{}, err error) {
+	notFuncErr := fmt.Errorf(ErrNotFunction.Error(), call.Name, call.Line)
+	val, err := env.Get(call.Name)
+	if err != nil {
+		return value, notFuncErr
+	}
 
-	return value, err
+	if function, ok := val.(Callable); ok {
+		numArgs := len(call.Exprs)
+		if numArgs != function.NumArgs {
+			name, expected, line := call.Name, function.NumArgs, call.Line
+			return value, fmt.Errorf(ErrIncorrectArgs.Error(), name, expected, numArgs, line)
+		}
+
+		// Evaluated args to be passed to function
+		args := []interface{}{}
+		for _, arg := range call.Exprs {
+			v, err := EvaluateExpression(&arg)
+			if err != nil {
+				return value, err
+			}
+
+			args = append(args, v)
+		}
+
+		if numArgs == 0 {
+			return function.Call()
+		}
+
+		return function.Call(args...)
+	}
+
+	return value, notFuncErr
 }
 
 func isTruthy(value interface{}) bool {
