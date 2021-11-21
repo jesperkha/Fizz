@@ -9,10 +9,10 @@ import (
 
 var (
 	ErrNoSemicolon 		  = errors.New("expected ; after statement, line %d")
-	ErrInvalidStmtType    = errors.New("execute: invalid statement type")
+	ErrInvalidStmtType    = errors.New("invalid statement type, check statement parsing")
 	ErrExpectedExpression = errors.New("expected expression in statement, line %d")
 	ErrNoStatement		  = errors.New("expected statement before semicolon, line %d")
-	ErrExpectedIdentifier = errors.New("expected identifier at variable declaration, line %d")
+	ErrExpectedIdentifier = errors.New("expected identifier, line %d")
 	ErrInvalidStatement	  = errors.New("invalid statement, line %d")
 	ErrNoBrace			  = errors.New("expected } after block statement, line %d")
 	ErrExpectedBlock	  = errors.New("expected block after statememt, line %d")
@@ -35,6 +35,7 @@ const (
 	Repeat
 	Break
 	Skip
+	Function
 )
 
 type Statement struct {
@@ -47,6 +48,7 @@ type Statement struct {
 	Statements	   []Statement
 	Then		   *Statement
 	Else		   *Statement
+	Params	   	   []string
 }
 
 func init() {
@@ -55,9 +57,11 @@ func init() {
 	execConTable[If] = execIf
 	execConTable[While] = execWhile
 	execConTable[Repeat] = execRepeat
+	execConTable[Function] = execFunction
 
 	pconTable[lexer.IF] = parseIf
 	pconTable[lexer.WHILE] = parseWhile
 	pconTable[lexer.LEFT_BRACE] = parseBlock
 	pconTable[lexer.REPEAT] = parseRepeat
+	pconTable[lexer.FUNC] = parseFunc
 }

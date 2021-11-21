@@ -18,7 +18,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		currentLine := firstToken.Line
 
 		// Check conditional statements seperatly because the parse funcs need
-		// a currentIndex pointer
+		// a currentIndex pointer. Note: Full list of tokens are given
 		if parseFunc, ok := pconTable[firstToken.Type]; ok {
 			currentStmt, err = parseFunc(tokens, &currentIdx)
 			if err != nil {
@@ -86,8 +86,8 @@ var pconTable = map[int]func([]lexer.Token, *int)(Statement, error){}
 var parseStatementTable = parseTable {
 	lexer.IDENTIFIER: parseAssignment,
 	lexer.PRINT: 	  parsePrint,
-	lexer.VAR: 	 	  parseVariable,
-	lexer.ELSE:		  parseElse,
+	lexer.VAR: 		  parseVariable,
+	lexer.ELSE: 	  parseElse,
 	lexer.BREAK: 	  parseBreak,
 	lexer.SKIP: 	  parseSkip,
 }
@@ -180,6 +180,50 @@ func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 	rightExpr := tokens[2:]
 	expr, err := expr.ParseExpression(rightExpr)
 	return Statement{Type: Assignment, Name: name, Expression: &expr, Operator: t}, err
+}
+
+// Just returns the statement with a type. Implementation is handled in exec.
+func parseFunc(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
+	if len(tokens) < 6 {
+		return stmt, ErrInvalidStatement
+	}
+
+	nameToken := tokens[*idx + 1]
+
+	hasName := nameToken.Type == lexer.IDENTIFIER
+	hasParens := tokens[*idx + 2].Type == lexer.LEFT_PAREN
+	if !hasName || !hasParens {
+		return stmt, ErrInvalidStatement
+	}
+
+	// Get param names
+	*idx += 3 // Skip to start of param list
+	endIdx, eof := seekToken(tokens, *idx, lexer.RIGHT_PAREN)
+	if eof {
+		return stmt, ErrInvalidStatement
+	}
+	
+	params := []string{}
+	paramTokens := tokens[*idx:endIdx]
+	for _, p := range paramTokens {
+		if p.Type != lexer.IDENTIFIER {
+			return stmt, ErrExpectedIdentifier
+		}
+
+		params = append(params, p.Lexeme)
+	}
+
+	*idx = endIdx + 1 // Skip to start of block
+	if tokens[*idx].Type != lexer.LEFT_BRACE {
+		return stmt, ErrExpectedBlock
+	}
+
+	block, err := getBlockStatement(tokens, idx)
+	if err != nil {
+		return stmt, err
+	}
+
+	return Statement{Type: Function, Name: nameToken.Lexeme, Params: params, Then: &block}, err
 }
 
 // Gets a trailing block statement

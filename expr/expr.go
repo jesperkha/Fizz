@@ -3,6 +3,7 @@ package expr
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/lexer"
@@ -61,8 +62,8 @@ type Callable struct {
 }
 
 func init() {
-	env.Declare("test", Callable{NumArgs: 0, Call: func(i ...interface{}) (interface{}, error) {
-		return 1.0, nil
+	env.Declare("time", Callable{NumArgs: 0, Call: func(i ...interface{}) (interface{}, error) {
+		return float64(time.Now().Nanosecond() / 1000000), nil
 	}})
 }
 

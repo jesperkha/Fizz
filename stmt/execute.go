@@ -93,7 +93,7 @@ func execPrint(stmt Statement) (err error) {
 		return err
 	}
 
-	fmt.Println(value)
+	fmt.Printf("%f\n", value)
 	return nil
 }
 
@@ -165,6 +165,30 @@ func execBlock(stmt Statement) (err error) {
 	return err
 }
 
+// Declares function to current scope
+func execFunction(stmt Statement, idx *int) (err error) {
+	err = env.Declare(stmt.Name, expr.Callable{
+		NumArgs: len(stmt.Params),
+
+		// Call function and set param variables to scope
+		Call: func(args ...interface{}) (interface{}, error) {
+			env.PushScope()
+
+			// Declare args
+			for idx, arg := range args {
+				// Cannot raise error because block is in own scope
+				env.Declare(stmt.Params[idx], arg)
+			}
+
+			err = ExecuteStatements(stmt.Then.Statements)
+			env.PopScope()
+			return 0, err
+		},
+	})
+
+	return err
+}
+
 // Skips trailing block statement if expression is false
 func execIf(stmt Statement, idx *int) (err error) {
 	val, err := expr.EvaluateExpression(stmt.Expression)
@@ -215,7 +239,7 @@ func execWhile(stmt Statement, idx *int) (err error) {
 // Runs loop while expression is true
 func execRepeat(stmt Statement, idx *int) (err error) {
 	name := stmt.Expression.Left.Name
-	env.PushScope() // Avoid clashin when defining new variable
+	env.PushScope() // Avoid clashing when defining new variable
 	env.Declare(name, float64(0))
 
 	for {
