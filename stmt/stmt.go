@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/jesperkha/Fizz/expr"
-	"github.com/jesperkha/Fizz/lexer"
 )
 
 var (
@@ -25,7 +24,8 @@ var (
 )
 
 const (
-	ExpressionStmt = iota
+	NotExpression = iota
+	ExpressionStmt
 	Print
 	Variable
 	Assignment
@@ -49,19 +49,4 @@ type Statement struct {
 	Then		   *Statement
 	Else		   *Statement
 	Params	   	   []string
-}
-
-func init() {
-	// Recursive functions set at init because go is weird
-	// Todo fix this shit pls
-	execConTable[If] = execIf
-	execConTable[While] = execWhile
-	execConTable[Repeat] = execRepeat
-	execConTable[Function] = execFunction
-
-	pconTable[lexer.IF] = parseIf
-	pconTable[lexer.WHILE] = parseWhile
-	pconTable[lexer.LEFT_BRACE] = parseBlock
-	pconTable[lexer.REPEAT] = parseRepeat
-	pconTable[lexer.FUNC] = parseFunc
-}
+} 

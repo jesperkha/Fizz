@@ -18,43 +18,33 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		currentLine := firstToken.Line
 
 		// Check conditional statements seperatly because the parse funcs need
-		// a currentIndex pointer. Note: Full list of tokens are given
-		if parseFunc, ok := pconTable[firstToken.Type]; ok {
-			currentStmt, err = parseFunc(tokens, &currentIdx)
-			if err != nil {
-				return statements, util.FormatError(err, currentLine)
-			}
-			
-			currentStmt.Line = currentLine
-			statements = append(statements, currentStmt)
-			currentIdx++
-			continue
-		}
-
-		// Finally parse remainig statements.
-		// Seeks a semicolon since all other statements end with a semicolon
-		endIdx, eof := seekToken(tokens, startIndex, lexer.SEMICOLON)
-		if eof {
-			return statements, util.FormatError(ErrNoSemicolon, currentLine)
-		}
-
-		currentIdx = endIdx
-
-		// Get tokens in interval between last semicolon and current one
-		tokenInterval := tokens[startIndex:currentIdx]
-		if len(tokenInterval) == 0 {
+		// a currentIndex pointer. Note: Full list of tokens is given
+		currentStmt, err = parseComplexStatement(firstToken.Type, tokens, &currentIdx)
+		if err != nil {
 			return statements, util.FormatError(err, currentLine)
 		}
 		
-		if parseFunc, ok := parseStatementTable[firstToken.Type]; ok {
-			currentStmt, err = parseFunc(tokenInterval)
-		} else {
-			// Default to parsing expression statement
-			currentStmt, err = parseExpression(tokenInterval)
-		}
-
-		if err != nil {
-			return statements, util.FormatError(err, currentLine)
+		// Parse any other type of statement. Checks if not statement
+		if currentStmt.Type == 0 {
+			// Seeks a semicolon since all other statements end with a semicolon
+			endIdx, eof := seekToken(tokens, startIndex, lexer.SEMICOLON)
+			if eof {
+				return statements, util.FormatError(ErrNoSemicolon, currentLine)
+			}
+	
+			currentIdx = endIdx
+	
+			// Get tokens in interval between last semicolon and current one
+			tokenInterval := tokens[startIndex:currentIdx]
+			if len(tokenInterval) == 0 {
+				return statements, util.FormatError(err, currentLine)
+			}
+	
+			// Parse statement
+			currentStmt, err = parseStatement(firstToken.Type, tokenInterval)
+			if err != nil {
+				return statements, util.FormatError(err, currentLine)
+			}
 		}
 
 		currentStmt.Line = currentLine
@@ -63,6 +53,33 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 	}
 
 	return statements, err
+}
+
+// Helper. Returnes the value for the specific statement parse function. Defaults to ExpressionStatement
+func parseStatement(typ int, tokens []lexer.Token) (stmt Statement, err error) {
+	switch typ {
+	case lexer.IDENTIFIER: return parseAssignment(tokens)
+	case lexer.PRINT: return parsePrint(tokens)
+	case lexer.VAR: return parseVariable(tokens)
+	case lexer.ELSE: return parseElse(tokens)
+	case lexer.BREAK: return parseBreak(tokens)
+	case lexer.SKIP: return parseSkip(tokens)
+	}
+	
+	return parseExpression(tokens)
+}
+
+// Parses statements where current index would be modified or the length of the statement is unknown
+func parseComplexStatement(typ int, tokens []lexer.Token, idx *int) (stmt Statement, err error) {
+	switch typ {
+	case lexer.IF: return parseIf(tokens, idx)
+	case lexer.WHILE: return parseWhile(tokens, idx)
+	case lexer.LEFT_BRACE: return parseBlock(tokens, idx)
+	case lexer.REPEAT: return parseRepeat(tokens, idx)
+	case lexer.FUNC: return parseFunc(tokens, idx)
+	}
+
+	return stmt, err
 }
 
 // Seeks target token type and returns the index of target and eof
@@ -76,21 +93,7 @@ func seekToken(tokens []lexer.Token, start int, target int) (endIdx int, eof boo
 	return 0, true
 }
 
-type parseTable map[int]func(tokens []lexer.Token) (stmt Statement, err error)
-
-// For the functions in this map the tokens are passed as the complete list
-// This is to ensure that the result of seekToken mathes up with the current
-// index value.
-var pconTable = map[int]func([]lexer.Token, *int)(Statement, error){}
-
-var parseStatementTable = parseTable {
-	lexer.IDENTIFIER: parseAssignment,
-	lexer.PRINT: 	  parsePrint,
-	lexer.VAR: 		  parseVariable,
-	lexer.ELSE: 	  parseElse,
-	lexer.BREAK: 	  parseBreak,
-	lexer.SKIP: 	  parseSkip,
-}
+// Parse funcs
 
 // Just returns the statement with a type. Implementation is handled in exec.
 func parseBreak(tokens []lexer.Token) (stmt Statement, err error) {

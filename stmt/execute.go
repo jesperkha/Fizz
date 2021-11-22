@@ -20,53 +20,36 @@ func ExecuteStatements(stmts []Statement) (err error) {
 		line := statement.Line
 		currentIdx++
 
-		// Check conditional statements
-		if execFunc, ok := execConTable[statement.Type]; ok {
-			if err = execFunc(statement, &currentIdx); err != nil {
-				return util.FormatError(err, line)
-			}
-
-			continue
+		if err = executeStatement(statement, &currentIdx); err != nil {
+			return util.FormatError(err, line)
 		}
-		
-		// Check block sepeartly because go maps are gay
-		if statement.Type == Block {
-			if err = execBlock(statement); err != nil {
-				return util.FormatError(err, line)
-			}
-
-			continue
-		}
-
-		// Check ramining statement types
-		if execFunc, ok := execStatementTable[statement.Type]; ok {
-			if err = execFunc(statement); err != nil {
-				return util.FormatError(err, line)
-			}
-
-			continue
-		}
-		
-		// Will never be returned since all types are pre-defined.
-		// However it is nice to have in case rework is done and types
-		// get mixed up or new types are only partially added.
-		return ErrInvalidStmtType
 	}
 
 	return err
 }
 
-type execTable map[int]func(stmt Statement) error 
+func executeStatement(stmt Statement, idx *int) error {
+	switch stmt.Type {
+		// Normal types
+		case Block: return execBlock(stmt)
+		case Print: return execPrint(stmt)
+		case Variable: return execVariable(stmt)
+		case Assignment: return execAssignment(stmt)
+		case Break: return execBreak(stmt)
+		case Skip: return execSkip(stmt)
+		case ExpressionStmt: return execExpression(stmt)
 
-var execConTable = map[int]func(stmt Statement, idx *int) error {}
+		// Complex types
+		case If: return execIf(stmt, idx)
+		case While: return execWhile(stmt, idx)
+		case Repeat: return execRepeat(stmt, idx)
+		case Function: return execFunction(stmt, idx)
+	}
 
-var execStatementTable = execTable {
-	Print: 	    execPrint,
-	Variable:   execVariable,
-	Assignment: execAssignment,
-	Break:		execBreak,
-	Skip: 		execSkip,
-	ExpressionStmt: execExpression,
+	// Will never be returned since all types are pre-defined.
+	// However it is nice to have in case rework is done and types
+	// get mixed up or new types are only partially added.
+	return ErrInvalidStmtType
 }
 
 // Just checks for errors
@@ -93,7 +76,12 @@ func execPrint(stmt Statement) (err error) {
 		return err
 	}
 
-	fmt.Printf("%f\n", value)
+	switch value.(type) {
+		case float64: fmt.Println(value)
+		case string: fmt.Println(value)
+		default: fmt.Println(stmt.Expression.Name)
+	}
+
 	return nil
 }
 
