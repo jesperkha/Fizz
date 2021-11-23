@@ -15,22 +15,16 @@ import (
 // resolve nested expressions. Returned value is result of expression and is Go literal.
 func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 	switch expr.Type {
-	case Literal:
-		return expr.Value.Literal, err
-	case Unary:
-		return evalUnary(expr)
-	case Binary:
-		return evalBinary(expr)
-	case Group:
-		return EvaluateExpression(expr.Inner)
-	case Variable:
-		return env.Get(expr.Name)
-	case Call:
-		return evalCall(expr)
+		case Literal: return expr.Value.Literal, err
+		case Unary: return evalUnary(expr)
+		case Binary: return evalBinary(expr)
+		case Group:	return EvaluateExpression(expr.Inner)
+		case Variable: return env.Get(expr.Name)
+		case Call: return evalCall(expr)
 	}
 
 	// Wont be reached
-	return expr, nil
+	return expr, ErrInvalidExpression
 }
 
 // Helper for any unary expression with a valid operator. Returns an error
@@ -116,7 +110,7 @@ func evalCall(call *Expression) (value interface{}, err error) {
 		return value, notFuncErr
 	}
 
-	if function, ok := val.(Callable); ok {
+	if function, ok := val.(env.Callable); ok {
 		numArgs := len(call.Exprs)
 		if numArgs != function.NumArgs {
 			name, expected, line := call.Name, function.NumArgs, call.Line

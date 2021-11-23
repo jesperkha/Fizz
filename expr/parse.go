@@ -137,6 +137,12 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 func parsePTokens(tokens []ParseToken) *Expression {
 	line := tokens[0].Token.Line
 
+	// Unary expression
+	unaryTokens := []int{lexer.MINUS, lexer.TYPE, lexer.PRINT, lexer.NOT}
+	if len(tokens) == 2 || util.Contains(unaryTokens, tokens[0].Token.Type) {
+		return &Expression{Type: Unary, Line: line, Operand: tokens[0].Token, Right: parsePTokens(tokens[1:])}
+	}
+	
 	// Literal, Variable, or Group expression
 	if len(tokens) == 1 {
 		token := tokens[0]
@@ -161,11 +167,6 @@ func parsePTokens(tokens []ParseToken) *Expression {
 
 		// Defualts to literal
 		return &Expression{Type: Literal, Line: line, Value: token.Token}
-	}
-
-	// Unary expression
-	if len(tokens) == 2 {
-		return &Expression{Type: Unary, Line: line, Operand: tokens[0].Token, Right: parsePTokens(tokens[1:])}
 	}
 
 	// Binary expression

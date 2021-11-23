@@ -1,6 +1,7 @@
 package stmt
 
 import (
+	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
 	"github.com/jesperkha/Fizz/lexer"
 	"github.com/jesperkha/Fizz/util"
@@ -58,12 +59,13 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 // Helper. Returnes the value for the specific statement parse function. Defaults to ExpressionStatement
 func parseStatement(typ int, tokens []lexer.Token) (stmt Statement, err error) {
 	switch typ {
-	case lexer.IDENTIFIER: return parseAssignment(tokens)
-	case lexer.PRINT: return parsePrint(tokens)
-	case lexer.VAR: return parseVariable(tokens)
-	case lexer.ELSE: return parseElse(tokens)
-	case lexer.BREAK: return parseBreak(tokens)
-	case lexer.SKIP: return parseSkip(tokens)
+		case lexer.IDENTIFIER: return parseAssignment(tokens)
+		case lexer.PRINT: return parsePrint(tokens)
+		case lexer.VAR: return parseVariable(tokens)
+		case lexer.ELSE: return parseElse(tokens)
+		case lexer.BREAK: return parseBreak(tokens)
+		case lexer.SKIP: return parseSkip(tokens)
+		case lexer.RETURN: return parseReturn(tokens)
 	}
 	
 	return parseExpression(tokens)
@@ -72,11 +74,11 @@ func parseStatement(typ int, tokens []lexer.Token) (stmt Statement, err error) {
 // Parses statements where current index would be modified or the length of the statement is unknown
 func parseComplexStatement(typ int, tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	switch typ {
-	case lexer.IF: return parseIf(tokens, idx)
-	case lexer.WHILE: return parseWhile(tokens, idx)
-	case lexer.LEFT_BRACE: return parseBlock(tokens, idx)
-	case lexer.REPEAT: return parseRepeat(tokens, idx)
-	case lexer.FUNC: return parseFunc(tokens, idx)
+		case lexer.IF: return parseIf(tokens, idx)
+		case lexer.WHILE: return parseWhile(tokens, idx)
+		case lexer.LEFT_BRACE: return parseBlock(tokens, idx)
+		case lexer.REPEAT: return parseRepeat(tokens, idx)
+		case lexer.FUNC: return parseFunc(tokens, idx)
 	}
 
 	return stmt, err
@@ -94,6 +96,16 @@ func seekToken(tokens []lexer.Token, start int, target int) (endIdx int, eof boo
 }
 
 // Parse funcs
+
+// Will raise error in exec
+func parseReturn(tokens []lexer.Token) (stmt Statement, err error) {
+	if len(tokens) == 1 {
+		return Statement{Type: Return}, err
+	}
+
+	expr, err := expr.ParseExpression(tokens[1:])
+	return Statement{Type: Return, Expression: &expr}, err
+}
 
 // Just returns the statement with a type. Implementation is handled in exec.
 func parseBreak(tokens []lexer.Token) (stmt Statement, err error) {
@@ -209,6 +221,11 @@ func parseFunc(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	params := []string{}
 	paramTokens := tokens[*idx:endIdx]
 	for _, p := range paramTokens {
+		// Todo: check comma rule
+		if p.Type == lexer.COMMA {
+			continue
+		}
+
 		if p.Type != lexer.IDENTIFIER {
 			return stmt, ErrExpectedIdentifier
 		}
@@ -226,7 +243,7 @@ func parseFunc(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 		return stmt, err
 	}
 
-	return Statement{Type: Function, Name: nameToken.Lexeme, Params: params, Then: &block}, err
+	return Statement{Type: Function, Name: nameToken.Lexeme, Params: params, Then: &block, Enviroment: env.CurrentEnv}, err
 }
 
 // Gets a trailing block statement

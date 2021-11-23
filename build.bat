@@ -4,4 +4,3 @@ if not exist ./bin (
 )
 
 go build -o ./bin/fizz.exe main.go
-echo done

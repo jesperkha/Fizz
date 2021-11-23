@@ -3,9 +3,7 @@ package expr
 import (
 	"errors"
 	"fmt"
-	"time"
 
-	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/lexer"
 )
 
@@ -54,17 +52,6 @@ type ParseToken struct {
 	Token  lexer.Token
 	Inner  []ParseToken
 	Args   [][]ParseToken
-}
-
-type Callable struct {
-	Call func(...interface{}) (interface{}, error)
-	NumArgs int
-}
-
-func init() {
-	env.Declare("time", Callable{NumArgs: 0, Call: func(i ...interface{}) (interface{}, error) {
-		return float64(time.Now().Nanosecond() / 1000000), nil
-	}})
 }
 
 func PrintExpressionAST(expr Expression) {

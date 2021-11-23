@@ -3,6 +3,7 @@ package stmt
 import (
 	"errors"
 
+	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
 )
 
@@ -20,6 +21,7 @@ var (
 	ErrDifferentTypes	  = errors.New("different types in statement, line %d")
 	ErrBeakOutsideLoop    = errors.New("cannot use break outside of a loop")
 	ErrSkipOutsideLoop    = errors.New("cannot use skip outside of a loop")
+	ErrReturnOutsideFunc  = errors.New("cannot use return outside of a function")
 	ErrNonCallable		  = errors.New("cannot call non-callable type, line %d")
 )
 
@@ -36,6 +38,7 @@ const (
 	Break
 	Skip
 	Function
+	Return
 )
 
 type Statement struct {
@@ -49,4 +52,5 @@ type Statement struct {
 	Then		   *Statement
 	Else		   *Statement
 	Params	   	   []string
+	Enviroment	   env.Environment
 } 

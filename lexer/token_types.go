@@ -19,13 +19,12 @@ const (
 	PLUS
 	MINUS
 	TYPE
+	NOT
 
 	STAR
 	SLASH
 	MODULO
 	HAT
-
-	NOT
 
 	STRING
 	NUMBER

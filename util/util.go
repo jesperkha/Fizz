@@ -18,3 +18,14 @@ func FormatError(err error, line int) error {
 
 	return err
 }
+
+// Checks if tokens is in tokenlist
+func Contains(arr []int, target int) bool {
+	for _, v := range arr {
+		if v == target {
+			return true
+		}
+	}
+
+	return false
+}

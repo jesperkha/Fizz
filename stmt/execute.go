@@ -11,6 +11,8 @@ import (
 	"github.com/jesperkha/Fizz/util"
 )
 
+var currentReturnValue interface{}
+
 // Goes through list of statements and executes them. Error is returned from statements exec method.
 func ExecuteStatements(stmts []Statement) (err error) {
 	currentIdx := 0 // For changing dynamically
@@ -38,6 +40,7 @@ func executeStatement(stmt Statement, idx *int) error {
 		case Break: return execBreak(stmt)
 		case Skip: return execSkip(stmt)
 		case ExpressionStmt: return execExpression(stmt)
+		case Return: return execReturn(stmt)
 
 		// Complex types
 		case If: return execIf(stmt, idx)
@@ -50,6 +53,22 @@ func executeStatement(stmt Statement, idx *int) error {
 	// However it is nice to have in case rework is done and types
 	// get mixed up or new types are only partially added.
 	return ErrInvalidStmtType
+}
+
+// Raises error and assigns expr value to global currentReturnValue
+func execReturn(stmt Statement) (err error) {
+	if stmt.Expression == nil {
+		currentReturnValue = nil
+		return ErrReturnOutsideFunc
+	}
+
+	value, err := expr.EvaluateExpression(stmt.Expression)
+	if err != nil {
+		return err
+	}
+
+	currentReturnValue = value
+	return ErrReturnOutsideFunc
 }
 
 // Just checks for errors
@@ -68,7 +87,6 @@ func execSkip(stmt Statement) (err error) {
 	return ErrSkipOutsideLoop
 }
 
-
 // Evaluates statement expression and prints out to terminal
 func execPrint(stmt Statement) (err error) {
 	value, err := expr.EvaluateExpression(stmt.Expression)
@@ -76,12 +94,7 @@ func execPrint(stmt Statement) (err error) {
 		return err
 	}
 
-	switch value.(type) {
-		case float64: fmt.Println(value)
-		case string: fmt.Println(value)
-		default: fmt.Println(stmt.Expression.Name)
-	}
-
+	fmt.Println(value)
 	return nil
 }
 
@@ -95,7 +108,7 @@ func execVariable(stmt Statement) (err error) {
 
 		return env.Declare(stmt.Name, val)
 	}
-
+	
 	return env.Declare(stmt.Name, nil)
 }
 
@@ -155,7 +168,7 @@ func execBlock(stmt Statement) (err error) {
 
 // Declares function to current scope
 func execFunction(stmt Statement, idx *int) (err error) {
-	err = env.Declare(stmt.Name, expr.Callable{
+	err = env.Declare(stmt.Name, env.Callable{
 		NumArgs: len(stmt.Params),
 
 		// Call function and set param variables to scope
@@ -167,10 +180,14 @@ func execFunction(stmt Statement, idx *int) (err error) {
 				// Cannot raise error because block is in own scope
 				env.Declare(stmt.Params[idx], arg)
 			}
-
+ 
 			err = ExecuteStatements(stmt.Then.Statements)
 			env.PopScope()
-			return 0, err
+			if errors.Is(err, ErrReturnOutsideFunc) {
+				return currentReturnValue, nil
+			}
+
+			return nil, err
 		},
 	})
 
