@@ -23,10 +23,11 @@ var (
 	ErrSkipOutsideLoop    = errors.New("cannot use skip outside of a loop")
 	ErrReturnOutsideFunc  = errors.New("cannot use return outside of a function")
 	ErrNonCallable		  = errors.New("cannot call non-callable type, line %d")
+	ErrCommaError		  = errors.New("comma error, line %d")
 )
 
 const (
-	NotExpression = iota
+	NotStatement = iota
 	ExpressionStmt
 	Print
 	Variable

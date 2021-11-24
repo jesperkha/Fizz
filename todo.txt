@@ -1,2 +1,7 @@
 Todo:
 Fix int to float64 conversion issue for function return values
+Add actual comma separation for function declarations
+
+Rework
+stmt/exec + stmt errors
+expr/*
