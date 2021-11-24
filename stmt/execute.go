@@ -11,6 +11,8 @@ import (
 	"github.com/jesperkha/Fizz/util"
 )
 
+// Todo: Rework exec and remove global return
+
 var currentReturnValue interface{}
 
 // Goes through list of statements and executes them. Error is returned from statements exec method.
@@ -32,21 +34,33 @@ func ExecuteStatements(stmts []Statement) (err error) {
 
 func executeStatement(stmt Statement, idx *int) error {
 	switch stmt.Type {
-		// Normal types
-		case Block: return execBlock(stmt)
-		case Print: return execPrint(stmt)
-		case Variable: return execVariable(stmt)
-		case Assignment: return execAssignment(stmt)
-		case Break: return execBreak(stmt)
-		case Skip: return execSkip(stmt)
-		case ExpressionStmt: return execExpression(stmt)
-		case Return: return execReturn(stmt)
+	// Normal types
+	case Block:
+		return execBlock(stmt)
+	case Print:
+		return execPrint(stmt)
+	case Variable:
+		return execVariable(stmt)
+	case Assignment:
+		return execAssignment(stmt)
+	case Break:
+		return execBreak(stmt)
+	case Skip:
+		return execSkip(stmt)
+	case ExpressionStmt:
+		return execExpression(stmt)
+	case Return:
+		return execReturn(stmt)
 
-		// Complex types
-		case If: return execIf(stmt, idx)
-		case While: return execWhile(stmt, idx)
-		case Repeat: return execRepeat(stmt, idx)
-		case Function: return execFunction(stmt, idx)
+	// Complex types
+	case If:
+		return execIf(stmt, idx)
+	case While:
+		return execWhile(stmt, idx)
+	case Repeat:
+		return execRepeat(stmt, idx)
+	case Function:
+		return execFunction(stmt, idx)
 	}
 
 	// Will never be returned since all types are pre-defined.
@@ -108,7 +122,7 @@ func execVariable(stmt Statement) (err error) {
 
 		return env.Declare(stmt.Name, val)
 	}
-	
+
 	return env.Declare(stmt.Name, nil)
 }
 
@@ -139,9 +153,9 @@ func execAssignment(stmt Statement) (err error) {
 	if reflect.TypeOf(val) == reflect.TypeOf("") {
 		if stmt.Operator == lexer.MINUS_EQUAL {
 			return ErrInvalidOperator
-		} 
+		}
 
-		return env.Assign(stmt.Name, oldVal.(string) + val.(string))
+		return env.Assign(stmt.Name, oldVal.(string)+val.(string))
 	}
 
 	// Float addition / subtraction
@@ -151,8 +165,8 @@ func execAssignment(stmt Statement) (err error) {
 		if stmt.Operator == lexer.MINUS_EQUAL {
 			a *= -1
 		}
-	
-		return env.Assign(stmt.Name, a + b)
+
+		return env.Assign(stmt.Name, a+b)
 	}
 
 	return ErrDifferentTypes
@@ -180,7 +194,7 @@ func execFunction(stmt Statement, idx *int) (err error) {
 				// Cannot raise error because block is in own scope
 				env.Declare(stmt.Params[idx], arg)
 			}
- 
+
 			err = ExecuteStatements(stmt.Then.Statements)
 			env.PopScope()
 			if errors.Is(err, ErrReturnOutsideFunc) {
@@ -206,7 +220,7 @@ func execIf(stmt Statement, idx *int) (err error) {
 	} else if stmt.Else != nil {
 		return ExecuteStatements(stmt.Else.Statements)
 	}
-	
+
 	return err
 }
 
@@ -218,7 +232,7 @@ func execWhile(stmt Statement, idx *int) (err error) {
 			if err != nil {
 				return err
 			}
-		
+
 			if val == nil || val == false {
 				break
 			}
@@ -261,12 +275,12 @@ func execRepeat(stmt Statement, idx *int) (err error) {
 
 			if err == nil || errors.Is(err, ErrSkipOutsideLoop) {
 				if oldVal, err := env.Get(name); err == nil {
-					env.Assign(name, oldVal.(float64) + 1)
+					env.Assign(name, oldVal.(float64)+1)
 				}
-				
+
 				continue
 			}
-			
+
 			return err
 		}
 

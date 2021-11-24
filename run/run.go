@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+// Todo: Move this to main
+
 var (
 	ErrFileNotFound = errors.New("cannot find file with name: '%s'")
 	ErrNonFizzFile  = errors.New("cannot run non-Fizz file")

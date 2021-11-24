@@ -14,7 +14,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 	for currentIdx < len(tokens) {
 		startIndex := currentIdx
 		firstToken := tokens[currentIdx]
-		
+
 		var currentStmt Statement
 		line := firstToken.Line
 
@@ -24,7 +24,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		if err != nil {
 			return statements, util.FormatError(err, line)
 		}
-		
+
 		// Parse any other type of statement.
 		if currentStmt.Type == NotStatement {
 			// Seeks a semicolon since all other statements end with a semicolon
@@ -32,15 +32,15 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 			if eof {
 				return statements, util.FormatError(ErrNoSemicolon, line)
 			}
-	
+
 			currentIdx = endIdx // Skip to end of statement to section off token list
-	
+
 			// Get tokens in interval between last semicolon and current one
 			tokenInterval := tokens[startIndex:currentIdx]
 			if len(tokenInterval) == 0 {
 				return statements, util.FormatError(err, line)
 			}
-	
+
 			// Parse statement
 			currentStmt, err = parseStatement(firstToken.Type, tokenInterval)
 			if err != nil {
@@ -59,26 +59,38 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 // Defaults to ExpressionStatement
 func parseStatement(typ int, tokens []lexer.Token) (stmt Statement, err error) {
 	switch typ {
-		case lexer.IDENTIFIER: return parseAssignment(tokens)
-		case lexer.PRINT: return parsePrint(tokens)
-		case lexer.VAR: return parseVariable(tokens)
-		case lexer.ELSE: return parseElse(tokens)
-		case lexer.BREAK: return parseBreak(tokens)
-		case lexer.SKIP: return parseSkip(tokens)
-		case lexer.RETURN: return parseReturn(tokens)
+	case lexer.IDENTIFIER:
+		return parseAssignment(tokens)
+	case lexer.PRINT:
+		return parsePrint(tokens)
+	case lexer.VAR:
+		return parseVariable(tokens)
+	case lexer.ELSE:
+		return parseElse(tokens)
+	case lexer.BREAK:
+		return parseBreak(tokens)
+	case lexer.SKIP:
+		return parseSkip(tokens)
+	case lexer.RETURN:
+		return parseReturn(tokens)
 	}
-	
+
 	return parseExpression(tokens)
 }
 
 // Parses statements where current index would be modified or the length of the statement is unknown
 func parseComplexStatement(typ int, tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	switch typ {
-		case lexer.IF: return parseIf(tokens, idx)
-		case lexer.WHILE: return parseWhile(tokens, idx)
-		case lexer.LEFT_BRACE: return parseBlock(tokens, idx)
-		case lexer.REPEAT: return parseRepeat(tokens, idx)
-		case lexer.FUNC: return parseFunc(tokens, idx)
+	case lexer.IF:
+		return parseIf(tokens, idx)
+	case lexer.WHILE:
+		return parseWhile(tokens, idx)
+	case lexer.LEFT_BRACE:
+		return parseBlock(tokens, idx)
+	case lexer.REPEAT:
+		return parseRepeat(tokens, idx)
+	case lexer.FUNC:
+		return parseFunc(tokens, idx)
 	}
 
 	return stmt, err
@@ -138,7 +150,7 @@ func parsePrint(tokens []lexer.Token) (stmt Statement, err error) {
 	if len(tokens) == 1 {
 		return stmt, ErrExpectedExpression
 	}
-	
+
 	expr, err := expr.ParseExpression(tokens[1:])
 	return Statement{Type: Print, Expression: &expr}, err
 }
@@ -152,12 +164,12 @@ func parseVariable(tokens []lexer.Token) (stmt Statement, err error) {
 	name := tokens[1]
 	equals := tokens[2].Type == lexer.EQUAL
 	exprTokens := tokens[3:]
-	
+
 	if name.Type == lexer.IDENTIFIER && equals {
 		initExpr, err := expr.ParseExpression(exprTokens)
 		return Statement{Type: Variable, Name: name.Lexeme, InitExpression: &initExpr}, err
 	}
-	
+
 	return stmt, ErrInvalidStatement
 }
 
@@ -165,12 +177,12 @@ func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 	if len(tokens) < 3 {
 		return parseExpression(tokens)
 	}
-	
+
 	t := tokens[1].Type
 	if t != lexer.EQUAL && t != lexer.PLUS_EQUAL && t != lexer.MINUS_EQUAL {
 		return parseExpression(tokens)
 	}
-	
+
 	expr, err := expr.ParseExpression(tokens[2:])
 	return Statement{Type: Assignment, Name: tokens[0].Lexeme, Expression: &expr, Operator: t}, err
 }
@@ -180,8 +192,8 @@ func parseFunc(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 		return stmt, ErrInvalidStatement
 	}
 
-	nameToken := tokens[*idx + 1]
-	if nameToken.Type != lexer.IDENTIFIER || tokens[*idx + 2].Type != lexer.LEFT_PAREN {
+	nameToken := tokens[*idx+1]
+	if nameToken.Type != lexer.IDENTIFIER || tokens[*idx+2].Type != lexer.LEFT_PAREN {
 		return stmt, ErrInvalidStatement // Missing identifier or block
 	}
 
@@ -190,12 +202,13 @@ func parseFunc(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	if eof {
 		return stmt, ErrInvalidStatement
 	}
-	
+
 	// Get param names
 	params := []string{}
 	for _, p := range tokens[*idx:endIdx] {
 		switch p.Type {
-		case lexer.COMMA: continue
+		case lexer.COMMA:
+			continue
 		case lexer.IDENTIFIER:
 			params = append(params, p.Lexeme)
 			continue
@@ -219,20 +232,22 @@ func getBlockStatement(tokens []lexer.Token, idx *int) (block Statement, err err
 	if tokens[start].Type != lexer.LEFT_BRACE {
 		return block, ErrExpectedBlock
 	}
-	
+
 	numEndBraces := 0
 	for *idx < len(tokens) {
 		switch tokens[*idx].Type {
-			case lexer.LEFT_BRACE: numEndBraces++
-			case lexer.RIGHT_BRACE: numEndBraces--
+		case lexer.LEFT_BRACE:
+			numEndBraces++
+		case lexer.RIGHT_BRACE:
+			numEndBraces--
 		}
-		
+
 		if numEndBraces != 0 {
 			*idx++
 			continue
 		}
-		
-		blockTokens := tokens[start + 1:*idx]
+
+		blockTokens := tokens[start+1 : *idx]
 		statements, err := ParseStatements(blockTokens)
 		return Statement{Type: Block, Statements: statements}, err
 	}
@@ -251,7 +266,7 @@ func getExpressionAndBlock(tokens []lexer.Token, idx *int, expectExpr bool) (exp
 		return expr, block, ErrExpectedBlock
 	}
 
-	expr, err = parseExpression(tokens[*idx + 1:startBlock])
+	expr, err = parseExpression(tokens[*idx+1 : startBlock])
 	if err != nil {
 		return expr, block, err
 	}
@@ -270,10 +285,10 @@ func parseIf(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	if err != nil {
 		return stmt, err
 	}
-	
+
 	// Check for else statement
-	if *idx + 1 < len(tokens) && tokens[*idx + 1].Type == lexer.ELSE {
-		if *idx + 2 >= len(tokens) {
+	if *idx+1 < len(tokens) && tokens[*idx+1].Type == lexer.ELSE {
+		if *idx+2 >= len(tokens) {
 			return stmt, ErrExpectedBlock
 		}
 

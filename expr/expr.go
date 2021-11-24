@@ -8,16 +8,16 @@ import (
 )
 
 var (
-	ErrParenError			= errors.New("unmatched parenthesies, line %d")
+	ErrParenError           = errors.New("unmatched parenthesies, line %d")
 	ErrInvalidUnaryOperator = errors.New("invalid unary operator '%s', line %d")
 	ErrInvalidOperatorType  = errors.New("invalid operator '%s' for type '%s', line %d")
 	ErrInvalidOperatorTypes = errors.New("invalid operator '%s' for types '%s' and '%s', line %d")
-	ErrDivideByZero			= errors.New("division by 0, line %d")
+	ErrDivideByZero         = errors.New("division by 0, line %d")
 	ErrInvalidExpression    = errors.New("invalid expression, line %d")
 	ErrExpectedExpression   = errors.New("expected expression in group, line %d")
-	ErrCommaError			= errors.New("comma error, line %d")
-	ErrIncorrectArgs		= errors.New("'%s()' expected %d args, got %d, line %d")
-	ErrNotFunction			= errors.New("'%s' is not a function, line %d")
+	ErrCommaError           = errors.New("comma error, line %d")
+	ErrIncorrectArgs        = errors.New("'%s()' expected %d args, got %d, line %d")
+	ErrNotFunction          = errors.New("'%s' is not a function, line %d")
 )
 
 const (
@@ -28,7 +28,7 @@ const (
 	Group
 	Variable
 	Call
-	
+
 	// ParseToken types
 	Single
 	TokenGroup
@@ -36,22 +36,22 @@ const (
 )
 
 type Expression struct {
-	Type     int
-	Line	 int
-	Name	 string
-	Operand  lexer.Token
-	Value    lexer.Token
-	Left	 *Expression
-	Right 	 *Expression
-	Inner 	 *Expression
-	Exprs	 []Expression
+	Type    int
+	Line    int
+	Name    string
+	Operand lexer.Token
+	Value   lexer.Token
+	Left    *Expression
+	Right   *Expression
+	Inner   *Expression
+	Exprs   []Expression
 }
 
 type ParseToken struct {
-	Type   int
-	Token  lexer.Token
-	Inner  []ParseToken
-	Args   [][]ParseToken
+	Type  int
+	Token lexer.Token
+	Inner []ParseToken
+	Args  [][]ParseToken
 }
 
 func PrintExpressionAST(expr Expression) {

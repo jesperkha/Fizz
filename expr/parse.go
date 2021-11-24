@@ -19,8 +19,10 @@ func seekEndParen(tokens []lexer.Token, start int) (endIdx int, eof bool) {
 	numParen := 0
 	for i := start; i < len(tokens); i++ {
 		switch tokens[i].Type {
-		case lexer.LEFT_PAREN: numParen++
-		case lexer.RIGHT_PAREN: numParen--
+		case lexer.LEFT_PAREN:
+			numParen++
+		case lexer.RIGHT_PAREN:
+			numParen--
 		}
 
 		if numParen == 0 {
@@ -44,7 +46,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 	for currentIdx < len(tokens) {
 		token := tokens[currentIdx]
 		line := token.Line
-		
+
 		// Find end paren and call recursive for inner part
 		if token.Type == lexer.LEFT_PAREN {
 			endIdx, eof := seekEndParen(tokens, currentIdx)
@@ -52,12 +54,12 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 				return ptokens, util.FormatError(ErrParenError, line)
 			}
 
-			if endIdx - currentIdx == 1 {
+			if endIdx-currentIdx == 1 {
 				return ptokens, util.FormatError(ErrExpectedExpression, line)
 			}
 
 			// Generate ptokens between start and end paren
-			tokenGroup, err := generateParseTokens(tokens[currentIdx + 1:endIdx])
+			tokenGroup, err := generateParseTokens(tokens[currentIdx+1 : endIdx])
 			if err != nil {
 				return ptokens, err
 			}
@@ -75,7 +77,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 		// Check and handle function call expression
 		if token.Type == lexer.IDENTIFIER {
-			if currentIdx + 1 >= len(tokens) || tokens[currentIdx + 1].Type != lexer.LEFT_PAREN {
+			if currentIdx+1 >= len(tokens) || tokens[currentIdx+1].Type != lexer.LEFT_PAREN {
 				ptokens = append(ptokens, ParseToken{Type: Single, Token: token})
 				currentIdx++
 				continue
@@ -89,7 +91,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 			}
 
 			// +1 to skip start paren
-			interval := tokens[currentIdx + 1:endIdx]
+			interval := tokens[currentIdx+1 : endIdx]
 			// Add end comma to parse last expression
 			if len(interval) != 0 {
 				interval = append(interval, lexer.Token{Type: lexer.COMMA})
@@ -101,7 +103,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 				if t.Type != lexer.COMMA {
 					continue
 				}
-				
+
 				if exprStart == idx {
 					return ptokens, util.FormatError(ErrCommaError, line)
 				}
@@ -142,7 +144,7 @@ func parsePTokens(tokens []ParseToken) *Expression {
 	if len(tokens) == 2 || util.Contains(unaryTokens, tokens[0].Token.Type) {
 		return &Expression{Type: Unary, Line: line, Operand: tokens[0].Token, Right: parsePTokens(tokens[1:])}
 	}
-	
+
 	// Literal, Variable, or Group expression
 	if len(tokens) == 1 {
 		token := tokens[0]
@@ -179,6 +181,6 @@ func parsePTokens(tokens []ParseToken) *Expression {
 		}
 	}
 
-	right, left := parsePTokens(tokens[lowestIdx + 1:]), parsePTokens(tokens[:lowestIdx])
+	right, left := parsePTokens(tokens[lowestIdx+1:]), parsePTokens(tokens[:lowestIdx])
 	return &Expression{Type: Binary, Line: line, Operand: lowest, Left: left, Right: right}
 }

@@ -15,12 +15,18 @@ import (
 // resolve nested expressions. Returned value is result of expression and is Go literal.
 func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 	switch expr.Type {
-		case Literal: return expr.Value.Literal, err
-		case Unary: return evalUnary(expr)
-		case Binary: return evalBinary(expr)
-		case Group:	return EvaluateExpression(expr.Inner)
-		case Variable: return env.Get(expr.Name)
-		case Call: return evalCall(expr)
+	case Literal:
+		return expr.Value.Literal, err
+	case Unary:
+		return evalUnary(expr)
+	case Binary:
+		return evalBinary(expr)
+	case Group:
+		return EvaluateExpression(expr.Inner)
+	case Variable:
+		return env.Get(expr.Name)
+	case Call:
+		return evalCall(expr)
 	}
 
 	// Wont be reached
@@ -32,8 +38,9 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 func evalUnary(unary *Expression) (value interface{}, err error) {
 	right, err := EvaluateExpression(unary.Right)
 
-	switch (unary.Operand.Type) {
-		case lexer.MINUS: {
+	switch unary.Operand.Type {
+	case lexer.MINUS:
+		{
 			if !isBool(right) {
 				return -right.(float64), err
 			}
@@ -41,8 +48,10 @@ func evalUnary(unary *Expression) (value interface{}, err error) {
 			op, typ, line := unary.Operand.Lexeme, getType(right), unary.Line
 			return nil, fmt.Errorf(ErrInvalidOperatorType.Error(), op, typ, line)
 		}
-		case lexer.NOT: return !isTruthy(right), err
-		case lexer.TYPE: return getType(right), err
+	case lexer.NOT:
+		return !isTruthy(right), err
+	case lexer.TYPE:
+		return getType(right), err
 	}
 
 	op, line := unary.Operand.Lexeme, unary.Line
@@ -65,37 +74,50 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 	// Numbers are float64, set from lexer
 	if isNumber(right) && isNumber(left) {
 		vl, vr := left.(float64), right.(float64)
-		switch (binary.Operand.Type) {
-			case lexer.PLUS: return vl + vr, err
-			case lexer.MINUS: return vl - vr, err
-			case lexer.STAR: return vl * vr, err
-			case lexer.HAT: return math.Pow(vl, vr), err
-			case lexer.GREATER: return vl > vr, err
-			case lexer.LESS: return vl < vr, err
-			case lexer.LESS_EQUAL: return vl <= vr, err
-			case lexer.GREATER_EQUAL: return vl >= vr, err
-			case lexer.MODULO: return float64(int(vl) % int(vr)), err
+		switch binary.Operand.Type {
+		case lexer.PLUS:
+			return vl + vr, err
+		case lexer.MINUS:
+			return vl - vr, err
+		case lexer.STAR:
+			return vl * vr, err
+		case lexer.HAT:
+			return math.Pow(vl, vr), err
+		case lexer.GREATER:
+			return vl > vr, err
+		case lexer.LESS:
+			return vl < vr, err
+		case lexer.LESS_EQUAL:
+			return vl <= vr, err
+		case lexer.GREATER_EQUAL:
+			return vl >= vr, err
+		case lexer.MODULO:
+			return float64(int(vl) % int(vr)), err
 		case lexer.SLASH:
 			if vr == 0 {
 				return nil, util.FormatError(ErrDivideByZero, binary.Line)
 			}
-			
+
 			return vl / vr, err
 		}
 	}
-	
-	switch (binary.Operand.Type) {
-		case lexer.EQUAL_EQUAL: return left == right, err
-		case lexer.NOT_EQUAL: return left != right, err
-		case lexer.AND: return isTruthy(left) && isTruthy(right), err
-		case lexer.OR: return isTruthy(left) || isTruthy(right), err
+
+	switch binary.Operand.Type {
+	case lexer.EQUAL_EQUAL:
+		return left == right, err
+	case lexer.NOT_EQUAL:
+		return left != right, err
+	case lexer.AND:
+		return isTruthy(left) && isTruthy(right), err
+	case lexer.OR:
+		return isTruthy(left) || isTruthy(right), err
 	}
 
 	// Support string addition
 	if getType(left) == "string" && getType(right) == "string" && binary.Operand.Type == lexer.PLUS {
 		return strings.Join([]string{left.(string), right.(string)}, ""), err
 	}
-	
+
 	typeLeft, typeRight := getType(left), getType(right)
 	op, line := binary.Operand.Lexeme, binary.Line
 	return nil, fmt.Errorf(ErrInvalidOperatorTypes.Error(), op, typeLeft, typeRight, line)
@@ -128,6 +150,7 @@ func evalCall(call *Expression) (value interface{}, err error) {
 			args = append(args, v)
 		}
 
+		// Todo: Fix int to float64 conversion error for native function returns
 		if numArgs == 0 {
 			return function.Call()
 		}
@@ -148,9 +171,12 @@ func isBool(value interface{}) bool {
 
 func isNumber(value interface{}) bool {
 	switch value.(type) {
-		case int: return true
-		case float32: return true
-		case float64: return true
+	case int:
+		return true
+	case float32:
+		return true
+	case float64:
+		return true
 	}
 
 	return false

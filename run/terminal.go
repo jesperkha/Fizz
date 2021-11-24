@@ -14,7 +14,7 @@ func RunTerminal() {
 	totalString := ""
 	numBlocks := 0
 	indent := "    "
-	
+
 	fmt.Println("type 'exit' to terminate session")
 	for {
 		fmt.Print("::: " + strings.Repeat(indent, numBlocks))
