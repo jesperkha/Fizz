@@ -181,6 +181,14 @@ func parsePTokens(tokens []ParseToken) *Expression {
 		}
 	}
 
+	// Invalid expression might have lowest as end token
+	// Move to middle and let evaluation handle error
+	if lowestIdx == len(tokens) - 1 {
+		newIdx := int(len(tokens)/2)
+		lowestIdx = newIdx
+		lowest = tokens[lowestIdx].Token
+	}
+
 	right, left := parsePTokens(tokens[lowestIdx+1:]), parsePTokens(tokens[:lowestIdx])
 	return &Expression{Type: Binary, Line: line, Operand: lowest, Left: left, Right: right}
 }

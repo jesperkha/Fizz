@@ -191,21 +191,22 @@ func parseFunc(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	if len(tokens) < 6 {
 		return stmt, ErrInvalidStatement
 	}
-
+	
 	nameToken := tokens[*idx+1]
 	if nameToken.Type != lexer.IDENTIFIER || tokens[*idx+2].Type != lexer.LEFT_PAREN {
 		return stmt, ErrInvalidStatement // Missing identifier or block
 	}
-
+	
 	*idx += 3 // Skip to start of param list
 	endIdx, eof := seekToken(tokens, *idx, lexer.RIGHT_PAREN)
 	if eof {
 		return stmt, ErrInvalidStatement
 	}
-
+	
 	// Get param names
 	params := []string{}
 	for _, p := range tokens[*idx:endIdx] {
+		// Todo: Add actual comma separation for function declarations
 		switch p.Type {
 		case lexer.COMMA:
 			continue

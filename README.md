@@ -13,7 +13,7 @@ This roadmap highlights progress for Fizz's development:
 - ✔️ Expression parsing
 - ✔️ Conditional statements
 - ✔️ Loops
-- ❌ Functions
+- ✔️ Functions
 - ❌ Classes
 - ❌ Arrays
 - ❌ File import
