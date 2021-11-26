@@ -73,6 +73,8 @@ func parseStatement(typ int, tokens []lexer.Token) (stmt Statement, err error) {
 		return parseSkip(tokens)
 	case lexer.RETURN:
 		return parseReturn(tokens)
+	case lexer.EXIT:
+		return parseExit(tokens)
 	}
 
 	return parseExpression(tokens)
@@ -105,6 +107,14 @@ func seekToken(tokens []lexer.Token, start int, target int) (endIdx int, eof boo
 	}
 
 	return 0, true
+}
+
+func parseExit(tokens []lexer.Token) (stmt Statement, err error) {
+	if len(tokens) > 1 {
+		return stmt, ErrInvalidStatement
+	}
+
+	return Statement{Type: Exit}, err
 }
 
 func parseReturn(tokens []lexer.Token) (stmt Statement, err error) {
@@ -206,7 +216,6 @@ func parseFunc(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	// Get param names
 	params := []string{}
 	for _, p := range tokens[*idx:endIdx] {
-		// Todo: Add actual comma separation for function declarations
 		switch p.Type {
 		case lexer.COMMA:
 			continue
@@ -234,20 +243,8 @@ func getBlockStatement(tokens []lexer.Token, idx *int) (block Statement, err err
 		return block, ErrExpectedBlock
 	}
 
-	numEndBraces := 0
-	for *idx < len(tokens) {
-		switch tokens[*idx].Type {
-		case lexer.LEFT_BRACE:
-			numEndBraces++
-		case lexer.RIGHT_BRACE:
-			numEndBraces--
-		}
-
-		if numEndBraces != 0 {
-			*idx++
-			continue
-		}
-
+	if endIdx, eof := util.SeekClosingBracket(tokens, *idx, lexer.LEFT_BRACE, lexer.RIGHT_BRACE); !eof {
+		*idx = endIdx
 		blockTokens := tokens[start+1 : *idx]
 		statements, err := ParseStatements(blockTokens)
 		return Statement{Type: Block, Statements: statements}, err

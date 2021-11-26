@@ -1,17 +1,22 @@
 package env
 
-import "log"
+type FizzObject interface {
+	Type() string
+}
 
 type Callable struct {
 	Call    func(...interface{}) (interface{}, error)
 	NumArgs int
 }
 
+func (c Callable) Type() string {
+	return "function"
+}
+
 func init() {
-	Declare("log", Callable{
-		NumArgs: 1,
+	Declare("test", Callable{
+		NumArgs: 0,
 		Call: func(i ...interface{}) (interface{}, error) {
-			log.Println(i...)
 			return 1.0, nil
 		},
 	})

@@ -30,6 +30,7 @@ const (
 	NUMBER
 	TRUE
 	FALSE
+	NIL
 	IDENTIFIER
 
 	// Not valid expression types
@@ -49,9 +50,9 @@ const (
 	RETURN
 	IF
 	ELSE
-	NIL
 	PRINT
 	SUPER
+	EXIT
 	THIS
 	VAR
 	WHILE
@@ -111,6 +112,7 @@ var keyWordLookup = map[string]int{
 	"nil":    NIL,
 	"print":  PRINT,
 	"return": RETURN,
+	"exit":   EXIT,
 	"class":  CLASS,
 	"super":  SUPER,
 	"this":   THIS,

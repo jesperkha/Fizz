@@ -3,7 +3,6 @@ package stmt
 import (
 	"errors"
 	"fmt"
-	"reflect"
 
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
@@ -11,20 +10,13 @@ import (
 	"github.com/jesperkha/Fizz/util"
 )
 
-// Todo: Rework exec and remove global return
-
 var currentReturnValue interface{}
 
 // Goes through list of statements and executes them. Error is returned from statements exec method.
 func ExecuteStatements(stmts []Statement) (err error) {
-	currentIdx := 0 // For changing dynamically
-
-	for currentIdx < len(stmts) {
-		statement := stmts[currentIdx]
+	for _, statement := range stmts {
 		line := statement.Line
-		currentIdx++
-
-		if err = executeStatement(statement, &currentIdx); err != nil {
+		if err = executeStatement(statement); err != nil {
 			return util.FormatError(err, line)
 		}
 	}
@@ -32,41 +24,31 @@ func ExecuteStatements(stmts []Statement) (err error) {
 	return err
 }
 
-func executeStatement(stmt Statement, idx *int) error {
+func executeStatement(stmt Statement) error {
 	switch stmt.Type {
-	// Normal types
-	case Block:
-		return execBlock(stmt)
-	case Print:
-		return execPrint(stmt)
-	case Variable:
-		return execVariable(stmt)
-	case Assignment:
-		return execAssignment(stmt)
-	case Break:
-		return execBreak(stmt)
-	case Skip:
-		return execSkip(stmt)
-	case ExpressionStmt:
-		return execExpression(stmt)
-	case Return:
-		return execReturn(stmt)
-
-	// Complex types
-	case If:
-		return execIf(stmt, idx)
-	case While:
-		return execWhile(stmt, idx)
-	case Repeat:
-		return execRepeat(stmt, idx)
-	case Function:
-		return execFunction(stmt, idx)
+	case ExpressionStmt: return execExpression(stmt)
+	case Block: 		 return execBlock(stmt)
+	case Print: 		 return execPrint(stmt)
+	case Variable: 		 return execVariable(stmt)
+	case Assignment: 	 return execAssignment(stmt)
+	case Break:			 return execBreak(stmt)
+	case Skip: 			 return execSkip(stmt)
+	case Return: 		 return execReturn(stmt)
+	case If: 			 return execIf(stmt)
+	case While: 		 return execWhile(stmt)
+	case Repeat: 		 return execRepeat(stmt)
+	case Function: 		 return execFunction(stmt)
+	case Exit:			 return execExit(stmt)
 	}
 
 	// Will never be returned since all types are pre-defined.
 	// However it is nice to have in case rework is done and types
 	// get mixed up or new types are only partially added.
 	return ErrInvalidStmtType
+}
+
+func execExit(stmt Statement) (err error) {
+	return ErrProgramExit
 }
 
 // Raises error and assigns expr value to global currentReturnValue
@@ -85,23 +67,19 @@ func execReturn(stmt Statement) (err error) {
 	return ErrReturnOutsideFunc
 }
 
-// Just checks for errors
 func execExpression(stmt Statement) (err error) {
 	_, err = expr.EvaluateExpression(stmt.Expression)
 	return err
 }
 
-// Error is handled in loop exec methods
 func execBreak(stmt Statement) (err error) {
 	return ErrBeakOutsideLoop
 }
 
-// Same as break
 func execSkip(stmt Statement) (err error) {
 	return ErrSkipOutsideLoop
 }
 
-// Evaluates statement expression and prints out to terminal
 func execPrint(stmt Statement) (err error) {
 	value, err := expr.EvaluateExpression(stmt.Expression)
 	if err != nil {
@@ -112,7 +90,6 @@ func execPrint(stmt Statement) (err error) {
 	return nil
 }
 
-// Adds variable init value to current environment table
 func execVariable(stmt Statement) (err error) {
 	if stmt.InitExpression != nil {
 		val, err := expr.EvaluateExpression(stmt.InitExpression)
@@ -126,7 +103,6 @@ func execVariable(stmt Statement) (err error) {
 	return env.Declare(stmt.Name, nil)
 }
 
-// Assigns right side expression value to variable
 func execAssignment(stmt Statement) (err error) {
 	val, err := expr.EvaluateExpression(stmt.Expression)
 	if err != nil {
@@ -145,12 +121,13 @@ func execAssignment(stmt Statement) (err error) {
 	}
 
 	// Not same type
-	if reflect.TypeOf(oldVal) != reflect.TypeOf(val) {
-		return ErrInvalidStatement
+	oldType, newType := util.GetType(oldVal), util.GetType(val)
+	if oldType != newType {
+		return ErrDifferentTypes
 	}
 
 	// String addition
-	if reflect.TypeOf(val) == reflect.TypeOf("") {
+	if newType == "string" {
 		if stmt.Operator == lexer.MINUS_EQUAL {
 			return ErrInvalidOperator
 		}
@@ -159,7 +136,7 @@ func execAssignment(stmt Statement) (err error) {
 	}
 
 	// Float addition / subtraction
-	if reflect.TypeOf(val) == reflect.TypeOf(float64(1)) {
+	if newType == "float64" {
 		a := val.(float64)
 		b := oldVal.(float64)
 		if stmt.Operator == lexer.MINUS_EQUAL {
@@ -169,10 +146,9 @@ func execAssignment(stmt Statement) (err error) {
 		return env.Assign(stmt.Name, a+b)
 	}
 
-	return ErrDifferentTypes
+	return ErrInvalidStatement
 }
 
-// Executes all statements within block scope
 func execBlock(stmt Statement) (err error) {
 	env.PushScope()
 	err = ExecuteStatements(stmt.Statements)
@@ -180,8 +156,7 @@ func execBlock(stmt Statement) (err error) {
 	return err
 }
 
-// Declares function to current scope
-func execFunction(stmt Statement, idx *int) (err error) {
+func execFunction(stmt Statement) (err error) {
 	err = env.Declare(stmt.Name, env.Callable{
 		NumArgs: len(stmt.Params),
 
@@ -208,8 +183,7 @@ func execFunction(stmt Statement, idx *int) (err error) {
 	return err
 }
 
-// Skips trailing block statement if expression is false
-func execIf(stmt Statement, idx *int) (err error) {
+func execIf(stmt Statement) (err error) {
 	val, err := expr.EvaluateExpression(stmt.Expression)
 	if err != nil {
 		return err
@@ -224,8 +198,8 @@ func execIf(stmt Statement, idx *int) (err error) {
 	return err
 }
 
-// Runs block if expression is true or no expression
-func execWhile(stmt Statement, idx *int) (err error) {
+// Runs block if expression is nil too
+func execWhile(stmt Statement) (err error) {
 	for {
 		if stmt.Expression != nil {
 			val, err := expr.EvaluateExpression(stmt.Expression)
@@ -255,10 +229,11 @@ func execWhile(stmt Statement, idx *int) (err error) {
 	return err
 }
 
-// Runs loop while expression is true
-func execRepeat(stmt Statement, idx *int) (err error) {
+func execRepeat(stmt Statement) (err error) {
 	name := stmt.Expression.Left.Name
-	env.PushScope() // Avoid clashing when defining new variable
+	// Push new scope to avoid clashing when defining new variable
+	// Block is in child scope anyway
+	env.PushScope()
 	env.Declare(name, float64(0))
 
 	for {
@@ -267,24 +242,26 @@ func execRepeat(stmt Statement, idx *int) (err error) {
 			return err
 		}
 
-		if val == true {
-			err = ExecuteStatements(stmt.Then.Statements)
-			if errors.Is(err, ErrBeakOutsideLoop) {
-				return nil
-			}
-
-			if err == nil || errors.Is(err, ErrSkipOutsideLoop) {
-				if oldVal, err := env.Get(name); err == nil {
-					env.Assign(name, oldVal.(float64)+1)
-				}
-
-				continue
-			}
-
-			return err
+		if val == false { // Explicit check for false because interface, stfu
+			break
 		}
 
-		break
+		// Break and skip return errors that are handled here
+		// Todo: Add line number for break, skip, and return 'errors'
+		err = ExecuteStatements(stmt.Then.Statements)
+		if errors.Is(err, ErrBeakOutsideLoop) {
+			return nil
+		}
+
+		if err == nil || errors.Is(err, ErrSkipOutsideLoop) {
+			if oldVal, err := env.Get(name); err == nil {
+				env.Assign(name, oldVal.(float64)+1)
+			}
+
+			continue
+		}
+
+		return err
 	}
 
 	env.PopScope()

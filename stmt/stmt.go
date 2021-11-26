@@ -19,11 +19,13 @@ var (
 	ErrExpectedIf         = errors.New("expected if statement before else, line %d")
 	ErrInvalidOperator    = errors.New("invalid statement operator, line %d")
 	ErrDifferentTypes     = errors.New("different types in statement, line %d")
-	ErrBeakOutsideLoop    = errors.New("cannot use break outside of a loop")
-	ErrSkipOutsideLoop    = errors.New("cannot use skip outside of a loop")
-	ErrReturnOutsideFunc  = errors.New("cannot use return outside of a function")
 	ErrNonCallable        = errors.New("cannot call non-callable type, line %d")
 	ErrCommaError         = errors.New("comma error, line %d")
+
+	ErrReturnOutsideFunc  = errors.New("cannot use return outside of a function")
+	ErrSkipOutsideLoop    = errors.New("cannot use skip outside of a loop")
+	ErrBeakOutsideLoop    = errors.New("cannot use break outside of a loop")
+	ErrProgramExit		  = errors.New("")
 )
 
 const (
@@ -40,6 +42,7 @@ const (
 	Skip
 	Function
 	Return
+	Exit
 )
 
 type Statement struct {

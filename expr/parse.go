@@ -15,24 +15,6 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	return *parsePTokens(ptokens), err
 }
 
-func seekEndParen(tokens []lexer.Token, start int) (endIdx int, eof bool) {
-	numParen := 0
-	for i := start; i < len(tokens); i++ {
-		switch tokens[i].Type {
-		case lexer.LEFT_PAREN:
-			numParen++
-		case lexer.RIGHT_PAREN:
-			numParen--
-		}
-
-		if numParen == 0 {
-			return i, false
-		}
-	}
-
-	return endIdx, true
-}
-
 // Creates new ParseTokens from lexer tokens to simplify expression parsing. The ParseTokens can
 // either be of type Single or TokenGroup. Symbols and identifiers are of the Single type while any
 // expression within parens is a TokenGroup type. The single type has a .Token value which is the
@@ -49,7 +31,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 		// Find end paren and call recursive for inner part
 		if token.Type == lexer.LEFT_PAREN {
-			endIdx, eof := seekEndParen(tokens, currentIdx)
+			endIdx, eof := util.SeekClosingBracket(tokens, currentIdx, lexer.LEFT_PAREN, lexer.RIGHT_PAREN)
 			if eof {
 				return ptokens, util.FormatError(ErrParenError, line)
 			}
@@ -85,7 +67,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 			// Increment to skip identifier
 			currentIdx++
-			endIdx, eof := seekEndParen(tokens, currentIdx)
+			endIdx, eof := util.SeekClosingBracket(tokens, currentIdx, lexer.LEFT_PAREN, lexer.RIGHT_PAREN)
 			if eof {
 				return ptokens, util.FormatError(ErrParenError, line)
 			}
