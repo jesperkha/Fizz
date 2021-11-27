@@ -31,17 +31,17 @@ This roadmap highlights progress for Fizz's development:
 After cloning the repo you can:
 
 - build an executable with `build.bat`
-- or run `go run . [filename]`
+- or run with `go run . [filename]`
 
 ### **Terminal mode**
 
-Running the interpreter without giving a filename with run the terminal mode where you can run any valid Fizz code live. Errors are printed but the program is not terminated.
+Running the interpreter without giving a filename will run the terminal mode where you can run any valid Fizz code live. Errors are printed but the program is not terminated.
 
 ### **Run file**
 
 Running the interpreter and giving a filename simply runs the code in the file and halts if an error occurs. Fizz files must end in the `.fizz` suffix.
 
-```c
+```
 fizz myFile.fizz
 fizz myFile // valid if the file ends with .fizz
 ```
