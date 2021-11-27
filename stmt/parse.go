@@ -188,13 +188,14 @@ func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 		return parseExpression(tokens)
 	}
 
-	t := tokens[1].Type
-	if t != lexer.EQUAL && t != lexer.PLUS_EQUAL && t != lexer.MINUS_EQUAL {
+	operator := tokens[1].Type
+	validOperands := []int{lexer.EQUAL, lexer.PLUS_EQUAL, lexer.MINUS_EQUAL, lexer.MULT_EQUAL, lexer.DIV_EQUAL}
+	if !util.Contains(validOperands, operator) {
 		return parseExpression(tokens)
 	}
 
 	expr, err := expr.ParseExpression(tokens[2:])
-	return Statement{Type: Assignment, Name: tokens[0].Lexeme, Expression: &expr, Operator: t}, err
+	return Statement{Type: Assignment, Name: tokens[0].Lexeme, Expression: &expr, Operator: operator}, err
 }
 
 func parseFunc(tokens []lexer.Token, idx *int) (stmt Statement, err error) {

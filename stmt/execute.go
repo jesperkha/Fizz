@@ -141,7 +141,7 @@ func execAssignment(stmt Statement) (err error) {
 
 	// String addition
 	if newType == "string" {
-		if stmt.Operator == lexer.MINUS_EQUAL {
+		if stmt.Operator != lexer.PLUS_EQUAL {
 			return ErrInvalidOperator
 		}
 
@@ -150,13 +150,18 @@ func execAssignment(stmt Statement) (err error) {
 
 	// Float addition / subtraction
 	if newType == "float64" {
-		a := val.(float64)
-		b := oldVal.(float64)
-		if stmt.Operator == lexer.MINUS_EQUAL {
-			a *= -1
+		a := oldVal.(float64)
+		b := val.(float64)
+		var newVal float64
+
+		switch stmt.Operator {
+		case lexer.PLUS_EQUAL: newVal = a + b
+		case lexer.MINUS_EQUAL: newVal = a - b
+		case lexer.MULT_EQUAL: newVal = a * b
+		case lexer.DIV_EQUAL: newVal = a / b
 		}
 
-		return env.Assign(stmt.Name, a+b)
+		return env.Assign(stmt.Name, newVal)
 	}
 
 	return ErrInvalidStatement

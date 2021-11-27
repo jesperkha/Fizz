@@ -45,6 +45,8 @@ const (
 	EQUAL
 	PLUS_EQUAL
 	MINUS_EQUAL
+	MULT_EQUAL
+	DIV_EQUAL
 	FUNC
 	CLASS
 	RETURN
@@ -104,6 +106,8 @@ var doubleTokenLookup = map[string]int{
 	"<=": LESS_EQUAL,
 	"+=": PLUS_EQUAL,
 	"-=": MINUS_EQUAL,
+	"*=": MULT_EQUAL,
+	"/=": DIV_EQUAL,
 }
 
 var keyWordLookup = map[string]int{
