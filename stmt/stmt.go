@@ -51,7 +51,6 @@ type Statement struct {
 	Operator       int
 	Name           string
 	Expression     *expr.Expression
-	InitExpression *expr.Expression
 	Statements     []Statement
 	Then           *Statement
 	Else           *Statement

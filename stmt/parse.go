@@ -177,7 +177,7 @@ func parseVariable(tokens []lexer.Token) (stmt Statement, err error) {
 
 	if name.Type == lexer.IDENTIFIER && equals {
 		initExpr, err := expr.ParseExpression(exprTokens)
-		return Statement{Type: Variable, Name: name.Lexeme, InitExpression: &initExpr}, err
+		return Statement{Type: Variable, Name: name.Lexeme, Expression: &initExpr}, err
 	}
 
 	return stmt, ErrInvalidStatement

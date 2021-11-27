@@ -20,3 +20,107 @@
 - `string`
 - `function`
 - `nil`
+
+<br>
+
+### **Syntax**
+
+Fizz features a lot of standard syntax similar to other languages. For example, all normal expressions using the basic arithmatic and logic operators will work in Fizz:
+
+`1 + 1 == 2` <br>
+`(15 / 3) > 4`
+
+For conditions and flow control there are some things to take note of. Firstly, you can create and infinite while loop by not giving it an expression:
+
+```
+while {
+    # Will run forever
+}
+```
+
+As you may have noticed, comments are declared with a hashtag, similar to python. Some other unique triats include the `repeat` statement:
+
+```
+repeat n < 10 {
+    # executes block 10 times
+    print n; # 0 -> 9
+}
+```
+
+This is really just a simplified for loop. As of now, it only works with the less than operator. In the future more will be added. Further below is a list of code examples to further explain the syntax of Fizz. They should be very straight forward and easy to understand for anyone experienced with similar programming languages.
+
+<br>
+
+### **Code examples**
+
+Some code examples that show most, if not all, of the syntax Fizz features:
+
+```
+func add(a, b) {
+    return a + b;
+}
+
+var num1 = 3;
+var num2 = 4;
+print add(num1, num2); # 7
+```
+
+```
+func isEven(num) {
+    return num % 2 == 0;
+}
+
+repeat n < 10 {
+    if isEven(n) {
+        print "Even!";
+    } else {
+        print "Odd!";
+    }
+}
+```
+
+```
+var name = "John";
+var age = 31;
+
+print type name == type age; # false
+```
+
+```
+var n = 0;
+while n < 5 {
+    n += 1;
+}
+
+while {
+    if n == 0 {
+        break;
+    }
+
+    n -= 1;
+}
+```
+
+```
+var n = 1;
+while {
+    n *= 2;
+    if n < 100 {
+        skip;
+    }
+
+    exit;
+}
+
+print "This will not be printed";
+```
+
+```
+var name = "Bob";
+var age = 56;
+var job = "Pilot";
+
+if (name == "Bob" & age >= 40) : (job == "Pilot") {
+    print "Bob is 40 or older, or is a pilot";
+}
+```

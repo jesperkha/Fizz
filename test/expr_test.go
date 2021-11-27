@@ -9,7 +9,7 @@ import (
 
 var (
 	// Valid expressions and should not return an error
-	ExampleExpressions1 = []string {
+	ExampleExpressions1 = []string{
 		"1 + 1",
 		"(5 + 1) * 2",
 		"-1 + -1",
@@ -19,7 +19,7 @@ var (
 	}
 
 	// Invalid expressions and should return an error, but not panic
-	ExampleExpressions2 = []string {
+	ExampleExpressions2 = []string{
 		"+1 - 8",
 		"() * 5",
 		"x + 1",

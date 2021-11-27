@@ -14,7 +14,7 @@ import (
 var (
 	ErrUnexpectedToken    = errors.New("unexpeted token: '%s', line: %d")
 	ErrUnterminatedString = errors.New("unterminated string, line %d")
-	ErrInvalidSyntax  	= errors.New("invalid syntax '%s', line %d")
+	ErrInvalidSyntax      = errors.New("invalid syntax '%s', line %d")
 )
 
 type Token struct {

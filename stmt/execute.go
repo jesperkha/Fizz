@@ -104,8 +104,8 @@ func execPrint(stmt Statement) (err error) {
 }
 
 func execVariable(stmt Statement) (err error) {
-	if stmt.InitExpression != nil {
-		val, err := expr.EvaluateExpression(stmt.InitExpression)
+	if stmt.Expression != nil {
+		val, err := expr.EvaluateExpression(stmt.Expression)
 		if err != nil {
 			return err
 		}
@@ -155,10 +155,14 @@ func execAssignment(stmt Statement) (err error) {
 		var newVal float64
 
 		switch stmt.Operator {
-		case lexer.PLUS_EQUAL: newVal = a + b
-		case lexer.MINUS_EQUAL: newVal = a - b
-		case lexer.MULT_EQUAL: newVal = a * b
-		case lexer.DIV_EQUAL: newVal = a / b
+		case lexer.PLUS_EQUAL:
+			newVal = a + b
+		case lexer.MINUS_EQUAL:
+			newVal = a - b
+		case lexer.MULT_EQUAL:
+			newVal = a * b
+		case lexer.DIV_EQUAL:
+			newVal = a / b
 		}
 
 		return env.Assign(stmt.Name, newVal)
