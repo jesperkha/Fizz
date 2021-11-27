@@ -38,7 +38,7 @@ while {
 }
 ```
 
-As you may have noticed, comments are declared with a hashtag, similar to python. Some other unique triats include the `repeat` statement:
+Some other unique traits include the `repeat` statement:
 
 ```
 repeat n < 10 {
@@ -47,7 +47,7 @@ repeat n < 10 {
 }
 ```
 
-This is really just a simplified for loop. As of now, it only works with the less than operator. In the future more will be added. Further below is a list of code examples to further explain the syntax of Fizz. They should be very straight forward and easy to understand for anyone experienced with similar programming languages.
+This is really just a simplified for loop. As of now it only works with the less than operator. In the future more will be added. Below is a list of code examples to further explain the syntax of Fizz. They should be very straight forward and easy to understand for anyone experienced with similar programming languages.
 
 <br>
 
@@ -103,7 +103,9 @@ while {
 
 ```
 var n = 1;
-while {
+var done = false;
+
+while !done {
     n *= 2;
     if n < 100 {
         skip;
@@ -117,10 +119,15 @@ print "This will not be printed";
 
 ```
 var name = "Bob";
-var age = 56;
+var age = 46;
 var job = "Pilot";
 
-if (name == "Bob" & age >= 40) : (job == "Pilot") {
-    print "Bob is 40 or older, or is a pilot";
+if name == "Bob" & job == "Pilot" {
+    print "Bob is a pilot";
 }
+
+if age == 42 : age == 46 {
+    print "Either 42 or 46";
+}
+
 ```

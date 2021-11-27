@@ -1,0 +1,11 @@
+func isEven(num) {
+    return num % 2 == 0;
+}
+
+repeat n < 10 {
+    if isEven(n) {
+        print "Even!";
+    } else {
+        print "Odd!";
+    }
+}
