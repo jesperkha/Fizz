@@ -18,11 +18,12 @@ var (
 	ErrCommaError           = errors.New("comma error, line %d")
 	ErrIncorrectArgs        = errors.New("'%s()' expected %d args, got %d, line %d")
 	ErrNotFunction          = errors.New("'%s' is not a function, line %d")
+	ErrNilValueError		= errors.New("unexpected nil value in expression, line %d")
 
-	ErrIllegalReturnVal		= errors.New("native functions cannot return a '%s' value")
+	ErrIllegalReturnVal = errors.New("native functions cannot return a '%s' value")
 )
 
-var LegalTypes = []string {
+var LegalTypes = []string{
 	"float64",
 	"nil",
 	"string",
@@ -63,8 +64,6 @@ type ParseToken struct {
 	Inner []ParseToken
 	Args  [][]ParseToken
 }
-
-
 
 func PrintExpressionAST(expr Expression) {
 	fmt.Println(printAST(expr))

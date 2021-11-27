@@ -119,6 +119,10 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 // Parses slice of ParseTokens into final AST
 func parsePTokens(tokens []ParseToken) *Expression {
+	if len(tokens) == 0 {
+		return &Expression{}
+	}
+
 	line := tokens[0].Token.Line
 
 	// Unary expression
@@ -165,8 +169,8 @@ func parsePTokens(tokens []ParseToken) *Expression {
 
 	// Invalid expression might have lowest as end token
 	// Move to middle and let evaluation handle error
-	if lowestIdx == len(tokens) - 1 {
-		newIdx := int(len(tokens)/2)
+	if lowestIdx == len(tokens)-1 {
+		newIdx := int(len(tokens) / 2)
 		lowestIdx = newIdx
 		lowest = tokens[lowestIdx].Token
 	}

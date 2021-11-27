@@ -42,17 +42,17 @@ func evalLiteral(literal *Expression) (value interface{}, err error) {
 
 func evalUnary(unary *Expression) (value interface{}, err error) {
 	right, err := EvaluateExpression(unary.Right)
+	if err != nil {
+		return value, err
+	}
 
 	switch unary.Operand.Type {
 	case lexer.MINUS:
-		{
-			if !isBool(right) {
-				return -right.(float64), err
-			}
-
-			op, typ, line := unary.Operand.Lexeme, util.GetType(right), unary.Line
-			return nil, fmt.Errorf(ErrInvalidOperatorType.Error(), op, typ, line)
+		if isNumber(right) {
+			return -right.(float64), err
 		}
+		op, typ, line := unary.Operand.Lexeme, util.GetType(right), unary.Line
+		return nil, fmt.Errorf(ErrInvalidOperatorType.Error(), op, typ, line)
 	case lexer.NOT:
 		return !isTruthy(right), err
 	case lexer.TYPE:
@@ -165,10 +165,6 @@ func evalCall(call *Expression) (value interface{}, err error) {
 
 func isTruthy(value interface{}) bool {
 	return value != false && value != nil
-}
-
-func isBool(value interface{}) bool {
-	return value == false || value == true
 }
 
 func isNumber(value interface{}) bool {

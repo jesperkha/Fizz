@@ -26,19 +26,32 @@ func ExecuteStatements(stmts []Statement) (err error) {
 
 func executeStatement(stmt Statement) error {
 	switch stmt.Type {
-	case ExpressionStmt: return execExpression(stmt)
-	case Block: 		 return execBlock(stmt)
-	case Print: 		 return execPrint(stmt)
-	case Variable: 		 return execVariable(stmt)
-	case Assignment: 	 return execAssignment(stmt)
-	case Break:			 return execBreak(stmt)
-	case Skip: 			 return execSkip(stmt)
-	case Return: 		 return execReturn(stmt)
-	case If: 			 return execIf(stmt)
-	case While: 		 return execWhile(stmt)
-	case Repeat: 		 return execRepeat(stmt)
-	case Function: 		 return execFunction(stmt)
-	case Exit:			 return execExit(stmt)
+	case ExpressionStmt:
+		return execExpression(stmt)
+	case Block:
+		return execBlock(stmt)
+	case Print:
+		return execPrint(stmt)
+	case Variable:
+		return execVariable(stmt)
+	case Assignment:
+		return execAssignment(stmt)
+	case Break:
+		return execBreak(stmt)
+	case Skip:
+		return execSkip(stmt)
+	case Return:
+		return execReturn(stmt)
+	case If:
+		return execIf(stmt)
+	case While:
+		return execWhile(stmt)
+	case Repeat:
+		return execRepeat(stmt)
+	case Function:
+		return execFunction(stmt)
+	case Exit:
+		return execExit(stmt)
 	}
 
 	// Will never be returned since all types are pre-defined.
