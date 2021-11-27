@@ -16,12 +16,14 @@ var (
 	ErrNonFizzFile  = errors.New("cannot run non-Fizz file")
 )
 
+// Todo: Make --version option
 var cmdOptions = map[string]func(){
 	"help": func() {
 		fmt.Println("use: fizz [filename.fizz | --option]")
 	},
 }
 
+// Todo: Fix --help error msg that pops up
 func RunInterpeter(args []string) {
 	if len(args) == 2 {
 		arg := args[1]

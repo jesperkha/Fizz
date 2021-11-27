@@ -1,7 +1,7 @@
 package env
 
 type FizzObject interface {
-	Type() string
+	Type()  string
 }
 
 type Callable struct {
@@ -14,7 +14,7 @@ func (c Callable) Type() string {
 }
 
 func init() {
-	Declare("test", Callable{
+	Declare("TEST", Callable{
 		NumArgs: 0,
 		Call: func(i ...interface{}) (interface{}, error) {
 			return 1.0, nil

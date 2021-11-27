@@ -30,14 +30,16 @@ You can find all the basic info you need about Fizz [here](lang.md). For a deepe
 
 ## **Setup and use**
 
-> **Disclaimer**: You need to have Go installed on your device to build the executable or run the interpreter.
+#### Pre-built binaries:
 
-<br>
+- [Test Release](https://github.com/jesperkha/Fizz/releases/tag/test-release)
 
-After cloning the repo you can:
+#### Or you can clone the repo and:
 
 - build an executable with `build.bat`
 - or run with `go run . [filename]`
+
+<br>
 
 ### **Terminal mode**
 
@@ -47,7 +49,8 @@ Running the interpreter without giving a filename will run the terminal mode whe
 
 Running the interpreter and giving a filename simply runs the code in the file and halts if an error occurs. Fizz files must end in the `.fizz` suffix.
 
-```
-fizz myFile.fizz
-fizz myFile // valid if the file ends with .fizz
-```
+Both of these are valid:
+
+`fizz myFile.fizz`
+
+`fizz myFile`
