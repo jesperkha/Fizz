@@ -151,7 +151,7 @@ func execAssignment(stmt Statement) (err error) {
 	}
 
 	// Float addition / subtraction
-	if newType == "float64" {
+	if newType == "number" {
 		a := oldVal.(float64)
 		b := val.(float64)
 		var newVal float64

@@ -154,7 +154,7 @@ func evalCall(call *Expression) (value interface{}, err error) {
 
 		val, err := function.Call(args...)
 		if !validFizzType(val) {
-			return val, fmt.Errorf(ErrIllegalReturnVal.Error(), util.GetType(val))
+			return val, fmt.Errorf(ErrIllegalType.Error(), util.GetType(val))
 		}
 
 		return val, err

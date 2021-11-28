@@ -20,11 +20,11 @@ var (
 	ErrNotFunction          = errors.New("'%s' is not a function, line %d")
 	ErrNilValueError        = errors.New("unexpected nil value in expression, line %d")
 
-	ErrIllegalReturnVal = errors.New("native functions cannot return a '%s' value")
+	ErrIllegalType = errors.New("unknown type '%s'")
 )
 
 var LegalTypes = []string{
-	"float64",
+	"number",
 	"nil",
 	"string",
 	"function",
