@@ -1,8 +1,0 @@
-var start = time();
-
-repeat n < 1000 {
-    print n;
-}
-
-var end = time() - start;
-print end;
