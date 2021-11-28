@@ -1,133 +1,133 @@
-### **Keywords**
+# **Syntax**
 
-- `var`
-- `func`
-- `print`
-- `type`
-- `repeat`
-- `while`
-- `return`
-- `break`
-- `skip`
-- `exit`
+### **Syntax overview**
 
-<br>
+- [Expressions](#expr)
+- [Print and Type](#prt)
+- [Variables](#var)
+- [If statements and logic](#if)
+- [While and repeat](#while)
+- [Break, skip, and exit](#break)
+- [Functions](#func)
 
-### **Types**
+### <a id="expr"></a> **Expressions**
 
-- `float64`
-- `bool`
-- `string`
-- `function`
-- `nil`
-
-<br>
-
-### **Syntax**
-
-Fizz features a lot of standard syntax similar to other languages. For example, all normal expressions using the basic arithmatic and logic operators will work in Fizz:
-
-`1 + 1 == 2` <br>
-`(15 / 3) > 4`
-
-For conditions and flow control there are some things to take note of. Firstly, you can create and infinite while loop by not giving it an expression:
+Fizz features a lot of standard syntax similar to other languages. For example, all normal expressions using the basic arithmetic and logic operators will work in Fizz, including the modulo operator and the hat operator. Plus can also be used for joining strings.
 
 ```
-while {
-    # Will run forever
+4 % 2 == 0
+3 ^ 2 == 9
+"Hello" + "World"
+```
+
+Fizz is dynamically typed, but will not convert types in expressions. Instead and error is raised when types do not match.
+
+<br>
+
+### <a id="prt"></a> **Print and Type**
+
+In Fizz, `print` is a _statement_, not a function. However, `type` is an _operator_, not a function, and gives a string value.
+
+```
+print "Hello";
+print type "World"; # "string"
+```
+
+<br>
+
+### <a id="var"></a> **Variables**
+
+You can declare a variable using the `var` statement. The value can be re-assigned later and even change type.
+
+```
+var name = "John";
+name = "Carl";
+name = 3;
+
+var name = "Susan"; # Error, 'name' is already defined
+```
+
+Local variables override global ones.
+
+```
+var age = 10;
+
+{
+    # This overrides the global 'age' variable
+    var age = 20;
 }
 ```
 
-Some other unique traits include the `repeat` statement:
+You can use shorthand assignment operators too:
+
+```
+var n = 1;
+n += 2;
+n -= 5;
+n *= 3;
+n /= 2;
+```
+
+You can also use the `+=` operator with strings.
+
+<br>
+
+### <a id="if"></a> **If statements and logic**
+
+Fizz features simple if and else statements, but not else-if. The 'and' operator is `&` and 'or' is `:`.
+
+```
+var job = "pilot";
+
+if job == "pilot" {
+    print "Person is a pilot";
+} else {
+    print "Person is not a pilot";
+}
+```
+
+<br>
+
+### <a id="while"></a> **While and repeat**
+
+Fizz has a while statement similar to most other languages. If you leave the expression field empty it will just run forever.
+
+```
+while n < 10 {
+    # loops 10 times. n goes from 0 to 9
+}
+
+while {
+    # goes forever
+}
+```
+
+The repeat statement is a little different. It is a condenced 'for' loop. You first declare a variable name followed by a legal repeat operator and range. Currently, only `<` is allowed.
 
 ```
 repeat n < 10 {
-    # executes block 10 times
-    print n; # 0 -> 9
+    # loops 10 times. n goes from 0 to 9
 }
 ```
 
-This is really just a simplified for loop. As of now it only works with the less than operator. In the future more will be added. Below is a list of code examples to further explain the syntax of Fizz. They should be very straight forward and easy to understand for anyone experienced with similar programming languages.
+<br>
+
+### <a id="break"></a> **Break, skip, and exit**
+
+- `skip` skips to next iteration in loop
+- `break` breaks out of loop
+- `exit` stops program execution
 
 <br>
 
-### **Code examples**
+### <a id="func"></a> **Functions**
 
-Some code examples that show most, if not all, of the syntax Fizz features:
+You can declare a function using the `func` keyword.
 
 ```
 func add(a, b) {
     return a + b;
 }
 
-var num1 = 3;
-var num2 = 4;
-print add(num1, num2); # 7
-```
-
-```
-func isEven(num) {
-    return num % 2 == 0;
-}
-
-repeat n < 10 {
-    if isEven(n) {
-        print "Even!";
-    } else {
-        print "Odd!";
-    }
-}
-```
-
-```
-var name = "John";
-var age = 31;
-
-print type name == type age; # false
-```
-
-```
-var n = 0;
-while n < 5 {
-    n += 1;
-}
-
-while {
-    if n == 0 {
-        break;
-    }
-
-    n -= 1;
-}
-```
-
-```
-var n = 1;
-var done = false;
-
-while !done {
-    n *= 2;
-    if n < 100 {
-        skip;
-    }
-
-    exit;
-}
-
-print "This will not be printed";
-```
-
-```
-var name = "Bob";
-var age = 46;
-var job = "Pilot";
-
-if name == "Bob" & job == "Pilot" {
-    print "Bob is a pilot";
-}
-
-if age == 42 : age == 46 {
-    print "Either 42 or 46";
-}
-
+print add(5, 2); # 7
 ```
