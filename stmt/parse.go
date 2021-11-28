@@ -93,6 +93,8 @@ func parseComplexStatement(typ int, tokens []lexer.Token, idx *int) (stmt Statem
 		return parseRepeat(tokens, idx)
 	case lexer.FUNC:
 		return parseFunc(tokens, idx)
+	case lexer.DEFINE:
+		return parseObject(tokens, idx)
 	}
 
 	return stmt, err
@@ -329,4 +331,46 @@ func parseRepeat(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	}
 
 	return Statement{Type: Repeat, Expression: stmt.Expression, Then: &block}, err
+}
+
+func parseObject(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
+	if len(tokens[*idx:]) < 4 {
+		return stmt, ErrInvalidStatement
+	}
+
+	nameToken := tokens[*idx + 1]
+	if nameToken.Type != lexer.IDENTIFIER {
+		return stmt, ErrExpectedIdentifier
+	}
+
+	*idx += 3 // Goto start of block
+	if tokens[*idx - 1].Type != lexer.LEFT_BRACE {
+		return stmt, ErrExpectedBlock
+	}
+
+	endIdx, eof := seekToken(tokens, *idx, lexer.RIGHT_BRACE)
+	if eof {
+		return stmt, ErrNoBrace
+	}
+
+	fields := tokens[*idx:endIdx]
+	fieldNames := []string{}
+	for _, field := range fields {
+		switch field.Type {
+		case lexer.COMMA:
+			continue
+		case lexer.IDENTIFIER:
+			fieldNames = append(fieldNames, field.Lexeme)
+			continue
+		}
+
+		return stmt, ErrExpectedIdentifier
+	}
+
+	if len(fieldNames) == 0 {
+		return stmt, ErrExpectedIdentifier
+	}
+
+	*idx = endIdx
+	return Statement{Type: Object, Name: nameToken.Lexeme, Params: fieldNames}, err
 }

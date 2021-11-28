@@ -29,6 +29,7 @@ var LegalTypes = []string{
 	"string",
 	"function",
 	"bool",
+	"object",
 }
 
 const (

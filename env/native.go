@@ -13,11 +13,11 @@ func (c Callable) Type() string {
 	return "function"
 }
 
-func init() {
-	Declare("TEST", Callable{
-		NumArgs: 0,
-		Call: func(i ...interface{}) (interface{}, error) {
-			return 1.0, nil
-		},
-	})
+type Object struct {
+	Fields 	  map[string]interface{}
+	NumFields int
+}
+
+func (o Object) Type() string {
+	return "object"
 }

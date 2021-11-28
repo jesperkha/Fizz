@@ -52,6 +52,8 @@ func executeStatement(stmt Statement) error {
 		return execFunction(stmt)
 	case Exit:
 		return execExit(stmt)
+	case Object:
+		return execObject(stmt)
 	}
 
 	// Will never be returned since all types are pre-defined.
@@ -178,6 +180,7 @@ func execBlock(stmt Statement) (err error) {
 	return err
 }
 
+// Todo: Add max recursion limit
 func execFunction(stmt Statement) (err error) {
 	err = env.Declare(stmt.Name, env.Callable{
 		NumArgs: len(stmt.Params),
@@ -287,5 +290,22 @@ func execRepeat(stmt Statement) (err error) {
 	}
 
 	env.PopScope()
+	return err
+}
+
+func execObject(stmt Statement) (err error) {
+	err = env.Declare(stmt.Name, env.Callable{
+		NumArgs: len(stmt.Params),
+
+		Call: func(args ...interface{}) (interface{}, error) {
+			obj := env.Object{Fields: map[string]interface{}{}}
+			for i, field := range stmt.Params {
+				obj.Fields[field] = args[i]
+			}
+
+			return obj, err
+		},
+	})
+
 	return err
 }

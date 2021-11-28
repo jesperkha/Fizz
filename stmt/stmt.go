@@ -43,6 +43,7 @@ const (
 	Function
 	Return
 	Exit
+	Object
 )
 
 type Statement struct {

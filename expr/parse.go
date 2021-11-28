@@ -12,8 +12,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return expr, err
 	}
 	
-	expr = *parsePTokens(ptokens)
-	return expr, err
+	return *parsePTokens(ptokens), err
 }
 
 // Creates new ParseTokens from lexer tokens to simplify expression parsing. The ParseTokens can
@@ -107,7 +106,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 		}
 
 		// Not expression type symbol
-		if token.Type > lexer.IDENTIFIER {
+		if token.Type > lexer.IDENTIFIER && token.Type != lexer.DOT {
 			return ptokens, ErrInvalidExpression
 		}
 
@@ -159,7 +158,7 @@ func parsePTokens(tokens []ParseToken) *Expression {
 		if token.Type == Single && token.Token.Type < lowest.Type {
 			lowest = token.Token
 			lowestIdx = idx
-		}
+		} 
 	}
 
 	// Invalid expression might have lowest as end token
@@ -169,6 +168,8 @@ func parsePTokens(tokens []ParseToken) *Expression {
 		lowestIdx = newIdx
 		lowest = tokens[lowestIdx].Token
 	}
+
+	// Todo: parse chained dots similar to a chained plus expression but order
 	
 	// Unary expression
 	unaryTokens := []int{lexer.MINUS, lexer.TYPE, lexer.NOT}

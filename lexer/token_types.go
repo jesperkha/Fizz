@@ -48,14 +48,12 @@ const (
 	MULT_EQUAL
 	DIV_EQUAL
 	FUNC
-	CLASS
+	DEFINE
 	RETURN
 	IF
 	ELSE
 	PRINT
-	SUPER
 	EXIT
-	THIS
 	VAR
 	WHILE
 	BREAK
@@ -117,9 +115,7 @@ var keyWordLookup = map[string]int{
 	"print":  PRINT,
 	"return": RETURN,
 	"exit":   EXIT,
-	"class":  CLASS,
-	"super":  SUPER,
-	"this":   THIS,
+	"define": DEFINE,
 	"var":    VAR,
 	"true":   TRUE,
 	"false":  FALSE,

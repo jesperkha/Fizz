@@ -65,12 +65,13 @@ func SeekClosingBracket(tokens []lexer.Token, start int, beginT, endT int) (endI
 
 // Returns Fizz name for value
 func GetType(value interface{}) string {
-	if value == nil {
-		return "nil"
-	}
-
 	if i, ok := value.(env.FizzObject); ok {
 		return i.Type()
+	}
+
+	switch value.(type) {
+		case float64: return "number"
+		case nil: return "nil"
 	}
 
 	return reflect.TypeOf(value).Name()
