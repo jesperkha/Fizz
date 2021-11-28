@@ -10,6 +10,8 @@
 - [Break, skip, and exit](#break)
 - [Functions](#func)
 
+<br>
+
 ### <a id="expr"></a> **Expressions**
 
 Fizz features a lot of standard syntax similar to other languages. For example, all normal expressions using the basic arithmetic and logic operators will work in Fizz, including the modulo operator and the hat operator. Plus can also be used for joining strings.
