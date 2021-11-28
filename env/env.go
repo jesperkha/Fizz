@@ -50,17 +50,14 @@ func getVariable(env *Environment, name string) (value interface{}, err error) {
 	return value, errors.New("undefined variable '" + name + "', line %d")
 }
 
-// Declares to current scope enviromnent table
 func Declare(name string, value interface{}) (err error) {
 	return declareVariable(&CurrentEnv, name, value)
 }
 
-// Gets value from current scope environment table
 func Get(name string) (value interface{}, err error) {
 	return getVariable(&CurrentEnv, name)
 }
 
-// Assigns new value to variable in current scope
 func Assign(name string, newVal interface{}) (err error) {
 	return assignVariable(&CurrentEnv, name, newVal)
 }
@@ -70,6 +67,12 @@ func PushScope() {
 	newEnv := Environment{Values: entryMap{}}
 	newEnv.Parent = &Environment{Parent: CurrentEnv.Parent, Values: CurrentEnv.Values}
 	CurrentEnv = newEnv
+}
+
+// Adds custom scope for closures
+func AddScope(env Environment) {
+	env.Parent = &CurrentEnv
+	CurrentEnv = env
 }
 
 // Goes back to previous scope

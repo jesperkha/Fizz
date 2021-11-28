@@ -11,24 +11,8 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	if err != nil {
 		return expr, err
 	}
-
+	
 	return *parsePTokens(ptokens), err
-}
-
-func seekEndParen(tokens []lexer.Token, start int) (endIdx int, eof bool) {
-	numParen := 0
-	for i := start; i < len(tokens); i++ {
-		switch tokens[i].Type {
-		case lexer.LEFT_PAREN: numParen++
-		case lexer.RIGHT_PAREN: numParen--
-		}
-
-		if numParen == 0 {
-			return i, false
-		}
-	}
-
-	return endIdx, true
 }
 
 // Creates new ParseTokens from lexer tokens to simplify expression parsing. The ParseTokens can
@@ -44,20 +28,20 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 	for currentIdx < len(tokens) {
 		token := tokens[currentIdx]
 		line := token.Line
-		
+
 		// Find end paren and call recursive for inner part
 		if token.Type == lexer.LEFT_PAREN {
-			endIdx, eof := seekEndParen(tokens, currentIdx)
+			endIdx, eof := util.SeekClosingBracket(tokens, currentIdx, lexer.LEFT_PAREN, lexer.RIGHT_PAREN)
 			if eof {
 				return ptokens, util.FormatError(ErrParenError, line)
 			}
 
-			if endIdx - currentIdx == 1 {
+			if endIdx-currentIdx == 1 {
 				return ptokens, util.FormatError(ErrExpectedExpression, line)
 			}
 
 			// Generate ptokens between start and end paren
-			tokenGroup, err := generateParseTokens(tokens[currentIdx + 1:endIdx])
+			tokenGroup, err := generateParseTokens(tokens[currentIdx+1 : endIdx])
 			if err != nil {
 				return ptokens, err
 			}
@@ -75,7 +59,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 		// Check and handle function call expression
 		if token.Type == lexer.IDENTIFIER {
-			if currentIdx + 1 >= len(tokens) || tokens[currentIdx + 1].Type != lexer.LEFT_PAREN {
+			if currentIdx+1 >= len(tokens) || tokens[currentIdx+1].Type != lexer.LEFT_PAREN {
 				ptokens = append(ptokens, ParseToken{Type: Single, Token: token})
 				currentIdx++
 				continue
@@ -83,13 +67,13 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 			// Increment to skip identifier
 			currentIdx++
-			endIdx, eof := seekEndParen(tokens, currentIdx)
+			endIdx, eof := util.SeekClosingBracket(tokens, currentIdx, lexer.LEFT_PAREN, lexer.RIGHT_PAREN)
 			if eof {
 				return ptokens, util.FormatError(ErrParenError, line)
 			}
 
 			// +1 to skip start paren
-			interval := tokens[currentIdx + 1:endIdx]
+			interval := tokens[currentIdx+1 : endIdx]
 			// Add end comma to parse last expression
 			if len(interval) != 0 {
 				interval = append(interval, lexer.Token{Type: lexer.COMMA})
@@ -101,7 +85,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 				if t.Type != lexer.COMMA {
 					continue
 				}
-				
+
 				if exprStart == idx {
 					return ptokens, util.FormatError(ErrCommaError, line)
 				}
@@ -122,7 +106,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 		}
 
 		// Not expression type symbol
-		if token.Type > lexer.IDENTIFIER {
+		if token.Type > lexer.IDENTIFIER && token.Type != lexer.DOT {
 			return ptokens, ErrInvalidExpression
 		}
 
@@ -135,6 +119,10 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 // Parses slice of ParseTokens into final AST
 func parsePTokens(tokens []ParseToken) *Expression {
+	if len(tokens) == 0 {
+		return &Expression{}
+	}
+
 	line := tokens[0].Token.Line
 
 	// Literal, Variable, or Group expression
@@ -163,11 +151,6 @@ func parsePTokens(tokens []ParseToken) *Expression {
 		return &Expression{Type: Literal, Line: line, Value: token.Token}
 	}
 
-	// Unary expression
-	if len(tokens) == 2 {
-		return &Expression{Type: Unary, Line: line, Operand: tokens[0].Token, Right: parsePTokens(tokens[1:])}
-	}
-
 	// Binary expression
 	lowest := lexer.Token{Type: 999}
 	lowestIdx := 0
@@ -175,9 +158,25 @@ func parsePTokens(tokens []ParseToken) *Expression {
 		if token.Type == Single && token.Token.Type < lowest.Type {
 			lowest = token.Token
 			lowestIdx = idx
-		}
+		} 
 	}
 
-	right, left := parsePTokens(tokens[lowestIdx + 1:]), parsePTokens(tokens[:lowestIdx])
+	// Invalid expression might have lowest as end token
+	// Move to middle and let evaluation handle error
+	if lowestIdx == len(tokens)-1 {
+		newIdx := int(len(tokens) / 2)
+		lowestIdx = newIdx
+		lowest = tokens[lowestIdx].Token
+	}
+
+	// Todo: parse chained dots similar to a chained plus expression but order
+	
+	// Unary expression
+	unaryTokens := []int{lexer.MINUS, lexer.TYPE, lexer.NOT}
+	if len(tokens) == 2 || (util.Contains(unaryTokens, lowest.Type) && lowest.Type == tokens[0].Type)  {
+		return &Expression{Type: Unary, Line: line, Operand: tokens[0].Token, Right: parsePTokens(tokens[1:])}
+	}
+
+	right, left := parsePTokens(tokens[lowestIdx+1:]), parsePTokens(tokens[:lowestIdx])
 	return &Expression{Type: Binary, Line: line, Operand: lowest, Left: left, Right: right}
 }

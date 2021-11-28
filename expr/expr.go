@@ -3,24 +3,34 @@ package expr
 import (
 	"errors"
 	"fmt"
-	"time"
 
-	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/lexer"
 )
 
 var (
-	ErrParenError			= errors.New("unmatched parenthesies, line %d")
+	ErrParenError           = errors.New("unmatched parenthesies, line %d")
 	ErrInvalidUnaryOperator = errors.New("invalid unary operator '%s', line %d")
 	ErrInvalidOperatorType  = errors.New("invalid operator '%s' for type '%s', line %d")
 	ErrInvalidOperatorTypes = errors.New("invalid operator '%s' for types '%s' and '%s', line %d")
-	ErrDivideByZero			= errors.New("division by 0, line %d")
+	ErrDivideByZero         = errors.New("division by 0, line %d")
 	ErrInvalidExpression    = errors.New("invalid expression, line %d")
 	ErrExpectedExpression   = errors.New("expected expression in group, line %d")
-	ErrCommaError			= errors.New("comma error, line %d")
-	ErrIncorrectArgs		= errors.New("'%s()' expected %d args, got %d, line %d")
-	ErrNotFunction			= errors.New("'%s' is not a function, line %d")
+	ErrCommaError           = errors.New("comma error, line %d")
+	ErrIncorrectArgs        = errors.New("'%s()' expected %d args, got %d, line %d")
+	ErrNotFunction          = errors.New("'%s' is not a function, line %d")
+	ErrNilValueError        = errors.New("unexpected nil value in expression, line %d")
+
+	ErrIllegalReturnVal = errors.New("native functions cannot return a '%s' value")
 )
+
+var LegalTypes = []string{
+	"float64",
+	"nil",
+	"string",
+	"function",
+	"bool",
+	"object",
+}
 
 const (
 	// Expression types
@@ -30,7 +40,7 @@ const (
 	Group
 	Variable
 	Call
-	
+
 	// ParseToken types
 	Single
 	TokenGroup
@@ -38,33 +48,22 @@ const (
 )
 
 type Expression struct {
-	Type     int
-	Line	 int
-	Name	 string
-	Operand  lexer.Token
-	Value    lexer.Token
-	Left	 *Expression
-	Right 	 *Expression
-	Inner 	 *Expression
-	Exprs	 []Expression
+	Type    int
+	Line    int
+	Name    string
+	Operand lexer.Token
+	Value   lexer.Token
+	Left    *Expression
+	Right   *Expression
+	Inner   *Expression
+	Exprs   []Expression
 }
 
 type ParseToken struct {
-	Type   int
-	Token  lexer.Token
-	Inner  []ParseToken
-	Args   [][]ParseToken
-}
-
-type Callable struct {
-	Call func(...interface{}) (interface{}, error)
-	NumArgs int
-}
-
-func init() {
-	env.Declare("time", Callable{NumArgs: 0, Call: func(i ...interface{}) (interface{}, error) {
-		return float64(time.Now().Nanosecond() / 1000000), nil
-	}})
+	Type  int
+	Token lexer.Token
+	Inner []ParseToken
+	Args  [][]ParseToken
 }
 
 func PrintExpressionAST(expr Expression) {

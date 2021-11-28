@@ -19,18 +19,18 @@ const (
 	PLUS
 	MINUS
 	TYPE
+	NOT
 
 	STAR
 	SLASH
 	MODULO
 	HAT
 
-	NOT
-
 	STRING
 	NUMBER
 	TRUE
 	FALSE
+	NIL
 	IDENTIFIER
 
 	// Not valid expression types
@@ -45,15 +45,15 @@ const (
 	EQUAL
 	PLUS_EQUAL
 	MINUS_EQUAL
+	MULT_EQUAL
+	DIV_EQUAL
 	FUNC
-	CLASS
+	DEFINE
 	RETURN
 	IF
 	ELSE
-	NIL
 	PRINT
-	SUPER
-	THIS
+	EXIT
 	VAR
 	WHILE
 	BREAK
@@ -104,6 +104,8 @@ var doubleTokenLookup = map[string]int{
 	"<=": LESS_EQUAL,
 	"+=": PLUS_EQUAL,
 	"-=": MINUS_EQUAL,
+	"*=": MULT_EQUAL,
+	"/=": DIV_EQUAL,
 }
 
 var keyWordLookup = map[string]int{
@@ -112,9 +114,8 @@ var keyWordLookup = map[string]int{
 	"nil":    NIL,
 	"print":  PRINT,
 	"return": RETURN,
-	"class":  CLASS,
-	"super":  SUPER,
-	"this":   THIS,
+	"exit":   EXIT,
+	"define": DEFINE,
 	"var":    VAR,
 	"true":   TRUE,
 	"false":  FALSE,

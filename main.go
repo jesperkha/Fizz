@@ -1,11 +1,11 @@
 package main
 
-import (
-	"os"
+import "os"
 
-	"github.com/jesperkha/Fizz/run"
+const (
+	VERSION = "0.1.0"
 )
 
 func main() {
-	run.RunInterpeter(os.Args)
+	RunInterpeter(os.Args)
 }

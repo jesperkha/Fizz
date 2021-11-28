@@ -14,18 +14,18 @@ import (
 var (
 	ErrUnexpectedToken    = errors.New("unexpeted token: '%s', line: %d")
 	ErrUnterminatedString = errors.New("unterminated string, line %d")
-	ErrInvalidIdentifier  = errors.New("invalid identifier '%s', line %d")
+	ErrInvalidSyntax      = errors.New("invalid syntax '%s', line %d")
 )
 
 type Token struct {
-	Type 	int
-	Lexeme 	string
+	Type    int
+	Lexeme  string
 	Literal interface{}
-	Line	int
+	Line    int
 }
 
 func GetTokens(input string) (tokens []Token, err error) {
-	currentIdx  := 0
+	currentIdx := 0
 	currentLine := 1 // Start at line 1 for editors
 	alphaNumRegex := regexp.MustCompile("^[a-zA-Z_0-9.]*$")
 	variableRegex := regexp.MustCompile("^[a-zA-Z_][a-zA-Z_0-9]*$")
@@ -37,24 +37,21 @@ func GetTokens(input string) (tokens []Token, err error) {
 
 		tokenType, isSymbol := tokenLookup[rune(char)]
 		token := Token{Type: tokenType, Lexeme: string(char), Line: currentLine}
-		
+
 		if isSymbol {
 			// Token exception cases
-			switch (tokenType) {
-				case NEWLINE: {
-					currentLine++
-					currentIdx++
-					continue
-				}
-				case WHITESPACE: {
-					currentIdx++
-					continue
-				}
-				case COMMENT: {
-					seekCharacter(input, &currentIdx, '\n')
-					currentLine++
-					continue
-				}
+			switch tokenType {
+			case NEWLINE:
+				currentLine++
+				currentIdx++
+				continue
+			case WHITESPACE:
+				currentIdx++
+				continue
+			case COMMENT:
+				seekCharacter(input, &currentIdx, '\n')
+				currentLine++
+				continue
 			}
 
 			// Check for double symbol (!=, >= etc)
@@ -73,7 +70,7 @@ func GetTokens(input string) (tokens []Token, err error) {
 
 				str := intervalToString(input, startIndex, currentIdx)
 				token.Lexeme = str
-				token.Literal = str[1:len(str) - 1]
+				token.Literal = str[1 : len(str)-1]
 			}
 
 			tokens = append(tokens, token)
@@ -90,7 +87,7 @@ func GetTokens(input string) (tokens []Token, err error) {
 		seekFunc(input, &currentIdx, func(c rune) bool {
 			return !alphaNumRegex.MatchString(string(c))
 		})
-		
+
 		identifier := intervalToString(input, startIndex, currentIdx)
 		number, err := strconv.ParseFloat(identifier, 32)
 		token.Lexeme = identifier
@@ -99,22 +96,25 @@ func GetTokens(input string) (tokens []Token, err error) {
 		isAlphaNum := variableRegex.MatchString(identifier)
 
 		if !isNumber && !isAlphaNum {
-			return tokens, fmt.Errorf(ErrInvalidIdentifier.Error(), identifier, currentLine)
+			return tokens, fmt.Errorf(ErrInvalidSyntax.Error(), identifier, currentLine)
 		}
 
 		if isNumber {
 			token.Literal = number
 			token.Type = NUMBER
 		}
-		
+
 		if isAlphaNum {
 			token.Type = IDENTIFIER
 			if keywordType, isKeyword := keyWordLookup[identifier]; isKeyword {
 				// Set literal values for keyword types
-				switch (keywordType) {
-					case FALSE: token.Literal = false
-					case TRUE: token.Literal = true
-					case NIL: token.Literal = nil
+				switch keywordType {
+				case FALSE:
+					token.Literal = false
+				case TRUE:
+					token.Literal = true
+				case NIL:
+					token.Literal = nil
 				}
 
 				token.Type = keywordType
@@ -130,8 +130,8 @@ func GetTokens(input string) (tokens []Token, err error) {
 
 // Returns the next character in the input without consuming it
 func getNextCharacter(input string, curIdx int) (nextChar rune, eof bool) {
-	if curIdx < len(input) - 1 {
-		return rune(input[curIdx + 1]), false
+	if curIdx < len(input)-1 {
+		return rune(input[curIdx+1]), false
 	}
 
 	return nextChar, true
@@ -170,6 +170,6 @@ func intervalToString(input string, startIdx int, endIdx int) string {
 	for i := startIdx; i <= endIdx; i++ {
 		result += string(input[i])
 	}
-	
+
 	return result
 }
