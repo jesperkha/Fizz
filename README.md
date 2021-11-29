@@ -14,7 +14,7 @@ This roadmap highlights progress for Fizz's development:
 - ✔️ Conditional statements
 - ✔️ Loops
 - ✔️ Functions
-- ❌ Classes
+- ❌ Objects
 - ❌ Arrays
 - ❌ File import
 - ❌ Go -> Fizz library support
