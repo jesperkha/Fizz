@@ -40,6 +40,7 @@ const (
 	Group
 	Variable
 	Call
+	Getter
 
 	// ParseToken types
 	Single

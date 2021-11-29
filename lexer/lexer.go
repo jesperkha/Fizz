@@ -78,7 +78,7 @@ func GetTokens(input string) (tokens []Token, err error) {
 			continue
 		}
 
-		// Not alpha numeric (a-z 0-9 _)
+		// Not alpha numeric (a-z 0-9 _.)
 		if !alphaNumRegex.MatchString(string(char)) {
 			return tokens, fmt.Errorf(ErrUnexpectedToken.Error(), string(char), currentLine)
 		}
@@ -89,14 +89,40 @@ func GetTokens(input string) (tokens []Token, err error) {
 		})
 
 		identifier := intervalToString(input, startIndex, currentIdx)
-		number, err := strconv.ParseFloat(identifier, 32)
+		number, err := strconv.ParseFloat(identifier, 64)
 		token.Lexeme = identifier
 
 		isNumber := err == nil
 		isAlphaNum := variableRegex.MatchString(identifier)
 
-		if !isNumber && !isAlphaNum {
+		splitDot := strings.Split(identifier, ".")
+		isGetter := !isNumber && len(splitDot) > 1
+
+		if !isNumber && !isAlphaNum && !isGetter {
 			return tokens, fmt.Errorf(ErrInvalidSyntax.Error(), identifier, currentLine)
+		}
+
+		if isGetter {
+			dot, err := GetTokens(".")
+			if err != nil {
+				return tokens, err
+			}
+
+			ts := []Token{}
+			for _, ident := range splitDot {
+				t, err := GetTokens(ident)
+				if err != nil {
+					return tokens, err
+				}
+				
+				ts = append(ts, dot...)
+				ts = append(ts, t...)
+			}
+
+			// Shift 1 to skip first dot
+			tokens = append(tokens, ts[1:]...)
+			currentIdx++
+			continue
 		}
 
 		if isNumber {

@@ -1,6 +1,8 @@
 package expr
 
 import (
+	"log"
+
 	"github.com/jesperkha/Fizz/lexer"
 	"github.com/jesperkha/Fizz/util"
 )
@@ -25,6 +27,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error) {
 	currentIdx := 0
 
+	// Todo: make sure getters dont cause an error here
 	for currentIdx < len(tokens) {
 		token := tokens[currentIdx]
 		line := token.Line
@@ -158,7 +161,7 @@ func parsePTokens(tokens []ParseToken) *Expression {
 		if token.Type == Single && token.Token.Type < lowest.Type {
 			lowest = token.Token
 			lowestIdx = idx
-		} 
+		}
 	}
 
 	// Invalid expression might have lowest as end token
@@ -170,6 +173,9 @@ func parsePTokens(tokens []ParseToken) *Expression {
 	}
 
 	// Todo: parse chained dots similar to a chained plus expression but order
+	if tokens[1].Type == lexer.DOT {
+		log.Fatal("dot")
+	}
 	
 	// Unary expression
 	unaryTokens := []int{lexer.MINUS, lexer.TYPE, lexer.NOT}
