@@ -1,2 +1,5 @@
-print "Hello";
-print type "World"; # "string"
+var name = "John";
+name = "Carl";
+name = 3;
+
+var name = "Susan"; # Error, 'name' is already defined
