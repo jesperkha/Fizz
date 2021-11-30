@@ -2,4 +2,5 @@ var name = "John";
 name = "Carl";
 name = 3;
 
-var name = "Susan"; # Error, 'name' is already defined
+# Error, 'name' is already defined
+var name = "Susan";
