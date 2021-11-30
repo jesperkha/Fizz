@@ -3,7 +3,6 @@
 	"displayName": "Fizz Language Support",
 	"description": "",
 	"version": "0.0.1",
-	"icon": "icon.png",
 	"engines": {
 		"vscode": "^1.61.0"
 	},

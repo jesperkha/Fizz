@@ -37,7 +37,7 @@ You can find all the basic info you need about Fizz [here](lang.md). For a deepe
 
 #### Or you can clone the repo and:
 
-- build an executable with `build.bat`
+- build an executable with `build.sh`
 - or run with `go run . [filename]`
 
 <br>
