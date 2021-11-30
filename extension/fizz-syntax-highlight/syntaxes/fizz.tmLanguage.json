@@ -1,0 +1,98 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Fizz",
+	"patterns": [
+		{
+			"include": "#objects"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#numbers"
+		},
+		{
+			"include": "#symbols"
+		},
+		{
+			"include": "#functions"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.fizz",
+					"match": "\\b(if|else|while|return|true|false|nil|repeat|skip|break)\\b"
+				},
+				{
+					"name": "keyword.function.fizz",
+					"match": "\\b(func|var|print|import|define|exit)\\b"
+				},
+				{
+					"name": "keyword.operator.comparison.fizz",
+					"match": "(==|!=|>=|<=|&|:|>|<|!)"
+				},
+				{
+					"name": "storage.type.string.fizz",
+					"match": "\\b(type)\\b"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.fizz",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.fizz",
+					"match": "\\\\."
+				}
+			]
+		},
+		"comments": {
+			"name": "comment.line.double-slash.fizz",
+			"begin": "#",
+			"end": "\n"
+		},
+		"numbers": {
+			"name": "constant.numeric.decimal.fizz",
+			"match": "\\d"
+		},
+		"symbols": {
+			"patterns": [
+				{
+					"name": "punctuation.definition.begin.bracket.round.fizz",
+					"match": "(\\(|\\)|\\{|\\}|=|\\[|\\]|\\;|\\,|\\.|\\+=|\\-=|\\*=|\\/=)"
+				},
+				{
+					"name": "keyword.operator.arithmetic.fizz",
+					"match": "(\\+|\\-|\\*|\\/|\\^|\\%)"
+				}
+			]
+		},
+		"functions": {
+			"patterns": [
+				{
+					"name": "entity.name.function.fizz",
+					"match": "(?<=func) \\w+"
+				},
+				{
+					"name": "entity.name.function.fizz",
+					"match": "\\w+(?=\\()"
+				}
+			]
+		},
+		"objects": {
+			"name": "entity.name.type.fizz",
+			"match": "(?<=define) \\w+"
+		}
+	},
+	"scopeName": "source.fizz"
+}
