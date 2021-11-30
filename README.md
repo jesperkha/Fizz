@@ -52,6 +52,7 @@ Running the interpreter and giving a filename simply runs the code in the file a
 
 Both of these are valid:
 
-`fizz myFile.fizz`
-
-`fizz myFile`
+```console
+$ ./fizz myFile.fizz
+$ ./fizz myFile
+```
