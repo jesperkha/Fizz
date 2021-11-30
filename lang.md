@@ -38,7 +38,7 @@ In Fizz, `print` is a _statement_, not a function. However, `type` is an _operat
 
 You can declare a variable using the `var` statement. The value can be re-assigned later and even change type.
 
-<img src="./.github/snippets/var.png" width="50%"/>
+<img src="./.github/snippets/var.png" width="60%"/>
 
 Local variables override global ones.
 
@@ -46,7 +46,7 @@ Local variables override global ones.
 
 You can use shorthand assignment operators too:
 
-<img src="./.github/snippets/var3.png" width="60%"/>
+<img src="./.github/snippets/var3.png" width="70%"/>
 
 You can also use the `+=` operator with strings.
 
@@ -88,4 +88,4 @@ repeat n < 10 {
 
 You can declare a function using the `func` keyword.
 
-<img src="./.github/snippets/func.png" width="50%"/>
+<img src="./.github/snippets/func.png" width="60%"/>
