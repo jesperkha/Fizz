@@ -26,6 +26,8 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 		return env.Get(expr.Name)
 	case Call:
 		return evalCall(expr)
+	case Getter:
+		return evalGetter(expr)
 	}
 
 	// Wont be reached
@@ -161,6 +163,11 @@ func evalCall(call *Expression) (value interface{}, err error) {
 	}
 
 	return value, notFuncErr
+}
+
+// Todo: evaluate each identifier, check if object, get value or err
+func evalGetter(getter *Expression) (value interface{}, err error) {
+	return value, err
 }
 
 func isTruthy(value interface{}) bool {

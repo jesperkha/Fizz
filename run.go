@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -16,30 +15,32 @@ var (
 	ErrNonFizzFile  = errors.New("cannot run non-Fizz file")
 )
 
-// Todo: Make --version option
 var cmdOptions = map[string]func(){
 	"help": func() {
-		fmt.Println("use: fizz [filename.fizz | --option]")
+		fmt.Println("use: fizz [--option] [-flag] [filename]")
+	},
+	"version": func() {
+		fmt.Printf("fizz version %s\n", VERSION)
+	},
+	"options": func() {
+		fmt.Println("--help\n--options\n--version")
 	},
 }
 
-// Todo: Fix --help error msg that pops up
 func RunInterpeter(args []string) {
 	if len(args) == 2 {
 		arg := args[1]
 
-		// Run option commands
 		if strings.HasPrefix(arg, "--") {
-			option, ok := cmdOptions[strings.TrimLeft(arg, "-")]
-			if !ok {
-				formatError(fmt.Errorf("unknown option: '%s'", arg))
-				return
+			if option, ok := cmdOptions[arg[2:]]; ok {
+				option()
+			} else {
+				formatError(fmt.Errorf("unknown option: '%s', use --options to see a full list of options", arg))
 			}
 
-			option()
+			return
 		}
 
-		// Run fizz file
 		filename := args[1]
 		if !strings.HasSuffix(filename, ".fizz") {
 			filename += ".fizz"
@@ -52,7 +53,6 @@ func RunInterpeter(args []string) {
 		return
 	}
 
-	// Run terminal mode
 	runTerminal()
 }
 
@@ -66,14 +66,16 @@ func formatError(err error) {
 // Leaves the interpreter running as the user inputs code to the terminal.
 // Prints out errors but does not terminate until ^C or 'exit'.
 func runTerminal() {
+	fmt.Println("type 'exit' to terminate session")
 	scanner := bufio.NewScanner(os.Stdin)
+
 	totalString := ""
 	numBlocks := 0
-	indent := "    "
-
-	fmt.Println("type 'exit' to terminate session")
+	line := 1
+	space := " "
+	
 	for {
-		fmt.Print("::: " + strings.Repeat(indent, numBlocks))
+		fmt.Printf("%d%s : %s", line, space, strings.Repeat("    ", numBlocks))
 		scanner.Scan()
 		input := scanner.Text()
 
@@ -86,13 +88,18 @@ func runTerminal() {
 		totalString += input + "\n" // Better error handling
 
 		if numBlocks <= 0 {
-			err := Interperate(totalString)
-			if err != nil {
+			if err := Interperate(totalString); err != nil {
 				formatError(err)
+				line--
 			}
 
 			totalString = ""
 			numBlocks = 0
+		}
+
+		line++
+		if line == 10 {
+			space = ""
 		}
 	}
 
@@ -105,10 +112,8 @@ func runFile(filename string) (err error) {
 		return ErrNonFizzFile
 	}
 
-	if file, err := os.Open(filename); err == nil {
-		var buf bytes.Buffer
-		bufio.NewReader(file).WriteTo(&buf)
-		return Interperate(buf.String())
+	if byt, err := os.ReadFile(filename); err == nil {
+		return Interperate(string(byt))
 	}
 
 	// Assumes path error

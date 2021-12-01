@@ -180,7 +180,7 @@ func execBlock(stmt Statement) (err error) {
 	return err
 }
 
-// Todo: Add max recursion limit
+// Todo: add max recursion limit
 func execFunction(stmt Statement) (err error) {
 	err = env.Declare(stmt.Name, env.Callable{
 		NumArgs: len(stmt.Params),
@@ -272,7 +272,7 @@ func execRepeat(stmt Statement) (err error) {
 		}
 
 		// Break and skip return errors that are handled here
-		// Todo: Add line number for break, skip, and return 'errors'
+		// Todo: add line number for break, skip, and return 'errors'
 		err = ExecuteStatements(stmt.Then.Statements)
 		if errors.Is(err, ErrBeakOutsideLoop) {
 			return nil

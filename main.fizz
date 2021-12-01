@@ -1,6 +1,0 @@
-var name = "John";
-name = "Carl";
-name = 3;
-
-# Error, 'name' is already defined
-var name = "Susan";
