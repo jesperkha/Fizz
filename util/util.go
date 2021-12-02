@@ -70,8 +70,10 @@ func GetType(value interface{}) string {
 	}
 
 	switch value.(type) {
-		case float64: return "number"
-		case nil: return "nil"
+	case float64:
+		return "number"
+	case nil:
+		return "nil"
 	}
 
 	return reflect.TypeOf(value).Name()

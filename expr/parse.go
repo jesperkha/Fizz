@@ -11,7 +11,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	if err != nil {
 		return expr, err
 	}
-	
+
 	return *parsePTokens(ptokens), err
 }
 
@@ -89,7 +89,7 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 						return ptokens, util.FormatError(ErrParenError, line)
 					}
 
-					idx = endIdx+1
+					idx = endIdx + 1
 					continue
 				}
 
@@ -183,14 +183,14 @@ func parsePTokens(tokens []ParseToken) *Expression {
 	}
 
 	if tokens[1].Token.Type == lexer.DOT {
-		if len(tokens) % 2 == 0 {
+		if len(tokens)%2 == 0 {
 			return &Expression{}
 		}
 
 		exprs := []Expression{}
-		for i := 0; i < len(tokens) - 1; i += 2 {
+		for i := 0; i < len(tokens)-1; i += 2 {
 			idn := tokens[i]
-			if tokens[i + 1].Token.Type != lexer.DOT {
+			if tokens[i+1].Token.Type != lexer.DOT {
 				return &Expression{}
 			}
 
@@ -201,10 +201,10 @@ func parsePTokens(tokens []ParseToken) *Expression {
 		exprs = append(exprs, *parsePTokens([]ParseToken{tokens[len(tokens)-1]}))
 		return &Expression{Type: Getter, Exprs: exprs, Line: line}
 	}
-	
+
 	// Unary expression
 	unaryTokens := []int{lexer.MINUS, lexer.TYPE, lexer.NOT}
-	if len(tokens) == 2 || (util.Contains(unaryTokens, lowest.Type) && lowest.Type == tokens[0].Type)  {
+	if len(tokens) == 2 || (util.Contains(unaryTokens, lowest.Type) && lowest.Type == tokens[0].Type) {
 		return &Expression{Type: Unary, Line: line, Operand: tokens[0].Token, Right: parsePTokens(tokens[1:])}
 	}
 

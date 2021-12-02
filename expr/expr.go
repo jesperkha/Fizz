@@ -19,7 +19,7 @@ var (
 	ErrIncorrectArgs        = errors.New("'%s()' expected %d args, got %d, line %d")
 	ErrNotFunction          = errors.New("'%s' is not a function, line %d")
 	ErrNilValueError        = errors.New("unexpected nil value in expression, line %d")
-	ErrNotObject = errors.New("type '%s' has no attributes, line %d")
+	ErrNotObject            = errors.New("type '%s' has no attributes, line %d")
 
 	ErrIllegalType = errors.New("unknown type '%s'")
 )

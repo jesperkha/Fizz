@@ -118,7 +118,7 @@ func GetTokens(input string) (tokens []Token, err error) {
 				if len(t) == 0 {
 					return tokens, invalidSyntax
 				}
-				
+
 				t[0].Line = token.Line
 				ts = append(ts, dot...)
 				ts = append(ts, t...)

@@ -47,14 +47,14 @@ const (
 )
 
 type Statement struct {
-	Type           int
-	Line           int
-	Operator       int
-	Name           string
-	Expression     *expr.Expression
-	Statements     []Statement
-	Then           *Statement
-	Else           *Statement
-	Params         []string
-	Enviroment     env.Environment
+	Type       int
+	Line       int
+	Operator   int
+	Name       string
+	Expression *expr.Expression
+	Statements []Statement
+	Then       *Statement
+	Else       *Statement
+	Params     []string
+	Enviroment env.Environment
 }

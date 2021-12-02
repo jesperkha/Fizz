@@ -24,7 +24,7 @@ func (c Callable) Type() string {
 type Object struct {
 	Fields    map[string]interface{}
 	NumFields int
-	Name	  string
+	Name      string
 }
 
 func (o Object) Type() string {

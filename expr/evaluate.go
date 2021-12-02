@@ -179,11 +179,11 @@ func evalGetter(getter *Expression) (value interface{}, err error) {
 			if err != nil {
 				return value, err
 			}
-			
+
 			last = value
 			continue
 		}
-		
+
 		// Last has to be object to continue. If gtr.Name is empty its not a identifier
 		if util.GetType(last) != "object" || gtr.Name == "" {
 			value, err = EvaluateExpression(&gtr)

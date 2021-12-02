@@ -1,6 +1,8 @@
 package stmt
 
 import (
+	"log"
+
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
 	"github.com/jesperkha/Fizz/lexer"
@@ -191,14 +193,24 @@ func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 		return parseExpression(tokens)
 	}
 
-	operator := tokens[1].Type
 	validOperands := []int{lexer.EQUAL, lexer.PLUS_EQUAL, lexer.MINUS_EQUAL, lexer.MULT_EQUAL, lexer.DIV_EQUAL}
+	operator := tokens[1].Type
+	if operator == lexer.DOT {
+		return parseObjectAssignment(tokens)
+	}
+
 	if !util.Contains(validOperands, operator) {
 		return parseExpression(tokens)
 	}
 
 	expr, err := expr.ParseExpression(tokens[2:])
 	return Statement{Type: Assignment, Name: tokens[0].Lexeme, Expression: &expr, Operator: operator}, err
+}
+
+// Todo: implement object assignment parsing
+func parseObjectAssignment(tokens []lexer.Token) (stmt Statement, err error) {
+	log.Fatal("not implemented")
+	return stmt, err
 }
 
 func parseFunc(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
@@ -339,13 +351,13 @@ func parseObject(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 		return stmt, ErrInvalidStatement
 	}
 
-	nameToken := tokens[*idx + 1]
+	nameToken := tokens[*idx+1]
 	if nameToken.Type != lexer.IDENTIFIER {
 		return stmt, ErrExpectedIdentifier
 	}
 
 	*idx += 3 // Goto start of block
-	if tokens[*idx - 1].Type != lexer.LEFT_BRACE {
+	if tokens[*idx-1].Type != lexer.LEFT_BRACE {
 		return stmt, ErrExpectedBlock
 	}
 

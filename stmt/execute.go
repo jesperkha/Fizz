@@ -101,7 +101,15 @@ func execPrint(stmt Statement) (err error) {
 		return err
 	}
 
-	fmt.Println(value)
+	switch util.GetType(value) {
+	case "function":
+		fmt.Printf("[function %s]\n", stmt.Expression.Name)
+	case "object":
+		fmt.Printf("[object %s]\n", value.(env.Object).Name)
+	default:
+		fmt.Println(value)
+	}
+
 	return nil
 }
 
