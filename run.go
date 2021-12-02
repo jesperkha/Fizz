@@ -20,7 +20,7 @@ var cmdOptions = map[string]func(){
 		fmt.Println("use: fizz [--option] [-flag] [filename]")
 	},
 	"version": func() {
-		fmt.Printf("fizz version %s\n", VERSION)
+		fmt.Printf("Fizz %s\n", VERSION)
 	},
 	"options": func() {
 		fmt.Println("--help\n--options\n--version")
@@ -73,7 +73,7 @@ func runTerminal() {
 	numBlocks := 0
 	line := 1
 	space := " "
-	
+
 	for {
 		fmt.Printf("%d%s : %s", line, space, strings.Repeat("    ", numBlocks))
 		scanner.Scan()

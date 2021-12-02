@@ -137,36 +137,88 @@ func evalCall(call *Expression) (value interface{}, err error) {
 	}
 
 	if function, ok := f.(env.Callable); ok {
-		numArgs := len(call.Exprs)
-		if numArgs != function.NumArgs {
-			name, expected, line := call.Name, function.NumArgs, call.Line
-			return value, fmt.Errorf(ErrIncorrectArgs.Error(), name, expected, numArgs, line)
-		}
-
-		// Evaluated args to be passed to function
-		args := []interface{}{}
-		for _, arg := range call.Exprs {
-			v, err := EvaluateExpression(&arg)
-			if err != nil {
-				return value, err
-			}
-
-			args = append(args, v)
-		}
-
-		val, err := function.Call(args...)
-		if !validFizzType(val) {
-			return val, fmt.Errorf(ErrIllegalType.Error(), util.GetType(val))
-		}
-
-		return val, err
+		return evalCallableObject(call, function)
 	}
 
 	return value, notFuncErr
 }
 
-// Todo: evaluate each identifier, check if object, get value or err
+// Seperate function because evalGetter needs to evaluate functions that are not in the current scope but rather value passed in nested objects
+func evalCallableObject(call *Expression, f env.Callable) (value interface{}, err error) {
+	numArgs := len(call.Exprs)
+	if numArgs != f.NumArgs {
+		name, expected, line := call.Name, f.NumArgs, call.Line
+		return value, fmt.Errorf(ErrIncorrectArgs.Error(), name, expected, numArgs, line)
+	}
+
+	// Evaluated args to be passed to function
+	args := []interface{}{}
+	for _, arg := range call.Exprs {
+		v, err := EvaluateExpression(&arg)
+		if err != nil {
+			return value, err
+		}
+
+		args = append(args, v)
+	}
+
+	val, err := f.Call(args...)
+	if !validFizzType(val) {
+		return val, fmt.Errorf(ErrIllegalType.Error(), util.GetType(val))
+	}
+
+	return val, err
+}
+
 func evalGetter(getter *Expression) (value interface{}, err error) {
+	var last interface{}
+	for idx, gtr := range getter.Exprs {
+		// For first token
+		if util.GetType(last) == "nil" {
+			value, err = EvaluateExpression(&gtr)
+			if err != nil {
+				return value, err
+			}
+			
+			last = value
+			continue
+		}
+		
+		// Last has to be object to continue. If gtr.Name is empty its not a identifier
+		if util.GetType(last) != "object" || gtr.Name == "" {
+			value, err = EvaluateExpression(&gtr)
+			if err != nil {
+				return value, err
+			}
+
+			return value, fmt.Errorf(ErrNotObject.Error(), util.GetType(value), getter.Line)
+		}
+
+		// Will not raise error because checked before
+		lastObj := last.(env.Object)
+
+		// Get current value
+		current, err := lastObj.Get(gtr.Name)
+		if err != nil {
+			return value, fmt.Errorf(err.Error(), lastObj.Name, gtr.Name, getter.Line)
+		}
+
+		// For last token return the value
+		if idx == len(getter.Exprs)-1 {
+			return current, err
+		}
+
+		// If function, set current as the return value of the function + args from gtr
+		if util.GetType(current) == "function" {
+			current, err = evalCallableObject(&gtr, current.(env.Callable))
+			if err != nil {
+				return value, err
+			}
+		}
+
+		last = current
+	}
+
 	return value, err
 }
 

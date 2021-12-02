@@ -50,7 +50,6 @@ func GetTokens(input string) (tokens []Token, err error) {
 				continue
 			case COMMENT:
 				seekCharacter(input, &currentIdx, '\n')
-				currentLine++
 				continue
 			}
 
@@ -98,8 +97,9 @@ func GetTokens(input string) (tokens []Token, err error) {
 		splitDot := strings.Split(identifier, ".")
 		isGetter := !isNumber && len(splitDot) > 1
 
+		invalidSyntax := fmt.Errorf(ErrInvalidSyntax.Error(), identifier, currentLine)
 		if !isNumber && !isAlphaNum && !isGetter {
-			return tokens, fmt.Errorf(ErrInvalidSyntax.Error(), identifier, currentLine)
+			return tokens, invalidSyntax
 		}
 
 		if isGetter {
@@ -114,7 +114,12 @@ func GetTokens(input string) (tokens []Token, err error) {
 				if err != nil {
 					return tokens, err
 				}
+
+				if len(t) == 0 {
+					return tokens, invalidSyntax
+				}
 				
+				t[0].Line = token.Line
 				ts = append(ts, dot...)
 				ts = append(ts, t...)
 			}

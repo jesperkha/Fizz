@@ -298,7 +298,7 @@ func execObject(stmt Statement) (err error) {
 		NumArgs: len(stmt.Params),
 
 		Call: func(args ...interface{}) (interface{}, error) {
-			obj := env.Object{Fields: map[string]interface{}{}}
+			obj := env.Object{Fields: map[string]interface{}{}, Name: stmt.Name}
 			for i, field := range stmt.Params {
 				obj.Fields[field] = args[i]
 			}

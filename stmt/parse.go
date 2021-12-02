@@ -185,6 +185,7 @@ func parseVariable(tokens []lexer.Token) (stmt Statement, err error) {
 	return stmt, ErrInvalidStatement
 }
 
+// Todo: make assignment for chained getters
 func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 	if len(tokens) < 3 {
 		return parseExpression(tokens)

@@ -81,8 +81,20 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 
 			args := [][]ParseToken{}
 			exprStart := 0 // Start of arg expression (index)
-			for idx, t := range interval {
-				if t.Type != lexer.COMMA {
+			idx := 0
+			for idx < len(interval) {
+				if interval[idx].Type == lexer.LEFT_PAREN {
+					endIdx, eof := util.SeekClosingBracket(interval, idx, lexer.LEFT_PAREN, lexer.RIGHT_PAREN)
+					if eof {
+						return ptokens, util.FormatError(ErrParenError, line)
+					}
+
+					idx = endIdx+1
+					continue
+				}
+
+				if interval[idx].Type != lexer.COMMA {
+					idx++
 					continue
 				}
 
@@ -96,7 +108,8 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 				}
 
 				args = append(args, argToken)
-				exprStart = idx + 1
+				idx++
+				exprStart = idx
 			}
 
 			callToken := ParseToken{Type: CallGroup, Token: token, Args: args}
@@ -186,7 +199,7 @@ func parsePTokens(tokens []ParseToken) *Expression {
 
 		// Get last token
 		exprs = append(exprs, *parsePTokens([]ParseToken{tokens[len(tokens)-1]}))
-		return &Expression{Type: Getter, Exprs: exprs}
+		return &Expression{Type: Getter, Exprs: exprs, Line: line}
 	}
 	
 	// Unary expression
