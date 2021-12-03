@@ -14,10 +14,10 @@ This roadmap highlights progress for Fizz's development:
 - ✔️ Conditional statements
 - ✔️ Loops
 - ✔️ Functions
-- ❌ Objects
+- ✔️ Objects
+- ❌ File import
 - ❌ Soft pointers
 - ❌ Arrays
-- ❌ File import
 - ❌ Go -> Fizz library support
 - ❌ Full language documentation
 
@@ -25,7 +25,7 @@ This roadmap highlights progress for Fizz's development:
 
 ## **Language**
 
-You can find all the basic info you need about Fizz [here](lang.md). For a deeper understanding of how Fizz works its suggested to simply look at the source code.
+You can find all the basic info you need about Fizz [here](./.github/LANG.md). For a deeper understanding of how Fizz works its suggested to simply look at the source code.
 
 <br>
 
