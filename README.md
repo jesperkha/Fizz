@@ -2,13 +2,13 @@
 
 ## **About**
 
-Fizz is an interpreted programming language built with Go. The main use cases for Fizz is file management, simple http requests, and general terminal scripting. The built in libraries (not added yet) support all of these features, including documentation with examples.
+Fizz is an interpreted programming language built with Go. The main use cases for Fizz will be file management, simple http requests, and general terminal scripting. The built in libraries (not added yet) will support all of these features, including documentation with examples.
 
 <br>
 
 ## **Roadmap**
 
-This roadmap highlights progress for Fizz's development:
+This roadmap highlights progress for the development of Fizz:
 
 - ✔️ Expression parsing
 - ✔️ Conditional statements
