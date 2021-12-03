@@ -48,6 +48,7 @@ const (
 	Object
 )
 
+// Todo: create soft pointer statement to pass value references
 type Statement struct {
 	Type       int
 	Line       int

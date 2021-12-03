@@ -1,6 +1,8 @@
 package expr
 
 import (
+	"fmt"
+
 	"github.com/jesperkha/Fizz/lexer"
 	"github.com/jesperkha/Fizz/util"
 )
@@ -173,7 +175,33 @@ func parsePTokens(tokens []ParseToken) *Expression {
 			lowestIdx = idx
 		}
 	}
+	
+	// Is getter expression (last parsed)
+	if tokens[1].Token.Type == lexer.DOT && lowest.Type == lexer.IDENTIFIER {
+		if len(tokens)%2 == 0 {
+			return &Expression{}
+		}
+		
+		exprs := []Expression{}
+		for i := 0; i < len(tokens)-1; i += 2 {
+			idn := tokens[i]
+			if tokens[i+1].Token.Type != lexer.DOT {
+				return &Expression{}
+			}
+			
+			exprs = append(exprs, *parsePTokens([]ParseToken{idn}))
+		}
+		
+		// Get last token
+		exprs = append(exprs, *parsePTokens([]ParseToken{tokens[len(tokens)-1]}))
+		fullName := ""
+		for _, e := range exprs {
+			fullName += fmt.Sprintf(".%s", e.Name)
+		}
 
+		return &Expression{Type: Getter, Exprs: exprs, Line: line, Name: fullName[1:]}
+	}
+	
 	// Invalid expression might have lowest as end token
 	// Move to middle and let evaluation handle error
 	if lowestIdx == len(tokens)-1 {
@@ -181,27 +209,7 @@ func parsePTokens(tokens []ParseToken) *Expression {
 		lowestIdx = newIdx
 		lowest = tokens[lowestIdx].Token
 	}
-
-	if tokens[1].Token.Type == lexer.DOT {
-		if len(tokens)%2 == 0 {
-			return &Expression{}
-		}
-
-		exprs := []Expression{}
-		for i := 0; i < len(tokens)-1; i += 2 {
-			idn := tokens[i]
-			if tokens[i+1].Token.Type != lexer.DOT {
-				return &Expression{}
-			}
-
-			exprs = append(exprs, *parsePTokens([]ParseToken{idn}))
-		}
-
-		// Get last token
-		exprs = append(exprs, *parsePTokens([]ParseToken{tokens[len(tokens)-1]}))
-		return &Expression{Type: Getter, Exprs: exprs, Line: line}
-	}
-
+	
 	// Unary expression
 	unaryTokens := []int{lexer.MINUS, lexer.TYPE, lexer.NOT}
 	if len(tokens) == 2 || (util.Contains(unaryTokens, lowest.Type) && lowest.Type == tokens[0].Type) {

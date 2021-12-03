@@ -16,6 +16,8 @@ var (
 		"while { break; }",
 		"repeat n < 10 { skip; }",
 		"func main(a, b) {return 1;} print main(1, 2);",
+		"define p{n} var a = p(2); a.n == 2;",
+		"var b = p(p(p(1))); b.n.n.n == 1;",
 	}
 
 	// Invalid statements, should return error, but not panic
@@ -27,6 +29,10 @@ var (
 		"if {}",
 		"while a + 2 {}",
 		"repeat 20 {}",
+		"var c = p(1); c.n.n;",
+		"b.n();",
+		".b.n;",
+		"b.n.",
 	}
 )
 

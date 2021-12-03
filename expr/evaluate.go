@@ -172,6 +172,7 @@ func evalCallableObject(call *Expression, f env.Callable) (value interface{}, er
 
 func evalGetter(getter *Expression) (value interface{}, err error) {
 	var last interface{}
+	line := getter.Line
 	for idx, gtr := range getter.Exprs {
 		// For first token
 		if util.GetType(last) == "nil" {
@@ -191,7 +192,7 @@ func evalGetter(getter *Expression) (value interface{}, err error) {
 				return value, err
 			}
 
-			return value, fmt.Errorf(ErrNotObject.Error(), util.GetType(value), getter.Line)
+			return value, fmt.Errorf(ErrNotObject.Error(), util.GetType(value), line)
 		}
 
 		// Will not raise error because checked before
@@ -200,20 +201,24 @@ func evalGetter(getter *Expression) (value interface{}, err error) {
 		// Get current value
 		current, err := lastObj.Get(gtr.Name)
 		if err != nil {
-			return value, fmt.Errorf(err.Error(), lastObj.Name, gtr.Name, getter.Line)
+			return value, fmt.Errorf(err.Error(), lastObj.Name, gtr.Name, line)
+		}
+
+		// If function, set current as the return value of the function + args from gtr
+		if gtr.Type == Call {
+			if util.GetType(current) != "function" {
+				return value, fmt.Errorf(ErrNotFunction.Error(), getter.Name, line)
+			}
+
+			current, err = evalCallableObject(&gtr, current.(env.Callable))
+			if err != nil {
+				return value, err
+			}
 		}
 
 		// For last token return the value
 		if idx == len(getter.Exprs)-1 {
 			return current, err
-		}
-
-		// If function, set current as the return value of the function + args from gtr
-		if util.GetType(current) == "function" {
-			current, err = evalCallableObject(&gtr, current.(env.Callable))
-			if err != nil {
-				return value, err
-			}
 		}
 
 		last = current

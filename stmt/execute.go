@@ -146,6 +146,7 @@ func assignToObject(objTokens []lexer.Token, name string, value interface{}) (er
 	return ErrNonAssignable
 }
 
+// Todo: make copy function so variables dont reference eachother
 func execAssignment(stmt Statement) (err error) {
 	val, err := expr.EvaluateExpression(stmt.Expression)
 	if err != nil {
