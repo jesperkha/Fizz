@@ -2,9 +2,11 @@ package util
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"strings"
 
+	ct "github.com/daviddengcn/go-colortext"
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/lexer"
 )
@@ -21,6 +23,19 @@ func FormatError(err error, line int) error {
 	}
 
 	return err
+}
+
+// Prints red error message to console
+func PrintError(err error) {
+	ct.Foreground(ct.Red, true)
+	fmt.Println(err.Error())
+	ct.ResetColor()
+}
+
+// Prints error followed by program exit
+func ErrorAndExit(err error) {
+	PrintError(err)
+	os.Exit(1)
 }
 
 // Checks if tokens is in tokenlist

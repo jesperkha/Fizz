@@ -126,6 +126,26 @@ func execVariable(stmt Statement) (err error) {
 	return env.Declare(stmt.Name, nil)
 }
 
+// Helper for execAssignment
+func assignToObject(objTokens []lexer.Token, name string, value interface{}) (err error) {
+	// Not object value assignment
+	if len(objTokens) == 0 {
+		return env.Assign(name, value)
+	}
+
+	// Get object to assign to
+	v, err := expr.ParseAndEval(objTokens)
+	if err != nil {
+		return err
+	}
+
+	if obj, ok := v.(env.Object); ok {
+		return obj.Set(name, value)
+	}
+	
+	return ErrNonAssignable
+}
+
 func execAssignment(stmt Statement) (err error) {
 	val, err := expr.EvaluateExpression(stmt.Expression)
 	if err != nil {
@@ -134,10 +154,9 @@ func execAssignment(stmt Statement) (err error) {
 
 	// Plain assignment
 	if stmt.Operator == lexer.EQUAL {
-		return env.Assign(stmt.Name, val)
+		return assignToObject(stmt.ObjTokens, stmt.Name, val)
 	}
 
-	// Plus equals
 	oldVal, err := env.Get(stmt.Name)
 	if err != nil {
 		return err
@@ -155,7 +174,7 @@ func execAssignment(stmt Statement) (err error) {
 			return ErrInvalidOperator
 		}
 
-		return env.Assign(stmt.Name, oldVal.(string)+val.(string))
+		return assignToObject(stmt.ObjTokens, stmt.Name, oldVal.(string)+val.(string))
 	}
 
 	// Float addition / subtraction
@@ -175,7 +194,7 @@ func execAssignment(stmt Statement) (err error) {
 			newVal = a / b
 		}
 
-		return env.Assign(stmt.Name, newVal)
+		return assignToObject(stmt.ObjTokens, stmt.Name, newVal)
 	}
 
 	return ErrInvalidStatement

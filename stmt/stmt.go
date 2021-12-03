@@ -5,6 +5,7 @@ import (
 
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
+	"github.com/jesperkha/Fizz/lexer"
 )
 
 var (
@@ -21,6 +22,7 @@ var (
 	ErrDifferentTypes     = errors.New("different types in statement, line %d")
 	ErrNonCallable        = errors.New("cannot call non-callable type, line %d")
 	ErrCommaError         = errors.New("comma error, line %d")
+	ErrNonAssignable	  = errors.New("cannot assign value to non-object, line %d")
 
 	ErrReturnOutsideFunc = errors.New("cannot use return outside of a function")
 	ErrSkipOutsideLoop   = errors.New("cannot use skip outside of a loop")
@@ -51,6 +53,7 @@ type Statement struct {
 	Line       int
 	Operator   int
 	Name       string
+	ObjTokens  []lexer.Token
 	Expression *expr.Expression
 	Statements []Statement
 	Then       *Statement

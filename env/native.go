@@ -38,3 +38,12 @@ func (o Object) Get(name string) (value interface{}, err error) {
 
 	return value, ErrNotAField
 }
+
+func (o *Object) Set(name string, value interface{}) (err error) {
+	if _, ok := o.Fields[name]; ok {
+		o.Fields[name] = value
+		return err
+	}
+
+	return ErrNotAField
+}

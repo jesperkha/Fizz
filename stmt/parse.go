@@ -1,8 +1,6 @@
 package stmt
 
 import (
-	"log"
-
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
 	"github.com/jesperkha/Fizz/lexer"
@@ -187,7 +185,6 @@ func parseVariable(tokens []lexer.Token) (stmt Statement, err error) {
 	return stmt, ErrInvalidStatement
 }
 
-// Todo: make assignment for chained getters
 func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 	if len(tokens) < 3 {
 		return parseExpression(tokens)
@@ -195,8 +192,24 @@ func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 
 	validOperands := []int{lexer.EQUAL, lexer.PLUS_EQUAL, lexer.MINUS_EQUAL, lexer.MULT_EQUAL, lexer.DIV_EQUAL}
 	operator := tokens[1].Type
+
+	// Checks if object value assignment. Handles error. Skips if not
 	if operator == lexer.DOT {
-		return parseObjectAssignment(tokens)
+		for idx, t := range tokens {
+			if !util.Contains(validOperands, t.Type) {
+				continue
+			}
+
+			left, right := tokens[:idx], tokens[idx+1:] // exclude operator
+			rightExpr, err := expr.ParseExpression(right)
+			return Statement{
+				Type: Assignment,
+				ObjTokens: left[:len(left)-2],
+				Name: left[len(left)-1].Lexeme,
+				Expression: &rightExpr,
+				Operator: t.Type,
+			}, err
+		}
 	}
 
 	if !util.Contains(validOperands, operator) {
@@ -205,12 +218,6 @@ func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 
 	expr, err := expr.ParseExpression(tokens[2:])
 	return Statement{Type: Assignment, Name: tokens[0].Lexeme, Expression: &expr, Operator: operator}, err
-}
-
-// Todo: implement object assignment parsing
-func parseObjectAssignment(tokens []lexer.Token) (stmt Statement, err error) {
-	log.Fatal("not implemented")
-	return stmt, err
 }
 
 func parseFunc(tokens []lexer.Token, idx *int) (stmt Statement, err error) {

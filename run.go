@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	ct "github.com/daviddengcn/go-colortext"
+	"github.com/jesperkha/Fizz/util"
 )
 
 var (
@@ -35,7 +35,7 @@ func RunInterpeter(args []string) {
 			if option, ok := cmdOptions[arg[2:]]; ok {
 				option()
 			} else {
-				formatError(fmt.Errorf("unknown option: '%s', use --options to see a full list of options", arg))
+				util.PrintError(fmt.Errorf("unknown option: '%s', use --options to see a full list of options", arg))
 			}
 
 			return
@@ -47,20 +47,13 @@ func RunInterpeter(args []string) {
 		}
 
 		if err := runFile(filename); err != nil {
-			formatError(err)
+			util.PrintError(err)
 		}
 
 		return
 	}
 
 	runTerminal()
-}
-
-// Prints errors with red color to terminal
-func formatError(err error) {
-	ct.Foreground(ct.Red, true)
-	fmt.Println(err.Error())
-	ct.ResetColor()
 }
 
 // Leaves the interpreter running as the user inputs code to the terminal.
@@ -89,7 +82,7 @@ func runTerminal() {
 
 		if numBlocks <= 0 {
 			if err := Interperate(totalString); err != nil {
-				formatError(err)
+				util.PrintError(err)
 				line--
 			}
 

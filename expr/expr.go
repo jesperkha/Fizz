@@ -68,6 +68,15 @@ type ParseToken struct {
 	Args  [][]ParseToken
 }
 
+func ParseAndEval(tokens []lexer.Token) (value interface{}, err error) {
+	expr, err := ParseExpression(tokens)
+	if err != nil {
+		return value, err
+	}
+
+	return EvaluateExpression(&expr)
+}
+
 func PrintExpressionAST(expr Expression) {
 	fmt.Println(printAST(expr))
 }
