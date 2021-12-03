@@ -8,6 +8,7 @@
 - [While and repeat](#while)
 - [Break, skip, and exit](#break)
 - [Functions](#func)
+- [Objects](#obj)
 
 <br>
 
@@ -148,4 +149,23 @@ func add(a, b) {
 }
 
 print add(5, 2); // 7
+```
+
+<br>
+
+### <a id="obj"></a> **Objects**
+
+Object structures can be defined with the `define` keyword. This creates a object template which you can use to make your own structured data. The fields of the object do not have a specific type, unlike languages like C and Go. Object values support reassignment too.
+
+```js
+define Person {
+    name
+    age
+}
+
+var john = Person("John", 31);
+print john.name; // "John"
+
+john.age = 99;
+print john.age; // 99
 ```
