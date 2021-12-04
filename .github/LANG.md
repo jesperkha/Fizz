@@ -71,7 +71,7 @@ Local variables override higher level scope:
 var age = 10;
 
 {
-	// Overrides flobal 'age' variable
+	// Overrides global 'age' variable
 	var age = 20;
 }
 ```

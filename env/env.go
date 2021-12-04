@@ -4,14 +4,16 @@ import (
 	"errors"
 )
 
+// Todo: redesign entire env model. every running instance of the interpreter should be 100% self contained
 type entryMap map[string]interface{}
 
 type Environment struct {
 	Values entryMap
 	Parent *Environment
+	Name string
 }
 
-var CurrentEnv = Environment{Values: entryMap{}}
+var currentEnv = Environment{Values: entryMap{}}
 
 // Adds a new key value pair for specified variable name. Returns error if already defined
 func declareVariable(env *Environment, name string, value interface{}) (err error) {
@@ -51,32 +53,32 @@ func getVariable(env *Environment, name string) (value interface{}, err error) {
 }
 
 func Declare(name string, value interface{}) (err error) {
-	return declareVariable(&CurrentEnv, name, value)
+	return declareVariable(&currentEnv, name, value)
 }
 
 func Get(name string) (value interface{}, err error) {
-	return getVariable(&CurrentEnv, name)
+	return getVariable(&currentEnv, name)
 }
 
 func Assign(name string, newVal interface{}) (err error) {
-	return assignVariable(&CurrentEnv, name, newVal)
+	return assignVariable(&currentEnv, name, newVal)
 }
 
 // Goes into new scope
 func PushScope() {
 	newEnv := Environment{Values: entryMap{}}
-	newEnv.Parent = &Environment{Parent: CurrentEnv.Parent, Values: CurrentEnv.Values}
-	CurrentEnv = newEnv
+	newEnv.Parent = &Environment{Parent: currentEnv.Parent, Values: currentEnv.Values}
+	currentEnv = newEnv
 }
 
 // Adds custom scope for closures
 func AddScope(env Environment) {
-	env.Parent = &CurrentEnv
-	CurrentEnv = env
+	env.Parent = &currentEnv
+	currentEnv = env
 }
 
 // Goes back to previous scope
 func PopScope() {
-	parent := CurrentEnv.Parent
-	CurrentEnv = *parent
+	parent := currentEnv.Parent
+	currentEnv = *parent
 }

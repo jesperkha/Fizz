@@ -23,6 +23,8 @@ var (
 	ErrNonCallable        = errors.New("cannot call non-callable type, line %d")
 	ErrCommaError         = errors.New("comma error, line %d")
 	ErrNonAssignable	  = errors.New("cannot assign value to non-object, line %d")
+	ErrExpectedName		  = errors.New("expected filename at import, line %d")
+	ErrCannotImport		  = errors.New("cannot import outside of global scope, line %d")
 
 	ErrReturnOutsideFunc = errors.New("cannot use return outside of a function")
 	ErrSkipOutsideLoop   = errors.New("cannot use skip outside of a loop")

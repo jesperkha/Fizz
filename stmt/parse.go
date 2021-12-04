@@ -1,7 +1,6 @@
 package stmt
 
 import (
-	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
 	"github.com/jesperkha/Fizz/lexer"
 	"github.com/jesperkha/Fizz/util"
@@ -24,7 +23,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		if err != nil {
 			return statements, util.FormatError(err, line)
 		}
-
+		
 		// Parse any other type of statement.
 		if currentStmt.Type == NotStatement {
 			// Seeks a semicolon since all other statements end with a semicolon
@@ -32,9 +31,9 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 			if eof {
 				return statements, util.FormatError(ErrNoSemicolon, line)
 			}
-
+			
 			currentIdx = endIdx // Skip to end of statement to section off token list
-
+			
 			// Get tokens in interval between last semicolon and current one
 			tokenInterval := tokens[startIndex:currentIdx]
 			if len(tokenInterval) == 0 {
@@ -256,7 +255,7 @@ func parseFunc(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	}
 
 	block, err := getBlockStatement(tokens, idx)
-	return Statement{Type: Function, Name: nameToken.Lexeme, Params: params, Then: &block, Enviroment: env.CurrentEnv}, err
+	return Statement{Type: Function, Name: nameToken.Lexeme, Params: params, Then: &block}, err
 }
 
 // Modifies index to go to block end. First token must be left brace

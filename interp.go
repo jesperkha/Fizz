@@ -20,6 +20,12 @@ import (
 // variable environment found in the env package.
 
 func Interperate(input string) (err error) {
+	// Todo: find out how to implement import statement.
+	// files in the same folder should share the same scope
+	// imports should be the name of a folder relative path
+	// to the main directory. no other 'package' can import
+	// each bundle of files is supposed to be self contained
+
 	// Parses input characters into lexical tokens for single and double symbols,
 	// identifiers, and keywords.
 	lexicalTokens, err := lexer.GetTokens(input)
