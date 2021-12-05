@@ -1,49 +1,19 @@
 package env
 
 import (
-	"errors"
+	"bufio"
+	"os"
 )
 
-var (
-	ErrNotAField = errors.New("'%s' has no attribute '%s', line %d")
-)
+func init() {
+	scanner := bufio.NewScanner(os.Stdin)
 
-type FizzObject interface {
-	Type() string
-}
-
-type Callable struct {
-	Call    func(...interface{}) (interface{}, error)
-	NumArgs int
-}
-
-func (c Callable) Type() string {
-	return "function"
-}
-
-type Object struct {
-	Fields    map[string]interface{}
-	NumFields int
-	Name      string
-}
-
-func (o Object) Type() string {
-	return "object"
-}
-
-func (o Object) Get(name string) (value interface{}, err error) {
-	if val, ok := o.Fields[name]; ok {
-		return val, err
-	}
-
-	return value, ErrNotAField
-}
-
-func (o *Object) Set(name string, value interface{}) (err error) {
-	if _, ok := o.Fields[name]; ok {
-		o.Fields[name] = value
-		return err
-	}
-
-	return ErrNotAField
+	Declare("input", Callable{
+		NumArgs: 0,
+		Call: func(i ...interface{}) (interface{}, error) {
+			scanner.Scan()
+			input := scanner.Text()
+			return input, nil
+		},
+	})
 }

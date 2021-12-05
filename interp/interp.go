@@ -1,6 +1,7 @@
-package main
+package interp
 
 import (
+	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/lexer"
 	"github.com/jesperkha/Fizz/stmt"
 )
@@ -19,30 +20,25 @@ import (
 // are evaluated. Variable values are also assigned and manipulated in the
 // variable environment found in the env package.
 
-func Interperate(input string) (err error) {
-	// Todo: find out how to implement import statement.
-	// files in the same folder should share the same scope
-	// imports should be the name of a folder relative path
-	// to the main directory. no other 'package' can import
-	// each bundle of files is supposed to be self contained
-
+func Interperate(input string) (env env.Environment, err error) {
 	// Parses input characters into lexical tokens for single and double symbols,
 	// identifiers, and keywords.
 	lexicalTokens, err := lexer.GetTokens(input)
 	if err != nil {
-		return err
+		return env, err
 	}
 
 	// Lexical tokens are analysed and put into statement tokens. These statements
 	// contain all the information they need for execution and error handling.
 	statements, err := stmt.ParseStatements(lexicalTokens)
 	if err != nil {
-		return err
+		return env, err
 	}
 
 	// Finally executes statement tokens. This is the only step that has any effect
 	// on the actual input program as the others were just braking it up into usable
 	// pieces. While the interpreter is still running, the values of variables will be
 	// remembered as the environments are never reset at runtime.
-	return stmt.ExecuteStatements(statements)
+	err = stmt.ExecuteStatements(statements)
+	return env, err // Todo: get env from exec and return it
 }

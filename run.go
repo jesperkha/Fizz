@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/jesperkha/Fizz/interp"
 	"github.com/jesperkha/Fizz/util"
 )
 
@@ -81,7 +82,7 @@ func runTerminal() {
 		totalString += input + "\n" // Better error handling
 
 		if numBlocks <= 0 {
-			if err := Interperate(totalString); err != nil {
+			if _, err := interp.Interperate(totalString); err != nil {
 				util.PrintError(err)
 				line--
 			}
@@ -106,7 +107,8 @@ func runFile(filename string) (err error) {
 	}
 
 	if byt, err := os.ReadFile(filename); err == nil {
-		return Interperate(string(byt))
+		_, err = interp.Interperate(string(byt))
+		return err
 	}
 
 	// Assumes path error
