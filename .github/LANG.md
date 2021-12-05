@@ -1,7 +1,8 @@
 # **Fizz**
 
 - [Overview](#overview)
-- [Expressions](#expr)
+- [Types](#types)
+- [Expressions and operators](#expr)
 - [Print and Type](#prt)
 - [Variables](#var)
 - [If statements and logic](#if)
@@ -19,25 +20,54 @@
 
 ### <a id="overview"></a> **Language overview**
 
-Heres a list of things about Fizz that you should know before reading the rest of this page or trying Fizz out for yourself:
-
-- Fizz is dynamically typed, meaning type checks are only performed for expression evaluation
-- Comments are created with a hashtag `#` (as mentioned above) and end at the first found line break
+- Fizz is dynamically typed, meaning type checks are only performed at runtime
+- Comments are created with a hashtag `#` (as mentioned above) and end at the first found newline
 - All statements that do not have a block tied to them must end with a semicolon `;`. This, off course, means you can have all your code on one line
 
 <br>
 
-### <a id="expr"></a> **Expressions**
+### <a id="types"></a> **Types**
+
+Fizz is strongly typed, meaning unmatched types in certain expressions will cause a runtime error.
+
+- `string` Any string of text with a starting and ending quote `"` symbol.
+
+- `number` Any number, including floats.
+
+- `nil` No value.
+
+- `bool` Keywords `true` and `false`.
+
+  - **Truthyness**: Any expression that does not evaluate to `nil` or `false` is truthy.
+
+- `object` Type of object instance
+
+- `function` Type of function or object constructor
+
+<br>
+
+### <a id="expr"></a> **Expressions and operators**
 
 Fizz features a lot of standard syntax similar to other languages. For example, all normal expressions using the basic arithmetic and logic operators will work in Fizz, including the modulo operator and the hat operator. Plus can also be used for joining strings.
 
-```go
-4 % 2 == 0;
-(3 ^ 2) == 9;
-"Hello" + "World";
-```
+Operators:
 
-Fizz is dynamically typed, but will not convert types in expressions. Instead and error is raised when types do not match.
+- `+` (for strings too)
+- `-` (also unary)
+- `*`
+- `/`
+- `%`
+- `^`
+- `<`
+- `>`
+- `!` (unary)
+- `==`
+- `!=`
+- `>=`
+- `<=`
+- `&`
+- `:`
+- `type` (unary)
 
 <br>
 
@@ -65,7 +95,7 @@ name = 3;
 var name = "Susan";
 ```
 
-Local variables override higher level scope:
+Local variables override higher level scopes:
 
 ```go
 var age = 10;
@@ -141,7 +171,7 @@ repeat n < 10 {
 
 ### <a id="func"></a> **Functions**
 
-You can declare a function using the `func` keyword.
+You can declare a function using the `func` keyword. Functions will return `nil` if no other return value is specified. Passing an incorrect argument number will cause a runtime error.
 
 ```go
 func add(a, b) {
@@ -169,3 +199,5 @@ print john.name; // "John"
 john.age = 99;
 print john.age; // 99
 ```
+
+Under the hood, the `define` statement creates a function that returns an object with the specified values. That means `Person` is a function type and `john` is an object type.
