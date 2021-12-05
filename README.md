@@ -19,6 +19,8 @@
 
 ---
 
+<br>
+
 ## <a id="roadmap"></a> **Roadmap**
 
 This roadmap highlights progress for the development of Fizz:
