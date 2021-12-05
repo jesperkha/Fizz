@@ -1,12 +1,26 @@
-# Fizz
+<img src="./.github/img/logo.svg" width="10%">
 
-## **About**
+<br>
+<br>
 
-Fizz is an interpreted programming language built with Go. The main use cases for Fizz will be file management, simple http requests, and general terminal scripting. The built in libraries (not added yet) will support all of these features, including documentation with examples.
+**Fizz** is an interpreted programming language built with Go. The main use cases for Fizz will be file management, simple http requests, and general terminal scripting. The built in libraries (not added yet) will support all of these features, including documentation with examples.
 
 <br>
 
-## **Roadmap**
+## Table of contents
+
+- [Roadmap](#roadmap)
+- [Language documentation](#language-documentation)
+- [Installation](#installation)
+  - [Pre-built binaries](#pre-built-binaries)
+  - [Building from source](#building-from-source)
+- [Running a program](#running-a-program)
+
+<br>
+
+---
+
+## <a id="roadmap"></a> **Roadmap**
 
 This roadmap highlights progress for the development of Fizz:
 
@@ -23,30 +37,32 @@ This roadmap highlights progress for the development of Fizz:
 
 <br>
 
-## **Language**
+## <a id="language-documentation"></a> **Language documentation**
 
 You can find all the basic info you need about Fizz [here](./.github/LANG.md). For a deeper understanding of how Fizz works its suggested to simply look at the source code.
 
 <br>
 
-## **Setup and use**
+## <a id="installation"></a> **Installation**
 
-#### Pre-built binaries:
+<a id="pre-built-binaries"></a> Pre-built binaries:
 
 - [Test Release](https://github.com/jesperkha/Fizz/releases/tag/test-release)
 
-#### Or you can clone the repo and:
+<a id="building-from-source"></a> Build from source:
 
-- build an executable with `build.sh`
-- or run with `go run . [filename]`
+1. Clone repo
+2. Run the `build.sh` file
 
 <br>
 
-### **Terminal mode**
+## <a id="running-a-program"></a> Running a program
 
-Running the interpreter without giving a filename will run the terminal mode where you can run any valid Fizz code live. Errors are printed but the program is not terminated.
+**Terminal mode**
 
-### **Run file**
+Running the interpreter without giving a filename will run the terminal mode where you can run any valid Fizz code live. Errors are printed but the program is not terminated. Newlines are supported for blocks and the code will not be executed until the block is closed.
+
+**Run file**
 
 Running the interpreter and giving a filename simply runs the code in the file and halts if an error occurs. Fizz files must end in the `.fizz` suffix.
 
