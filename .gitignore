@@ -2,4 +2,5 @@ bin
 dev_files
 .vscode
 main.fizz
+fizz.yaml
 extension/fizz-syntax-highlight/.vscode-test
