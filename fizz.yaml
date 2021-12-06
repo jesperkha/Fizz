@@ -1,0 +1,21 @@
+filetype: fizz
+detect:
+ filename: "\\.fizz$"
+rules:
+ - constant: "\\b(true|false|nil)\\b"
+ - identifier: "\\b(func|define)\\b [a-zA-Z_0-9]+"
+ - special: "\\b(break|skip|return|)\\b"
+ - statement: "\\b(else|while|if|range)\\b"
+ - preproc: "\\b(func|import|var|define|print|type)\\b"
+ - symbol.operator: "([~^:,+*|=!\\%@]|<|>|/|-|&)"
+ - symbol.brackets: "([(){}]|\\[|\\])"
+ # - constant.number: "\\b[0-9](_?[0-9])*(\\.([0-9](_?[0-9])*)?)?(e[0-9](_?[0-9])*)?\\b"
+ - constant.string:
+    start: "\""
+    end: "\""
+    rules: []
+ - comment:
+    start: "#"
+    end: "$"
+    rules:
+     - todo: "(Todo:|Note:|Fix:):?"
