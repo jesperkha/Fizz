@@ -22,7 +22,7 @@
 
 - Fizz is dynamically typed, meaning type checks are only performed at runtime
 - Comments are created with a hashtag `#` (as mentioned above) and end at the first found newline
-- All statements that do not have a block tied to them must end with a semicolon `;`. This, off course, means you can have all your code on one line
+- All statements that do not have a block tied to them must end with a semicolon `;`. This, of course, means you can have all your code on one line
 
 <br>
 
