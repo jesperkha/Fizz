@@ -11,6 +11,7 @@ import (
 
 var (
 	ErrNotValidArg = errors.New("flag name '%s' is not defined for parser")
+	ErrTooManyFiles = errors.New("cannot run more than one file")
 )
 
 // Arg passed is the value after an equals sign: --flag="arg". Defualt value is empty string
@@ -65,14 +66,13 @@ func (p *FlagParser) Assign(name string, f ArgFunc) error {
 }
 
 // Any undefined flag names found will return an error containing the first invalid flag name
-func (p *FlagParser) Parse() error {
+func (p *FlagParser) Parse() (filename string, err error) {
 	args := os.Args[1:]
-	filename := ""
 
 	for _, flag := range args {
 		if strings.HasPrefix(flag, "--") {
 			if !p.IsValid(flag) {
-				return fmt.Errorf(ErrNotValidArg.Error(), flag)
+				return filename, fmt.Errorf(ErrNotValidArg.Error(), flag)
 			}
 
 			if p.IsFunc(flag) {
@@ -87,7 +87,7 @@ func (p *FlagParser) Parse() error {
 			for _, opt := range strings.Split(flag, "-")[1] {
 				opt_s := "-" + string(opt)
 				if !p.IsValid(opt_s) {
-					return fmt.Errorf(ErrNotValidArg.Error(), opt_s)
+					return filename, fmt.Errorf(ErrNotValidArg.Error(), opt_s)
 				}
 
 				if p.IsFunc(opt_s) {
@@ -101,11 +101,11 @@ func (p *FlagParser) Parse() error {
 		}
 
 		if filename != "" {
-			return fmt.Errorf(ErrNotValidArg.Error(), flag)
+			return filename, ErrTooManyFiles
 		}
 
 		filename = flag
 	}
 
-	return nil
+	return filename, err
 }

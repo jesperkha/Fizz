@@ -27,15 +27,19 @@ func FormatError(err error, line int) error {
 
 // Prints red error message to console
 func PrintError(err error) {
+	if err == nil {
+		return
+	}
+
 	ct.Foreground(ct.Red, true)
 	fmt.Fprintln(os.Stderr, err.Error())
 	ct.ResetColor()
 }
 
-// Prints error followed by program exit
+// Prints error followed by program exit. Exit code 1 is reserved for crashes
 func ErrorAndExit(err error) {
 	PrintError(err)
-	os.Exit(1)
+	os.Exit(0)
 }
 
 // Checks if tokens is in tokenlist

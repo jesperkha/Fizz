@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/jesperkha/Fizz/cmd"
 	"github.com/jesperkha/Fizz/interp"
 	"github.com/jesperkha/Fizz/util"
 )
@@ -16,64 +17,47 @@ var (
 	ErrNonFizzFile  = errors.New("cannot run non-Fizz file")
 )
 
-// Todo: make simple cmd flag parser
-// Have full length versions of all flags. One letter flags for most common
-// Flags:
-// 		--json print data as json
-// 		--no-color prints errors without color
-var cmdOptions = map[string]func(){
-	// Todo: desc of what program does. a couple run examples. desc of flags. link to github
-	"help": func() {
-		fmt.Println("use: fizz [--option] [-flag] [filename]")
-	},
-	"version": func() {
+var parser = cmd.NewFlagParser(
+	[]string{},
+	[]string{"version", "help"},
+)
+
+func init() {
+	parser.Assign("--version", func ()  {
 		fmt.Printf("Fizz %s\n", VERSION)
-	},
-	"flags": func() {
-		
-	},
+		os.Exit(0)
+	})
+
+	parser.Assign("--help", func ()  {
+		fmt.Println("use:\n\tfizz [filename] <flags>\n\tfizz <flags>\n\tfizz")
+		os.Exit(0)
+	})
 }
 
-// Todo: set non 0 exit code for program failure. map to universal codes
 func RunInterpeter(args []string) {
-	if len(args) == 2 {
-		arg := args[1]
+	filename, err := parser.Parse()
+	if err != nil {
+		util.ErrorAndExit(err)
+	}
 
-		if strings.HasPrefix(arg, "--") {
-			if option, ok := cmdOptions[arg[2:]]; ok {
-				option()
-			} else {
-				util.PrintError(fmt.Errorf("unknown option: '%s', use --options to see a full list of options", arg))
-			}
-
-			return
-		}
-
-		filename := args[1]
-		if !strings.HasSuffix(filename, ".fizz") {
-			filename += ".fizz"
-		}
-
-		if err := runFile(filename); err != nil {
-			util.PrintError(err)
+	if filename != "" {
+		if err = RunFile(filename); err != nil {
+			util.ErrorAndExit(fmt.Errorf("%s: %s", filename, err.Error()))
 		}
 
 		return
 	}
 
-	runTerminal()
+	RunTerminal()
 }
 
 // Leaves the interpreter running as the user inputs code to the terminal.
 // Prints out errors but does not terminate until ^C or 'exit'.
-func runTerminal() {
+func RunTerminal() {
 	fmt.Println("type 'exit' to terminate session")
 	scanner := bufio.NewScanner(os.Stdin)
-
-	totalString := ""
-	numBlocks := 0
-	line := 1
-	space := " "
+	numBlocks, line := 0, 1
+	totalString, space := "", ""
 
 	for {
 		fmt.Printf("%d%s : %s", line, space, strings.Repeat("    ", numBlocks))
@@ -107,8 +91,7 @@ func runTerminal() {
 	fmt.Println("session ended")
 }
 
-// Interperates code found in file specified in commandline arguments
-func runFile(filename string) (err error) {
+func RunFile(filename string) (err error) {
 	if !strings.HasSuffix(filename, ".fizz") {
 		return ErrNonFizzFile
 	}

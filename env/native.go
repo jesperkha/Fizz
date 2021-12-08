@@ -2,6 +2,7 @@ package env
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 )
 
@@ -11,8 +12,9 @@ func init() {
 	// Todo: raise error if stdin is not an interactive terminal
 	// https://github.com/mattn/go-isatty
 	Declare("input", Callable{
-		NumArgs: 0,
+		NumArgs: 1,
 		Call: func(i ...interface{}) (interface{}, error) {
+			fmt.Print(i...)
 			scanner.Scan()
 			input := scanner.Text()
 			return input, nil
