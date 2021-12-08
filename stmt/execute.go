@@ -158,6 +158,7 @@ func execAssignment(stmt Statement) (err error) {
 		return assignToObject(stmt.ObjTokens, stmt.Name, val)
 	}
 
+	// Todo: fix getter for old value to support getting from object as well
 	oldVal, err := env.Get(stmt.Name)
 	if err != nil {
 		return err

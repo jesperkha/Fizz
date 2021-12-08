@@ -7,6 +7,8 @@ import (
 	"github.com/jesperkha/Fizz/stmt"
 )
 
+// Todo: expand testing to run chunks of code from files
+
 var (
 	// Valid statements, should not return error
 	ExampleStatements1 = []string{

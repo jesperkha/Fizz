@@ -1,7 +1,5 @@
 <img src="./.github/img/logo.svg" width="10%">
 
-<br>
-
 **Fizz** is an interpreted programming language built with Go. The main use cases for Fizz will be file management, simple http requests, and general terminal scripting. The built in libraries (not added yet) will support all of these features, including documentation with examples.
 
 <br>

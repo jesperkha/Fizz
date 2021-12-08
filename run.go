@@ -16,18 +16,25 @@ var (
 	ErrNonFizzFile  = errors.New("cannot run non-Fizz file")
 )
 
+// Todo: make simple cmd flag parser
+// Have full length versions of all flags. One letter flags for most common
+// Flags:
+// 		--json print data as json
+// 		--no-color prints errors without color
 var cmdOptions = map[string]func(){
+	// Todo: desc of what program does. a couple run examples. desc of flags. link to github
 	"help": func() {
 		fmt.Println("use: fizz [--option] [-flag] [filename]")
 	},
 	"version": func() {
 		fmt.Printf("Fizz %s\n", VERSION)
 	},
-	"options": func() {
-		fmt.Println("--help\n--options\n--version")
+	"flags": func() {
+		
 	},
 }
 
+// Todo: set non 0 exit code for program failure. map to universal codes
 func RunInterpeter(args []string) {
 	if len(args) == 2 {
 		arg := args[1]

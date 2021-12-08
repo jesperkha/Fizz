@@ -28,7 +28,7 @@ func FormatError(err error, line int) error {
 // Prints red error message to console
 func PrintError(err error) {
 	ct.Foreground(ct.Red, true)
-	fmt.Println(err.Error())
+	fmt.Fprintln(os.Stderr, err.Error())
 	ct.ResetColor()
 }
 
