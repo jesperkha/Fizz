@@ -20,19 +20,19 @@ import (
 // are evaluated. Variable values are also assigned and manipulated in the
 // variable environment found in the env package.
 
-func Interperate(input string) (env env.Environment, err error) {
+func Interperate(input string) (e env.Environment, err error) {
 	// Parses input characters into lexical tokens for single and double symbols,
 	// identifiers, and keywords.
 	lexicalTokens, err := lexer.GetTokens(input)
 	if err != nil {
-		return env, err
+		return e, err
 	}
 
 	// Lexical tokens are analysed and put into statement tokens. These statements
 	// contain all the information they need for execution and error handling.
 	statements, err := stmt.ParseStatements(lexicalTokens)
 	if err != nil {
-		return env, err
+		return e, err
 	}
 
 	// Finally executes statement tokens. This is the only step that has any effect
@@ -40,5 +40,5 @@ func Interperate(input string) (env env.Environment, err error) {
 	// pieces. While the interpreter is still running, the values of variables will be
 	// remembered as the environments are never reset at runtime.
 	err = stmt.ExecuteStatements(statements)
-	return env, err // Todo: get env from exec and return it
+	return env.NewEnvironment(), err
 }

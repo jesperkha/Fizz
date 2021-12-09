@@ -4,81 +4,73 @@ import (
 	"errors"
 )
 
-// Todo: redesign entire env model. every running instance of the interpreter should be 100% self contained
-type entryMap map[string]interface{}
+type valueMap map[string]interface{}
 
-type Environment struct {
-	Values entryMap
-	Parent *Environment
-	Name string
+// List of 'scopes'. Index 0 is always the current scope and when looping the
+// order will be from low to high level scopes.
+type Environment []valueMap
+
+var currentEnv = Environment{{}}
+
+// Creates new environment, replacing the old one. Returns old environment.
+func NewEnvironment() Environment {
+	oldEnv := currentEnv
+	currentEnv = Environment{{}}
+	return oldEnv
 }
 
-var currentEnv = Environment{Values: entryMap{}}
-
-// Adds a new key value pair for specified variable name. Returns error if already defined
-func declareVariable(env *Environment, name string, value interface{}) (err error) {
-	if _, ok := env.Values[name]; !ok {
-		env.Values[name] = value
-		return err
+// Declares value to name in current scope. This allows for overriding global
+// variable names for local scopes. Returns error if name is already declared.
+func Declare(name string, value interface{}) error {
+	curScope := currentEnv[0]
+	if _, ok := curScope[name]; !ok {
+		curScope[name] = value
+		return nil
 	}
 
 	return errors.New("variable '" + name + "' is already defined, line %d")
 }
 
-// Reassigns variable value if exists. Returns error otherwise
-func assignVariable(env *Environment, name string, newVal interface{}) (err error) {
-	if _, ok := env.Values[name]; ok {
-		env.Values[name] = newVal
-		return err
-	}
-
-	if env.Parent != nil {
-		return assignVariable(env.Parent, name, newVal)
+// Assigns value to name. If name is not defined in current scope the parent
+// scopes are checked. Therefore, reassignment of global variables in local
+// scopes i possible. Returns error if name is not defined anywhere.
+func Assign(name string, value interface{}) error {
+	for _, scope := range currentEnv {
+		if _, ok := scope[name]; ok {
+			scope[name] = value
+			return nil
+		}
 	}
 
 	return errors.New("undefined variable '" + name + "', line %d")
 }
 
-// Gets variable value by name. Returns error if not defined
-func getVariable(env *Environment, name string) (value interface{}, err error) {
-	if val, ok := env.Values[name]; ok {
-		return val, err
-	}
-
-	if env.Parent != nil {
-		return getVariable(env.Parent, name)
+// Gets the value assigned to name. If the name is not defined in the current
+// scope the parent scopes are checked. Gets the first instance of name. Returns
+// error if name is not defined anywhere.
+func Get(name string) (value interface{}, err error) {
+	for _, scope := range currentEnv {
+		if value, ok := scope[name]; ok {
+			return value, nil
+		}
 	}
 
 	return value, errors.New("undefined variable '" + name + "', line %d")
 }
 
-func Declare(name string, value interface{}) (err error) {
-	return declareVariable(&currentEnv, name, value)
-}
-
-func Get(name string) (value interface{}, err error) {
-	return getVariable(&currentEnv, name)
-}
-
-func Assign(name string, newVal interface{}) (err error) {
-	return assignVariable(&currentEnv, name, newVal)
-}
-
-// Goes into new scope
+// Puts new scope at beginning of slice, effectivly setting the previous scope
+// as the parent of the new. (slice is reverse stack)
 func PushScope() {
-	newEnv := Environment{Values: entryMap{}}
-	newEnv.Parent = &Environment{Parent: currentEnv.Parent, Values: currentEnv.Values}
-	currentEnv = newEnv
+	currentEnv = append([]valueMap{{}}, currentEnv...)
 }
 
-// Adds custom scope for closures
-func AddScope(env Environment) {
-	env.Parent = &currentEnv
-	currentEnv = env
-}
-
-// Goes back to previous scope
+// Removes first element in slice, meaning the parent scope is set to the current.
+// Unsafe: if the length of the slice is 1, pop will panic. However, the use of Push()
+// and Pop() is hardcoded and will never cause a pop of a scope list smaller than 2.
 func PopScope() {
-	parent := currentEnv.Parent
-	currentEnv = *parent
+	if len(currentEnv) < 2 {
+		panic("env: popped scope list of length < 2")
+	}
+
+	currentEnv = currentEnv[1:]
 }
