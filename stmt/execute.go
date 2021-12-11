@@ -1,7 +1,6 @@
 package stmt
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/jesperkha/Fizz/env"
@@ -18,6 +17,11 @@ func ExecuteStatements(stmts []Statement) (err error) {
 	for _, statement := range stmts {
 		line := statement.Line
 		if err = executeStatement(statement); err != nil {
+			if cerr, ok := err.(ConditionalError); ok {
+				cerr.Msg = fmt.Sprintf(cerr.Msg, line)
+				return cerr
+			}
+
 			return util.FormatError(err, line)
 		}
 	}
@@ -28,7 +32,8 @@ func ExecuteStatements(stmts []Statement) (err error) {
 func executeStatement(stmt Statement) error {
 	switch stmt.Type {
 	case ExpressionStmt:
-		return execExpression(stmt)
+		_, err := expr.EvaluateExpression(stmt.Expression)
+		return err
 	case Block:
 		return execBlock(stmt)
 	case Print:
@@ -38,9 +43,9 @@ func executeStatement(stmt Statement) error {
 	case Assignment:
 		return execAssignment(stmt)
 	case Break:
-		return execBreak(stmt)
+		return ErrBeakOutsideLoop
 	case Skip:
-		return execSkip(stmt)
+		return ErrSkipOutsideLoop
 	case Return:
 		return execReturn(stmt)
 	case If:
@@ -89,19 +94,6 @@ func execReturn(stmt Statement) (err error) {
 
 	currentReturnValue = value
 	return ErrReturnOutsideFunc
-}
-
-func execExpression(stmt Statement) (err error) {
-	_, err = expr.EvaluateExpression(stmt.Expression)
-	return err
-}
-
-func execBreak(stmt Statement) (err error) {
-	return ErrBeakOutsideLoop
-}
-
-func execSkip(stmt Statement) (err error) {
-	return ErrSkipOutsideLoop
 }
 
 func execPrint(stmt Statement) (err error) {
@@ -244,7 +236,7 @@ func execFunction(stmt Statement) (err error) {
 
 			err = ExecuteStatements(stmt.Then.Statements)
 			env.PopScope()
-			if errors.Is(err, ErrReturnOutsideFunc) {
+			if _, ok := err.(ConditionalError); ok {
 				return currentReturnValue, nil
 			}
 
@@ -285,12 +277,14 @@ func execWhile(stmt Statement) (err error) {
 		}
 
 		err = ExecuteStatements(stmt.Then.Statements)
-		if errors.Is(err, ErrBeakOutsideLoop) {
-			return nil
-		}
+		if e, ok := err.(ConditionalError); ok {
+			if e.Type == BREAK {
+				return nil
+			}
 
-		if errors.Is(err, ErrSkipOutsideLoop) {
-			continue
+			if e.Type == SKIP {
+				continue
+			}
 		}
 
 		if err != nil {
@@ -321,16 +315,18 @@ func execRepeat(stmt Statement) (err error) {
 		// Break and skip return errors that are handled here
 		// Todo: add line number for break, skip, and return 'errors'
 		err = ExecuteStatements(stmt.Then.Statements)
-		if errors.Is(err, ErrBeakOutsideLoop) {
-			return nil
-		}
-
-		if err == nil || errors.Is(err, ErrSkipOutsideLoop) {
-			if oldVal, err := env.Get(name); err == nil {
-				env.Assign(name, oldVal.(float64)+1)
+		if e, ok := err.(ConditionalError); ok {
+			if e.Type == BREAK {
+				return nil
 			}
 
-			continue
+			if e.Type == SKIP {
+				if oldVal, err := env.Get(name); err == nil {
+					env.Assign(name, oldVal.(float64)+1)
+				}
+
+				continue
+			}
 		}
 
 		return err

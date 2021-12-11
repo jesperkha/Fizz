@@ -22,14 +22,16 @@ var (
 	ErrDifferentTypes     = errors.New("different types in statement, line %d")
 	ErrNonCallable        = errors.New("cannot call non-callable type, line %d")
 	ErrCommaError         = errors.New("comma error, line %d")
-	ErrNonAssignable	  = errors.New("cannot assign value to non-object, line %d")
-	ErrExpectedName		  = errors.New("expected filename at import, line %d")
-	ErrCannotImport		  = errors.New("cannot import outside of global scope, line %d")
+	ErrNonAssignable      = errors.New("cannot assign value to non-object, line %d")
+	ErrExpectedName       = errors.New("expected filename at import, line %d")
+	ErrCannotImport       = errors.New("cannot import outside of global scope, line %d")
 
-	ErrReturnOutsideFunc = errors.New("cannot use return outside of a function")
-	ErrSkipOutsideLoop   = errors.New("cannot use skip outside of a loop")
-	ErrBeakOutsideLoop   = errors.New("cannot use break outside of a loop")
-	ErrProgramExit       = errors.New("")
+	ErrReturnOutsideFunc = ConditionalError{Msg: "cannot use return outside of a function, line %d", Type: RETURN}
+	ErrSkipOutsideLoop = ConditionalError{Msg: "cannot use skip outside of a loop, line %d", Type: SKIP}
+	ErrBeakOutsideLoop = ConditionalError{Msg: "cannot use break outside of a loop, line %d", Type: BREAK}
+
+
+	ErrProgramExit        = errors.New("")
 )
 
 const (
@@ -63,4 +65,20 @@ type Statement struct {
 	Else       *Statement
 	Params     []string
 	Enviroment env.Environment
+}
+
+const (
+	SKIP = iota
+	BREAK
+	RETURN
+)
+
+type ConditionalError struct {
+	Type int
+	Line int
+	Msg  string
+}
+
+func (c ConditionalError) Error() string {
+	return c.Msg
 }
