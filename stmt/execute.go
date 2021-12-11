@@ -11,6 +11,7 @@ import (
 )
 
 var currentReturnValue interface{}
+var CurrentOrigin string
 
 // Goes through list of statements and executes them. Error is returned from statements exec method.
 func ExecuteStatements(stmts []Statement) (err error) {
@@ -54,6 +55,8 @@ func executeStatement(stmt Statement) error {
 		return execExit(stmt)
 	case Object:
 		return execObject(stmt)
+	case Import:
+		return nil // Handled in interp
 	}
 
 	// Will never be returned since all types are pre-defined.
@@ -63,6 +66,12 @@ func executeStatement(stmt Statement) error {
 }
 
 func execExit(stmt Statement) (err error) {
+	if stmt.Expression != nil {
+		if err = execPrint(stmt); err != nil {
+			return err
+		}
+	}
+
 	return ErrProgramExit
 }
 
@@ -134,7 +143,7 @@ func assignToObject(objTokens []lexer.Token, name string, value interface{}) (er
 	}
 
 	// Get object to assign to
-	v, err := expr.ParseAndEval(objTokens)
+	v, err := expr.ParseAndEval(objTokens[:len(objTokens)-2]) // exclude name
 	if err != nil {
 		return err
 	}
@@ -146,7 +155,14 @@ func assignToObject(objTokens []lexer.Token, name string, value interface{}) (er
 	return ErrNonAssignable
 }
 
-// Todo: make copy function so variables dont reference eachother
+func getObjectValue(stmt Statement) (value interface{}, err error) {
+	if len(stmt.ObjTokens) == 0 {
+		return env.Get(stmt.Name)
+	}
+
+	return expr.ParseAndEval(stmt.ObjTokens)
+}
+
 func execAssignment(stmt Statement) (err error) {
 	val, err := expr.EvaluateExpression(stmt.Expression)
 	if err != nil {
@@ -158,8 +174,7 @@ func execAssignment(stmt Statement) (err error) {
 		return assignToObject(stmt.ObjTokens, stmt.Name, val)
 	}
 
-	// Todo: fix getter for old value to support getting from object as well
-	oldVal, err := env.Get(stmt.Name)
+	oldVal, err := getObjectValue(stmt)
 	if err != nil {
 		return err
 	}
@@ -209,10 +224,13 @@ func execBlock(stmt Statement) (err error) {
 	return err
 }
 
-// Todo: add max recursion limit
+// Todo: implement callstack (add recursion limit when doing so)
 func execFunction(stmt Statement) (err error) {
+	// Closure to store origin at point of function declaration
+	originCache := CurrentOrigin
 	err = env.Declare(stmt.Name, env.Callable{
 		NumArgs: len(stmt.Params),
+		Origin: CurrentOrigin,
 
 		// Call function and set param variables to scope
 		Call: func(args ...interface{}) (interface{}, error) {
@@ -230,7 +248,7 @@ func execFunction(stmt Statement) (err error) {
 				return currentReturnValue, nil
 			}
 
-			return nil, err
+			return nil, util.WrapFilename(originCache, err)
 		},
 	})
 

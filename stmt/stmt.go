@@ -48,9 +48,9 @@ const (
 	Return
 	Exit
 	Object
+	Import
 )
 
-// Todo: create soft pointer statement to pass value references
 type Statement struct {
 	Type       int
 	Line       int

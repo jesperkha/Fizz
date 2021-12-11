@@ -2,19 +2,14 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/jesperkha/Fizz/cmd"
 	"github.com/jesperkha/Fizz/interp"
+	"github.com/jesperkha/Fizz/stmt"
 	"github.com/jesperkha/Fizz/util"
-)
-
-var (
-	ErrFileNotFound = errors.New("cannot find file with name: '%s'")
-	ErrNonFizzFile  = errors.New("cannot run non-Fizz file")
 )
 
 var parser = cmd.NewFlagParser(
@@ -41,8 +36,14 @@ func RunInterpeter(args []string) {
 	}
 
 	if filename != "" {
-		if err = RunFile(filename); err != nil {
-			util.ErrorAndExit(fmt.Errorf("%s: %s", filename, err.Error()))
+		// Goto directory of file specified
+		split := strings.Split(filename, "/")
+		path := strings.Join(split[:len(split)-1], "/")
+		name := split[len(split)-1]
+		os.Chdir(path)
+		
+		if _, err = interp.RunFile(name); err != nil && err != stmt.ErrProgramExit {
+			util.ErrorAndExit(err)
 		}
 
 		return
@@ -73,7 +74,7 @@ func RunTerminal() {
 		totalString += input + "\n" // Better error handling
 
 		if numBlocks <= 0 {
-			if _, err := interp.Interperate(totalString); err != nil {
+			if _, err := interp.Interperate("", totalString); err != nil {
 				util.PrintError(err)
 				line--
 			}
@@ -89,18 +90,4 @@ func RunTerminal() {
 	}
 
 	fmt.Println("session ended")
-}
-
-func RunFile(filename string) (err error) {
-	if !strings.HasSuffix(filename, ".fizz") {
-		return ErrNonFizzFile
-	}
-
-	if byt, err := os.ReadFile(filename); err == nil {
-		_, err = interp.Interperate(string(byt))
-		return err
-	}
-
-	// Assumes path error
-	return fmt.Errorf(ErrFileNotFound.Error(), filename)
 }

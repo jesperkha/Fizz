@@ -97,3 +97,16 @@ func GetType(value interface{}) string {
 
 	return reflect.TypeOf(value).Name()
 }
+
+// Adds filename to error message if not already done
+func WrapFilename(filename string, err error) error {
+	if err == nil {
+		return err
+	}
+
+	if !strings.Contains(err.Error(), ".fizz") {
+		err = fmt.Errorf("%s: %s", filename, err.Error())
+	}
+
+	return err
+}

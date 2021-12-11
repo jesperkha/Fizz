@@ -1,6 +1,8 @@
 package stmt
 
 import (
+	"strings"
+
 	"github.com/jesperkha/Fizz/expr"
 	"github.com/jesperkha/Fizz/lexer"
 	"github.com/jesperkha/Fizz/util"
@@ -74,6 +76,8 @@ func parseStatement(typ int, tokens []lexer.Token) (stmt Statement, err error) {
 		return parseReturn(tokens)
 	case lexer.EXIT:
 		return parseExit(tokens)
+	case lexer.IMPORT:
+		return parseImport(tokens)
 	}
 
 	return parseExpression(tokens)
@@ -110,12 +114,26 @@ func seekToken(tokens []lexer.Token, start int, target int) (endIdx int, eof boo
 	return 0, true
 }
 
-func parseExit(tokens []lexer.Token) (stmt Statement, err error) {
-	if len(tokens) > 1 {
+func parseImport(tokens []lexer.Token) (stmt Statement, err error) {
+	if len(tokens) != 2 {
 		return stmt, ErrInvalidStatement
 	}
 
-	return Statement{Type: Exit}, err
+	if str, ok := tokens[1].Literal.(string); ok {
+		name := strings.TrimSuffix(str, ".fizz")
+		return Statement{Type: Import, Name: name}, err
+	}
+
+	return stmt, ErrExpectedName
+}
+
+func parseExit(tokens []lexer.Token) (stmt Statement, err error) {
+	if len(tokens) == 1 {
+		return Statement{Type: Exit}, err
+	}
+
+	expr, err := expr.ParseExpression(tokens[1:])
+	return Statement{Type: Exit, Expression: &expr}, err
 }
 
 func parseReturn(tokens []lexer.Token) (stmt Statement, err error) {
@@ -203,7 +221,7 @@ func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 			rightExpr, err := expr.ParseExpression(right)
 			return Statement{
 				Type: Assignment,
-				ObjTokens: left[:len(left)-2],
+				ObjTokens: left,
 				Name: left[len(left)-1].Lexeme,
 				Expression: &rightExpr,
 				Operator: t.Type,

@@ -4,6 +4,10 @@ import (
 	"errors"
 )
 
+var (
+	ThrowEnvironment = true
+)
+
 type valueMap map[string]interface{}
 
 // List of 'scopes'. Index 0 is always the current scope and when looping the
@@ -12,8 +16,14 @@ type Environment []valueMap
 
 var currentEnv = Environment{{}}
 
-// Creates new environment, replacing the old one. Returns old environment.
+// Creates new environment, replacing the old one. Returns old environment. For
+// testing, its not necessary to get rid of the old env, hence the option to not
+// remove it.
 func NewEnvironment() Environment {
+	if !ThrowEnvironment {
+		return currentEnv
+	}
+
 	oldEnv := currentEnv
 	currentEnv = Environment{{}}
 	return oldEnv
@@ -73,4 +83,15 @@ func PopScope() {
 	}
 
 	currentEnv = currentEnv[1:]
+}
+
+// Adds environment from imported file to current env. Values are passed as an object.
+// The fields are the values in the global scope of the environment (index 0).
+func AddImportedFile(name string, env Environment) error {
+	return Declare(name, Object{
+		Name: name,
+		NumFields: len(env[0]),
+		Fields: env[0],
+		File: true,
+	})
 }

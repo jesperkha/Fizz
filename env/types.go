@@ -13,6 +13,7 @@ type FizzObject interface {
 }
 
 type Callable struct {
+	Origin  string // Name of file function was defined in for error tracing
 	Call    func(...interface{}) (interface{}, error)
 	NumArgs int
 }
@@ -25,6 +26,7 @@ type Object struct {
 	Fields    map[string]interface{}
 	NumFields int
 	Name      string
+	File 	  bool
 }
 
 func (o Object) Type() string {
