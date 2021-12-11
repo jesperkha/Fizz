@@ -313,7 +313,6 @@ func execRepeat(stmt Statement) (err error) {
 		}
 
 		// Break and skip return errors that are handled here
-		// Todo: add line number for break, skip, and return 'errors'
 		err = ExecuteStatements(stmt.Then.Statements)
 		if e, ok := err.(ConditionalError); ok {
 			if e.Type == BREAK {

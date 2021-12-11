@@ -28,8 +28,7 @@ This roadmap highlights progress for the development of Fizz:
 - ✔️ Loops
 - ✔️ Functions
 - ✔️ Objects
-- ❌ File import
-- ❌ Soft pointers
+- ✔️ File import
 - ❌ Arrays
 - ❌ Go -> Fizz library support
 - ❌ Full language documentation
