@@ -25,13 +25,11 @@ var (
 	ErrNonAssignable      = errors.New("cannot assign value to non-object, line %d")
 	ErrExpectedName       = errors.New("expected filename at import, line %d")
 	ErrCannotImport       = errors.New("cannot import outside of global scope, line %d")
+	ErrProgramExit        = errors.New("")
 
 	ErrReturnOutsideFunc = ConditionalError{Msg: "cannot use return outside of a function, line %d", Type: RETURN}
-	ErrSkipOutsideLoop = ConditionalError{Msg: "cannot use skip outside of a loop, line %d", Type: SKIP}
-	ErrBeakOutsideLoop = ConditionalError{Msg: "cannot use break outside of a loop, line %d", Type: BREAK}
-
-
-	ErrProgramExit        = errors.New("")
+	ErrSkipOutsideLoop   = ConditionalError{Msg: "cannot use skip outside of a loop, line %d", Type: SKIP}
+	ErrBeakOutsideLoop   = ConditionalError{Msg: "cannot use break outside of a loop, line %d", Type: BREAK}
 )
 
 const (
@@ -58,12 +56,12 @@ type Statement struct {
 	Line       int
 	Operator   int
 	Name       string
+	Params     []string
 	ObjTokens  []lexer.Token
-	Expression *expr.Expression
 	Statements []Statement
 	Then       *Statement
 	Else       *Statement
-	Params     []string
+	Expression *expr.Expression
 	Enviroment env.Environment
 }
 
