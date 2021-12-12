@@ -86,6 +86,10 @@ func Interperate(filename string, input string) (e env.Environment, err error) {
 // it as imported to, which means if "main.fizz" imports "other.fizz", the main file
 // also imports all of the files imported in "other.fizz".
 func RunFile(filename string) (e env.Environment, err error) {
+	if !strings.Contains(filename, ".") {
+		filename = filename + ".fizz"
+	}
+
 	if !strings.HasSuffix(filename, ".fizz") {
 		return e, ErrNonFizzFile
 	}

@@ -9,8 +9,10 @@ import (
 	"github.com/jesperkha/Fizz/util"
 )
 
-var currentReturnValue interface{}
-var CurrentOrigin string
+var (
+	CurrentOrigin 	   string
+	currentReturnValue interface{}
+)
 
 // Goes through list of statements and executes them. Error is returned from statements exec method.
 func ExecuteStatements(stmts []Statement) (err error) {
@@ -21,11 +23,11 @@ func ExecuteStatements(stmts []Statement) (err error) {
 				cerr.Msg = fmt.Sprintf(cerr.Msg, line)
 				return cerr
 			}
-
+			
 			return util.FormatError(err, line)
 		}
 	}
-
+	
 	return err
 }
 
@@ -217,10 +219,12 @@ func execBlock(stmt Statement) (err error) {
 }
 
 // Todo: implement callstack (add recursion limit when doing so)
+// when the interp model is redone to fit a more object/instance
+// approach the callstack should be implemented
 func execFunction(stmt Statement) (err error) {
-	// Closure to store origin at point of function declaration
+	// Store origin at point of function declaration
 	originCache := CurrentOrigin
-	err = env.Declare(stmt.Name, env.Callable{
+	function := env.Callable{
 		NumArgs: len(stmt.Params),
 		Origin: CurrentOrigin,
 
@@ -239,12 +243,12 @@ func execFunction(stmt Statement) (err error) {
 			if _, ok := err.(ConditionalError); ok {
 				return currentReturnValue, nil
 			}
-
+			
 			return nil, util.WrapFilename(originCache, err)
 		},
-	})
+	}
 
-	return err
+	return env.Declare(stmt.Name, function)
 }
 
 func execIf(stmt Statement) (err error) {

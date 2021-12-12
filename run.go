@@ -13,7 +13,7 @@ import (
 )
 
 var parser = cmd.NewFlagParser(
-	[]string{},
+	[]string{"v"},
 	[]string{"version", "help"},
 )
 
@@ -24,7 +24,8 @@ func init() {
 	})
 
 	parser.Assign("--help", func ()  {
-		fmt.Println("use:\n\tfizz [filename] <flags>\n\tfizz <flags>\n\tfizz")
+		fmt.Println(cmd.HELP)
+		// fmt.Println("use:\n\tfizz [filename] <flags>\n\tfizz <flags>")
 		os.Exit(0)
 	})
 }
@@ -41,7 +42,6 @@ func RunInterpeter(args []string) {
 		path := strings.Join(split[:len(split)-1], "/")
 		name := split[len(split)-1]
 		os.Chdir(path)
-		
 		if _, err = interp.RunFile(name); err != nil && err != stmt.ErrProgramExit {
 			util.ErrorAndExit(err)
 		}
