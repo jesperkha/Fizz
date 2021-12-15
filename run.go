@@ -6,13 +6,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/jesperkha/Fizz/cmd"
 	"github.com/jesperkha/Fizz/interp"
 	"github.com/jesperkha/Fizz/stmt"
+	"github.com/jesperkha/Fizz/term"
 	"github.com/jesperkha/Fizz/util"
 )
 
-var parser = cmd.NewFlagParser(
+var parser = term.NewFlagParser(
 	[]string{"v"},
 	[]string{"version", "help"},
 )
@@ -24,8 +24,7 @@ func init() {
 	})
 
 	parser.Assign("--help", func ()  {
-		fmt.Println(cmd.HELP)
-		// fmt.Println("use:\n\tfizz [filename] <flags>\n\tfizz <flags>")
+		fmt.Println(term.HELP)
 		os.Exit(0)
 	})
 }

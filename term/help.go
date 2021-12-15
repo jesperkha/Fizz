@@ -1,4 +1,4 @@
-package cmd
+package term
 
 const HELP = `use:
 	fizz [filename] <flags>
