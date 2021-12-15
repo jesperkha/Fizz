@@ -233,11 +233,7 @@ func isTruthy(value interface{}) bool {
 
 func isNumber(value interface{}) bool {
 	switch value.(type) {
-	case int:
-		return true
-	case float32:
-		return true
-	case float64:
+	case int, float32, float64:
 		return true
 	}
 

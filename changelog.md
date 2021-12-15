@@ -1,5 +1,18 @@
 # Fizz update changelog
 
+## Version 0.4.0
+
+**Whats new:**
+
+- Closures
+
+**Bug fixes and more:**
+
+- Errors for circular imports
+- Patched bug where env was cleared in terminal mode
+
+<br>
+
 ## Version 0.3.0
 
 **Whats new:**
