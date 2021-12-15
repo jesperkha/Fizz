@@ -9,6 +9,12 @@
 > func main(a, b) { return 1; } main(1, 2);
 > define p{n} var a = p(2); a.n == 2;
 > var b = p(p(p(1))); b.n.n.n == 1;
+> func closure() {
+    var i = 0;
+    func add() {i += 1;}
+    return add;
+}
+var f = closure(); f();
 
 ?
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"sort"
 	"strings"
 
 	ct "github.com/daviddengcn/go-colortext"
@@ -109,4 +110,28 @@ func WrapFilename(filename string, err error) error {
 	}
 
 	return err
+}
+
+type UniquePairs []sort.StringSlice
+
+// Returns true if pair is already present in list
+func (u *UniquePairs) Add(a, b string) bool {
+	for _, p := range *u {
+		// Values are sorted
+		if p[0] == a && p[1] == b {
+			return true
+		}
+	}
+
+	newPair := sort.StringSlice{a, b}
+	newPair.Sort()
+	*u = append(*u, newPair)
+	return false
+}
+
+// Removes any path / file extension noise from filename
+func GetPlainFilename(path string) string {
+	path = strings.TrimSuffix(path, ".fizz")
+	split := strings.Split(path, "/")
+	return split[len(split)-1]
 }

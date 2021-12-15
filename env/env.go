@@ -15,6 +15,7 @@ type valueMap map[string]interface{}
 type Environment []valueMap
 
 var currentEnv = Environment{{}}
+var tempEnv = currentEnv
 
 // Creates new environment, replacing the old one. Returns old environment. For
 // testing, its not necessary to get rid of the old env, hence the option to not
@@ -94,4 +95,23 @@ func AddImportedFile(name string, env Environment) error {
 		Fields: env[0],
 		File: true,
 	})
+}
+
+// Gets a snapshot of the current env. Used for composing closures for functions and
+// also file imports. Unsafe: will get a temp env if there is one active.
+func GetCurrentEnv() Environment {
+	return []valueMap(currentEnv)
+}
+
+// Sets a new temporary envirnoment. Used for closures and envs are not passed as arguments
+// to any functions in this file. Is discarded upon calling PopTempEnv().
+func PushTempEnv(env Environment) {
+	tempEnv = currentEnv
+	currentEnv = env
+}
+
+// Unsafe: does not check if there is a current temp env or not, however, its use is
+// hardcoded and will not be called when there is no temporary environment.
+func PopTempEnv() {
+	currentEnv = tempEnv
 }

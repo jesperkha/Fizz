@@ -222,14 +222,16 @@ func execBlock(stmt Statement) (err error) {
 // when the interp model is redone to fit a more object/instance
 // approach the callstack should be implemented
 func execFunction(stmt Statement) (err error) {
-	// Store origin at point of function declaration
+	// Store origin at point of function declaration as well as scope around it
 	originCache := CurrentOrigin
+	envCache := env.GetCurrentEnv()
+
 	function := env.Callable{
 		NumArgs: len(stmt.Params),
 		Origin: CurrentOrigin,
-
 		// Call function and set param variables to scope
 		Call: func(args ...interface{}) (interface{}, error) {
+			env.PushTempEnv(envCache)
 			env.PushScope()
 
 			// Declare args
@@ -240,6 +242,7 @@ func execFunction(stmt Statement) (err error) {
 
 			err = ExecuteStatements(stmt.Then.Statements)
 			env.PopScope()
+			env.PopTempEnv()
 			if _, ok := err.(ConditionalError); ok {
 				return currentReturnValue, nil
 			}
