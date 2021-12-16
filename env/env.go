@@ -44,7 +44,7 @@ func Declare(name string, value interface{}) error {
 
 // Assigns value to name. If name is not defined in current scope the parent
 // scopes are checked. Therefore, reassignment of global variables in local
-// scopes i possible. Returns error if name is not defined anywhere.
+// scopes is possible. Returns error if name is not defined anywhere.
 func Assign(name string, value interface{}) error {
 	for _, scope := range currentEnv {
 		if _, ok := scope[name]; ok {
@@ -103,8 +103,8 @@ func GetCurrentEnv() Environment {
 	return []valueMap(currentEnv)
 }
 
-// Sets a new temporary envirnoment. Used for closures and envs are not passed as arguments
-// to any functions in this file. Is discarded upon calling PopTempEnv().
+// Sets a new temporary envirnoment. Used for closures since envs are not passed as
+// arguments to any functions in this file. Is discarded upon calling PopTempEnv().
 func PushTempEnv(env Environment) {
 	tempEnv = currentEnv
 	currentEnv = env

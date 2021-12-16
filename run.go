@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/interp"
 	"github.com/jesperkha/Fizz/stmt"
 	"github.com/jesperkha/Fizz/term"
@@ -24,7 +25,7 @@ func init() {
 	})
 
 	parser.Assign("--help", func ()  {
-		fmt.Println(term.HELP)
+		fmt.Printf(term.HELP)
 		os.Exit(0)
 	})
 }
@@ -58,6 +59,7 @@ func RunTerminal() {
 	scanner := bufio.NewScanner(os.Stdin)
 	numBlocks, line := 0, 1
 	totalString, space := "", ""
+	env.ThrowEnvironment = false
 
 	for {
 		fmt.Printf("%d%s : %s", line, space, strings.Repeat("    ", numBlocks))

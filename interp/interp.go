@@ -87,12 +87,7 @@ func Interperate(filename string, input string) (e env.Environment, err error) {
 	// pieces. While the interpreter is still running, the values of variables will be
 	// remembered as the environments are never reset at runtime.
 	err = stmt.ExecuteStatements(statements)
-	// Does not discard env for terminal mode
-	if filename != "" {
-		e = env.NewEnvironment()
-	}
-
-	return e,  err
+	return env.NewEnvironment(),  err
 }
 
 // Runs a fizz file. Imports are run as files and the environment is extracted and

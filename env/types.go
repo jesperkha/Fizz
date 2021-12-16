@@ -4,6 +4,8 @@ import (
 	"errors"
 )
 
+// Todo: comment types
+
 var (
 	ErrNotAField = errors.New("'%s' has no attribute '%s', line %d")
 )

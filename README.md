@@ -11,6 +11,7 @@
 - [Installation](#installation)
   - [Pre-built binaries](#pre-built-binaries)
   - [Building from source](#building-from-source)
+  - [Extensions](#extensions)
 - [Running a program](#running-a-program)
 
 <br>
@@ -52,6 +53,10 @@ You can find all the basic info you need about Fizz [here](./.github/LANG.md). F
 
 1. Clone repo
 2. Run the `build.sh` file
+
+<a id="extensions"></a> Extensions:
+
+[Syntax highlighting](https://github.com/jesperkha/fizz-extensions)
 
 <br>
 

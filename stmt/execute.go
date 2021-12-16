@@ -285,11 +285,10 @@ func execWhile(stmt Statement) (err error) {
 
 		err = ExecuteStatements(stmt.Then.Statements)
 		if e, ok := err.(ConditionalError); ok {
-			if e.Type == BREAK {
+			switch e.Type {
+			case BREAK:
 				return nil
-			}
-
-			if e.Type == SKIP {
+			case SKIP:
 				continue
 			}
 		}
@@ -322,15 +321,13 @@ func execRepeat(stmt Statement) (err error) {
 		// Break and skip return errors that are handled here
 		err = ExecuteStatements(stmt.Then.Statements)
 		if e, ok := err.(ConditionalError); ok {
-			if e.Type == BREAK {
+			switch e.Type {
+			case BREAK:
 				return nil
-			}
-
-			if e.Type == SKIP {
+			case SKIP:
 				if oldVal, err := env.Get(name); err == nil {
 					env.Assign(name, oldVal.(float64)+1)
 				}
-
 				continue
 			}
 		}
@@ -345,7 +342,6 @@ func execRepeat(stmt Statement) (err error) {
 func execObject(stmt Statement) (err error) {
 	err = env.Declare(stmt.Name, env.Callable{
 		NumArgs: len(stmt.Params),
-
 		Call: func(args ...interface{}) (interface{}, error) {
 			obj := env.Object{Fields: map[string]interface{}{}, Name: stmt.Name}
 			for i, field := range stmt.Params {

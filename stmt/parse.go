@@ -28,6 +28,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		
 		// Parse any other type of statement.
 		if currentStmt.Type == NotStatement {
+			// Todo: fix error handling when semicolon is not found, expr error happens instead
 			// Seeks a semicolon since all other statements end with a semicolon
 			endIdx, eof := seekToken(tokens, startIndex, lexer.SEMICOLON)
 			if eof {

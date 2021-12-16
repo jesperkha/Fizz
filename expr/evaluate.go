@@ -34,6 +34,8 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 	return expr, ErrInvalidExpression
 }
 
+// Todo: add better documentation
+
 func evalLiteral(literal *Expression) (value interface{}, err error) {
 	if literal.Value.Type >= lexer.STRING {
 		return literal.Value.Literal, err
@@ -185,7 +187,7 @@ func evalGetter(getter *Expression) (value interface{}, err error) {
 			continue
 		}
 
-		// Last has to be object to continue. If gtr.Name is empty its not a identifier
+		// Last has to be object to continue. If gtr.Name is empty its not an identifier
 		if util.GetType(last) != "object" || gtr.Name == "" {
 			value, err = EvaluateExpression(&gtr)
 			if err != nil {
