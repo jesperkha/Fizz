@@ -44,6 +44,7 @@ func GetTokens(input string) (tokens []Token, err error) {
 			case NEWLINE:
 				currentLine++
 				currentIdx++
+				tokens = append(tokens, Token{Type: NEWLINE})
 				continue
 			case WHITESPACE:
 				currentIdx++

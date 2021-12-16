@@ -19,6 +19,11 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		var currentStmt Statement
 		line := firstToken.Line
 
+		if firstToken.Type == lexer.NEWLINE {
+			currentIdx++
+			continue
+		}
+
 		// Check conditional statements seperatly because the parse funcs need
 		// a currentIndex pointer. Note: Full list of tokens is given
 		currentStmt, err = parseComplexStatement(firstToken.Type, tokens, &currentIdx)
@@ -28,7 +33,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		
 		// Parse any other type of statement.
 		if currentStmt.Type == NotStatement {
-			// Todo: fix error handling when semicolon is not found, expr error happens instead
+			// Todo: (doing) fix error handling when semicolon is not found, expr error happens instead
 			// Seeks a semicolon since all other statements end with a semicolon
 			endIdx, eof := seekToken(tokens, startIndex, lexer.SEMICOLON)
 			if eof {
@@ -40,7 +45,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 			// Get tokens in interval between last semicolon and current one
 			tokenInterval := tokens[startIndex:currentIdx]
 			if len(tokenInterval) == 0 {
-				return statements, util.FormatError(err, line)
+				return statements, util.FormatError(ErrNoStatement, line)
 			}
 
 			// Parse statement
@@ -54,7 +59,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		statements = append(statements, currentStmt)
 		currentIdx++
 	}
-
+	
 	return statements, err
 }
 
@@ -107,6 +112,11 @@ func parseComplexStatement(typ int, tokens []lexer.Token, idx *int) (stmt Statem
 // Returns index of target
 func seekToken(tokens []lexer.Token, start int, target int) (endIdx int, eof bool) {
 	for i := start; i < len(tokens); i++ {
+		// Found newline before semicolon, meaning a missing semicolon
+		if tokens[i].Type == lexer.NEWLINE {
+			return 0, true
+		}
+
 		if tokens[i].Type == target {
 			return i, false
 		}
