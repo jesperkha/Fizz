@@ -7,9 +7,10 @@
 - [Variables](#var)
 - [If statements and logic](#if)
 - [While and repeat](#while)
-- [Break, skip, and exit](#break)
+- [Break and skip](#break)
 - [Functions](#func)
 - [Objects](#obj)
+- [File imports](#import)
 
 <br>
 
@@ -18,7 +19,7 @@
 
 <br>
 
-### <a id="overview"></a> **Language overview**
+## <a id="overview"></a> **Language overview**
 
 - Fizz is dynamically typed, meaning type checks are only performed at runtime
 - Comments are created with a hashtag `#` (as mentioned above) and end at the first found newline
@@ -26,7 +27,7 @@
 
 <br>
 
-### <a id="types"></a> **Types**
+## <a id="types"></a> **Types**
 
 Fizz is strongly typed, meaning unmatched types in certain expressions will cause a runtime error.
 
@@ -46,7 +47,7 @@ Fizz is strongly typed, meaning unmatched types in certain expressions will caus
 
 <br>
 
-### <a id="expr"></a> **Expressions and operators**
+## <a id="expr"></a> **Expressions and operators**
 
 Fizz features a lot of standard syntax similar to other languages. For example, all normal expressions using the basic arithmetic and logic operators will work in Fizz, including the modulo operator and the hat operator. Plus can also be used for joining strings.
 
@@ -71,7 +72,7 @@ Operators:
 
 <br>
 
-### <a id="prt"></a> **Print and Type**
+## <a id="prt"></a> **Print and Type**
 
 In Fizz, `print` is a _statement_, not a function. However, `type` is an _operator_, not a function, and gives a string value.
 
@@ -80,9 +81,17 @@ print "Hello";
 print type "World";
 ```
 
+**Exit**
+
+Theres also an `exit` statement. It's almost identical to `print`, but it also exits the program at execution. If an expression is not given, `exit` will just quit without printing anything.
+
+```js
+exit "goodbye"; // prints 'goodbye' and exits program
+```
+
 <br>
 
-### <a id="var"></a> **Variables**
+## <a id="var"></a> **Variables**
 
 You can declare a variable using the `var` statement. The value can be re-assigned later and even change type.
 
@@ -120,7 +129,7 @@ You can also use the `+=` operator with strings.
 
 <br>
 
-### <a id="if"></a> **If statements and logic**
+## <a id="if"></a> **If statements and logic**
 
 Fizz features simple if and else statements, but not else-if. The 'and' operator is `&` and 'or' is `:`.
 
@@ -136,7 +145,7 @@ if age > 158.8 {
 
 <br>
 
-### <a id="while"></a> **While and repeat**
+## <a id="while"></a> **While and repeat**
 
 Fizz has a while statement similar to most other languages. If you leave the expression field empty it will just run forever.
 
@@ -161,15 +170,14 @@ repeat n < 10 {
 
 <br>
 
-### <a id="break"></a> **Break, skip, and exit**
+## <a id="break"></a> **Break and skip**
 
 - `skip` skips to next iteration in loop
 - `break` breaks out of loop
-- `exit` stops program execution
 
 <br>
 
-### <a id="func"></a> **Functions**
+## <a id="func"></a> **Functions**
 
 You can declare a function using the `func` keyword. Functions will return `nil` if no other return value is specified. Passing an incorrect argument number will cause a runtime error.
 
@@ -183,7 +191,7 @@ print add(5, 2); // 7
 
 <br>
 
-### <a id="obj"></a> **Objects**
+## <a id="obj"></a> **Objects**
 
 Object structures can be defined with the `define` keyword. This creates a object template which you can use to make your own structured data. The fields of the object do not have a specific type, unlike languages like C and Go. Object values support reassignment too.
 
@@ -201,3 +209,34 @@ print john.age; // 99
 ```
 
 Under the hood, the `define` statement creates a function that returns an object with the specified values. That means `Person` is a function type and `john` is an object type.
+
+<br>
+
+## <a id="import"></a> **File imports**
+
+You can import files by using the `import` statement. The given path, or name, is always relative to the file that the program started in. Circular imports are not allowed and an error will be raised if one is found.
+
+```js
+// other.fizz
+
+var name = "John";
+```
+
+```js
+// main.fizz
+
+import "other";
+// Also valid:
+// import "other.fizz";
+// import "./other.fizz";
+
+print other.name;
+```
+
+```console
+$ ls
+main.fizz   other.fizz
+
+$ fizz main
+John
+```
