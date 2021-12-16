@@ -107,9 +107,10 @@ func parseComplexStatement(typ int, tokens []lexer.Token, idx *int) (stmt Statem
 // Returns index of target
 func seekToken(tokens []lexer.Token, start int, target int) (endIdx int, eof bool) {
 	for i := start; i < len(tokens); i++ {
-		// if target == lexer.SEMICOLON && tokens[i].Type == lexer.NEWLINE {
-		// 	return 0, true
-		// }
+		// Missing semicolon if there are multiple statement identifiers
+		if i > start && tokens[i].Type >= lexer.FUNC {
+			return 0, true
+		}
 
 		if tokens[i].Type == target {
 			return i, false

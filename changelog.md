@@ -1,5 +1,13 @@
 # Fizz update changelog
 
+## Version 0.5.0
+
+**Whats new:**
+
+**Bug fixes and more:**
+
+- Fixed the semicolon error to now actually show when there is a semicolon missing, instead of just giving an expression error
+
 ## Version 0.4.0
 
 **Whats new:**

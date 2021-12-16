@@ -47,9 +47,10 @@ const (
 	MINUS_EQUAL
 	MULT_EQUAL
 	DIV_EQUAL
+
+	// Statement tokens
 	FUNC
 	DEFINE
-	RETURN
 	IF
 	ELSE
 	PRINT
@@ -60,6 +61,8 @@ const (
 	SKIP
 	IMPORT
 	REPEAT
+	RETURN
+
 	WHITESPACE
 	NEWLINE
 	EOF
