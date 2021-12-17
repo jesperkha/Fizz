@@ -95,9 +95,9 @@ func SplitByToken(tokens []lexer.Token, split int) [][]lexer.Token {
 	result := [][]lexer.Token{}
 	for idx, token := range tokens {
 		switch token.Type {
-		case lexer.LEFT_PAREN:
+		case lexer.LEFT_PAREN, lexer.LEFT_SQUARE:
 			numParen++
-		case lexer.RIGHT_PAREN:
+		case lexer.RIGHT_PAREN, lexer.RIGHT_SQUARE:
 			numParen--
 		case split:
 			if numParen == 0 {

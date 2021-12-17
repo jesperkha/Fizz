@@ -75,24 +75,29 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 			currentIdx = endIdx + 1
 			continue
 		}
-
-		// Unmatched open and closing parens
-		if token.Type == lexer.RIGHT_PAREN {
-			return ptokens, util.FormatError(ErrParenError, line)
-		}
-
+		
 		// Parse array expression
 		if token.Type == lexer.LEFT_SQUARE {
 			group, endIdx, err := parseCSV(tokens, currentIdx, lexer.LEFT_SQUARE, lexer.RIGHT_SQUARE)
 			if err != nil {
 				return ptokens, err
 			}
-
+			
 			ptokens = append(ptokens, ParseToken{Type: ArrayGroup, Inner: group})
 			currentIdx = endIdx + 1
 			continue
 		}
 
+		// Unmatched open and closing parens
+		if token.Type == lexer.RIGHT_PAREN {
+			return ptokens, util.FormatError(ErrParenError, line)
+		}
+
+		// Unmatched open and closing square brackets
+		if token.Type == lexer.RIGHT_SQUARE {
+			return ptokens, util.FormatError(ErrBracketError, line)
+		}
+		
 		// Check and handle function call expression
 		// Todo: make function for parsing comma separated values
 		// connect to array parsing too
