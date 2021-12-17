@@ -2,7 +2,6 @@ package env
 
 import (
 	"errors"
-	"fmt"
 )
 
 var (
@@ -11,10 +10,8 @@ var (
 
 // Interface matches all Fizz object structs.
 // Type() returns the name of the object
-// Print() returns a printable value of the object
 type FizzObject interface {
 	Type()  string
-	Print() interface{}
 }
 
 // Callable object is a function. The origin is the name of the file it
@@ -31,10 +28,6 @@ func (c Callable) Type() string {
 	return "function"
 }
 
-func (c Callable) Print() interface{} {
-	return c.Name + "()"
-}
-
 // Object with n fields. Name is the name of the constructor, not the
 // instance. File imports are also objects.
 type Object struct {
@@ -45,15 +38,6 @@ type Object struct {
 
 func (o Object) Type() string {
 	return "object"
-}
-
-func (o Object) Print() interface{} {
-	str := "{\n"
-	for key, value := range o.Fields {
-		str += fmt.Sprintf("\t%s: %v\n", key, value)
-	}
-
-	return str + "}"
 }
 
 // Gets value from object. Used for getter syntax "name.value"
@@ -84,8 +68,4 @@ type Array struct {
 
 func (a Array) Type() string {
 	return "array"
-}
-
-func (a Array) Print() interface{} {
-	return a.Values
 }

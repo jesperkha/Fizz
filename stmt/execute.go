@@ -98,18 +98,48 @@ func execReturn(stmt Statement) (err error) {
 	return ErrReturnOutsideFunc
 }
 
+func formatPrintValue(val interface{}) interface{} {
+	switch val.(type) {
+	case float64, string, bool, nil:
+		return val
+	}
+
+	if o, ok := val.(env.Object); ok {
+		str := "{\n"
+		for key, value := range o.Fields {
+			str += fmt.Sprintf("    %s: %v\n", key, formatPrintValue(value))
+		}
+	
+		return str + "}"
+	}
+
+	if o, ok := val.(env.Callable); ok {
+		return o.Name + "()"
+	}
+
+	if o, ok := val.(env.Array); ok {
+		str := "["
+		for i, v := range o.Values {
+			if i != 0 {
+				str += ", "
+			}
+
+			str += fmt.Sprintf("%v", formatPrintValue(v))
+		}
+
+		return str + "]"
+	}
+
+	return ""
+}
+
 func execPrint(stmt Statement) (err error) {
 	value, err := expr.EvaluateExpression(stmt.Expression)
 	if err != nil {
 		return err
 	}
 
-	if o, ok := value.(env.FizzObject); ok {
-		fmt.Println(o.Print())
-	} else {
-		fmt.Println(value)
-	}
-	
+	fmt.Println(formatPrintValue(value))
 	return nil
 }
 
