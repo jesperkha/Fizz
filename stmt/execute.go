@@ -104,15 +104,12 @@ func execPrint(stmt Statement) (err error) {
 		return err
 	}
 
-	switch util.GetType(value) {
-	case "function":
-		fmt.Printf("[function %s]\n", stmt.Expression.Name)
-	case "object":
-		fmt.Printf("[object %s]\n", value.(env.Object).Name)
-	default:
+	if o, ok := value.(env.FizzObject); ok {
+		fmt.Println(o.Print())
+	} else {
 		fmt.Println(value)
 	}
-
+	
 	return nil
 }
 
@@ -232,6 +229,7 @@ func execFunction(stmt Statement) (err error) {
 	envCache := env.GetCurrentEnv()
 
 	function := env.Callable{
+		Name: stmt.Name,
 		NumArgs: len(stmt.Params),
 		Origin: CurrentOrigin,
 		// Call function and set param variables to scope

@@ -17,6 +17,28 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	return *parsePTokens(ptokens), err
 }
 
+// Parse comma separated vaules for function arguments and array values
+func parseCSV(tokens []lexer.Token, start int, beginT int, endT int) (ptokens []ParseToken, endIdx int, err error) {
+	endIdx, eof := util.SeekClosingBracket(tokens, start, beginT, endT)
+	if eof {
+		return ptokens, 0, ErrBracketError
+	}
+	
+	interval := tokens[start+1:endIdx]
+	group := []ParseToken{}
+	split := util.SplitByToken(interval, lexer.COMMA)
+	for _, expr := range split {
+		t, err := generateParseTokens(expr)
+		if err != nil {
+			return ptokens, 0, err
+		}
+
+		group = append(group, ParseToken{Type: TokenGroup, Inner: t})
+	}
+
+	return group, endIdx, err
+}
+
 // Creates new ParseTokens from lexer tokens to simplify expression parsing. The ParseTokens can
 // either be of type Single or TokenGroup. Symbols and identifiers are of the Single type while any
 // expression within parens is a TokenGroup type. The single type has a .Token value which is the
@@ -59,63 +81,36 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 			return ptokens, util.FormatError(ErrParenError, line)
 		}
 
+		// Parse array expression
+		if token.Type == lexer.LEFT_SQUARE {
+			group, endIdx, err := parseCSV(tokens, currentIdx, lexer.LEFT_SQUARE, lexer.RIGHT_SQUARE)
+			if err != nil {
+				return ptokens, err
+			}
+
+			ptokens = append(ptokens, ParseToken{Type: ArrayGroup, Inner: group})
+			currentIdx = endIdx + 1
+			continue
+		}
+
 		// Check and handle function call expression
+		// Todo: make function for parsing comma separated values
+		// connect to array parsing too
 		if token.Type == lexer.IDENTIFIER {
+			// Check if just identifier
 			if currentIdx+1 >= len(tokens) || tokens[currentIdx+1].Type != lexer.LEFT_PAREN {
 				ptokens = append(ptokens, ParseToken{Type: Single, Token: token})
 				currentIdx++
 				continue
 			}
 
-			// Increment to skip identifier
-			currentIdx++
-			endIdx, eof := util.SeekClosingBracket(tokens, currentIdx, lexer.LEFT_PAREN, lexer.RIGHT_PAREN)
-			if eof {
-				return ptokens, util.FormatError(ErrParenError, line)
+			currentIdx++ // Skip function name
+			group, endIdx, err := parseCSV(tokens, currentIdx, lexer.LEFT_PAREN, lexer.RIGHT_PAREN)
+			if err != nil {
+				return ptokens, err
 			}
 
-			// +1 to skip start paren
-			interval := tokens[currentIdx+1 : endIdx]
-			// Add end comma to parse last expression
-			if len(interval) != 0 {
-				interval = append(interval, lexer.Token{Type: lexer.COMMA})
-			}
-
-			args := [][]ParseToken{}
-			exprStart := 0 // Start of arg expression (index)
-			idx := 0
-			for idx < len(interval) {
-				if interval[idx].Type == lexer.LEFT_PAREN {
-					endIdx, eof := util.SeekClosingBracket(interval, idx, lexer.LEFT_PAREN, lexer.RIGHT_PAREN)
-					if eof {
-						return ptokens, util.FormatError(ErrParenError, line)
-					}
-
-					idx = endIdx + 1
-					continue
-				}
-
-				if interval[idx].Type != lexer.COMMA {
-					idx++
-					continue
-				}
-
-				if exprStart == idx {
-					return ptokens, util.FormatError(ErrCommaError, line)
-				}
-
-				argToken, err := generateParseTokens(interval[exprStart:idx])
-				if err != nil {
-					return ptokens, err
-				}
-
-				args = append(args, argToken)
-				idx++
-				exprStart = idx
-			}
-
-			callToken := ParseToken{Type: CallGroup, Token: token, Args: args}
-			ptokens = append(ptokens, callToken)
+			ptokens = append(ptokens, ParseToken{Type: CallGroup, Token: token, Inner: group})
 			currentIdx = endIdx + 1
 			continue
 		}
@@ -147,17 +142,21 @@ func parsePTokens(tokens []ParseToken) *Expression {
 			return &Expression{Type: Group, Line: line, Inner: parsePTokens(token.Inner)}
 		}
 
-		// Parse call expression
-		if token.Type == CallGroup {
-			argExpressions := []Expression{}
-			for _, arg := range token.Args {
-				argExpressions = append(argExpressions, *parsePTokens(arg))
+		// Parse array group or call group, both are comma separated
+		if token.Type == ArrayGroup || token.Type == CallGroup {
+			exprs := []Expression{}
+			for _, grp := range token.Inner {
+				exprs = append(exprs, *parsePTokens(grp.Inner))
 			}
-
-			return &Expression{Type: Call, Line: line, Name: token.Token.Lexeme, Exprs: argExpressions}
+			
+			if token.Type ==  ArrayGroup {
+				return &Expression{Type: Array, Line: line, Exprs: exprs}
+			}
+			
+			return &Expression{Type: Call, Line: line, Name: token.Token.Lexeme, Exprs: exprs}
 		}
 
-		// Variable
+		// Parse single variable
 		if token.Token.Type == lexer.IDENTIFIER {
 			return &Expression{Type: Variable, Line: line, Name: token.Token.Lexeme}
 		}

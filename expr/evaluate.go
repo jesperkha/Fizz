@@ -28,10 +28,12 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 		return evalCall(expr)
 	case Getter:
 		return evalGetter(expr)
+	case Array:
+		return evalArray(expr)
 	}
 
 	// Wont be reached
-	return expr, ErrInvalidExpression
+	return expr, ErrInvalidType
 }
 
 // Token types >= string are valid literal types
@@ -236,6 +238,24 @@ func evalGetter(getter *Expression) (value interface{}, err error) {
 	}
 
 	return value, err
+}
+
+func evalArray(array *Expression) (value interface{}, err error) {
+	values := []interface{}{}
+	for _, expr := range array.Exprs {
+		if expr.Type == EmptyExpression {
+			return value, fmt.Errorf(ErrNoExpression.Error(), array.Line)
+		}
+		
+		val, err := EvaluateExpression(&expr)
+		if err != nil {
+			return value, err
+		}
+
+		values = append(values, val)
+	}
+
+	return env.Array{Values: values, Length: len(values)}, err
 }
 
 func isTruthy(value interface{}) bool {

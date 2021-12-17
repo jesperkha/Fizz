@@ -9,10 +9,12 @@ import (
 
 var (
 	ErrParenError           = errors.New("unmatched parenthesies, line %d")
+	ErrBracketError         = errors.New("unmatched brackets, line %d")
 	ErrInvalidUnaryOperator = errors.New("invalid unary operator '%s', line %d")
 	ErrInvalidOperatorType  = errors.New("invalid operator '%s' for type '%s', line %d")
 	ErrInvalidOperatorTypes = errors.New("invalid operator '%s' for types '%s' and '%s', line %d")
 	ErrDivideByZero         = errors.New("division by 0, line %d")
+	ErrNoExpression			= errors.New("empty expression, line %d")
 	ErrInvalidExpression    = errors.New("invalid expression, line %d")
 	ErrExpectedExpression   = errors.New("expected expression in group, line %d")
 	ErrCommaError           = errors.New("comma error, line %d")
@@ -20,7 +22,7 @@ var (
 	ErrNotFunction          = errors.New("'%s' is not a function, line %d")
 	ErrNilValueError        = errors.New("unexpected nil value in expression, line %d")
 	ErrNotObject            = errors.New("type '%s' has no attributes, line %d")
-
+	ErrInvalidType			= errors.New("expr: unknown expression type, line %d")
 	ErrIllegalType = errors.New("unknown type '%s'")
 )
 
@@ -35,18 +37,21 @@ var LegalTypes = []string{
 
 const (
 	// Expression types
-	Literal = iota
+	EmptyExpression = iota
+	Literal
 	Unary
 	Binary
 	Group
 	Variable
 	Call
 	Getter
+	Array
 
 	// ParseToken types
 	Single
 	TokenGroup
 	CallGroup
+	ArrayGroup
 )
 
 type Expression struct {

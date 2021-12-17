@@ -42,6 +42,12 @@ func ErrorAndExit(err error) {
 	os.Exit(0)
 }
 
+// Prints msg and exits with code 0
+func PrintAndExit(msg interface{}) {
+	fmt.Println(msg)
+	os.Exit(0)
+}
+
 // Checks if tokens is in tokenlist
 func Contains(arr []int, target int) bool {
 	for _, v := range arr {
@@ -80,6 +86,33 @@ func SeekClosingBracket(tokens []lexer.Token, start int, beginT, endT int) (endI
 	}
 
 	return endIdx, true
+}
+
+// Splits list of token by split type
+func SplitByToken(tokens []lexer.Token, split int) [][]lexer.Token {
+	numParen := 0
+	start := 0
+	result := [][]lexer.Token{}
+	for idx, token := range tokens {
+		switch token.Type {
+		case lexer.LEFT_PAREN:
+			numParen++
+		case lexer.RIGHT_PAREN:
+			numParen--
+		case split:
+			if numParen == 0 {
+				result = append(result, tokens[start:idx])
+				start = idx + 1
+			}
+		}
+	}
+
+	// Append last item
+	if len(tokens) != 0 {
+		result = append(result, tokens[start:])
+	}
+	
+	return result
 }
 
 // Returns Fizz name for value

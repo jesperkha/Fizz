@@ -38,6 +38,8 @@ const (
 	RIGHT_PAREN
 	LEFT_BRACE
 	RIGHT_BRACE
+	LEFT_SQUARE
+	RIGHT_SQUARE
 	COMMA
 	DOT
 	SEMICOLON
@@ -79,6 +81,8 @@ var tokenLookup = map[rune]int{
 	'(': LEFT_PAREN,
 	'{': LEFT_BRACE,
 	'}': RIGHT_BRACE,
+	'[': LEFT_SQUARE,
+	']': RIGHT_SQUARE,
 
 	'*': STAR,
 	'/': SLASH,
