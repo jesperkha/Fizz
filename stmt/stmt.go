@@ -3,7 +3,6 @@ package stmt
 import (
 	"errors"
 
-	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/expr"
 	"github.com/jesperkha/Fizz/lexer"
 )
@@ -62,7 +61,6 @@ type Statement struct {
 	Then       *Statement
 	Else       *Statement
 	Expression *expr.Expression
-	Enviroment env.Environment
 }
 
 const (

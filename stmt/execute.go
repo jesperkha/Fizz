@@ -168,6 +168,11 @@ func execAssignment(stmt Statement) (err error) {
 		return assignToObject(stmt.ObjTokens, stmt.Name, val)
 	}
 
+	// Declare variable with special := operator
+	if stmt.Operator == lexer.DEF_EQUAL {
+		return execVariable(stmt)
+	}
+
 	oldVal, err := getObjectValue(stmt)
 	if err != nil {
 		return err

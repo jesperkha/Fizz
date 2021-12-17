@@ -93,7 +93,7 @@ exit "goodbye"; // prints 'goodbye' and exits program
 
 ## <a id="var"></a> **Variables**
 
-You can declare a variable using the `var` statement. The value can be re-assigned later and even change type.
+You can declare a variable using the `var` statement or the `:=` operator. The value can be re-assigned later and even change type.
 
 ```go
 var name = "John";
@@ -102,6 +102,9 @@ name = 3;
 
 // Error, 'name' is already defined
 var name = "Susan";
+
+// same as 'var age = 10;'
+age := 10;
 ```
 
 Local variables override higher level scopes:

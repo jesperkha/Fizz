@@ -43,6 +43,7 @@ const (
 	SEMICOLON
 	COMMENT
 	EQUAL
+	DEF_EQUAL
 	PLUS_EQUAL
 	MINUS_EQUAL
 	MULT_EQUAL
@@ -109,6 +110,7 @@ var doubleTokenLookup = map[string]int{
 	"-=": MINUS_EQUAL,
 	"*=": MULT_EQUAL,
 	"/=": DIV_EQUAL,
+	":=": DEF_EQUAL,
 }
 
 var keyWordLookup = map[string]int{

@@ -4,6 +4,8 @@
 
 **Whats new:**
 
+- New `:=` operator for variable declaration
+
 **Bug fixes and more:**
 
 - Fixed the semicolon error to now actually show when there is a semicolon missing, instead of just giving an expression error

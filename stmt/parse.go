@@ -212,7 +212,7 @@ func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 		return parseExpression(tokens)
 	}
 
-	validOperands := []int{lexer.EQUAL, lexer.PLUS_EQUAL, lexer.MINUS_EQUAL, lexer.MULT_EQUAL, lexer.DIV_EQUAL}
+	validOperands := []int{lexer.EQUAL, lexer.PLUS_EQUAL, lexer.MINUS_EQUAL, lexer.MULT_EQUAL, lexer.DIV_EQUAL, lexer.DEF_EQUAL}
 	operator := tokens[1].Type
 
 	// Checks if object value assignment. Handles error. Skips if not
