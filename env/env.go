@@ -93,7 +93,6 @@ func AddImportedFile(name string, env Environment) error {
 		Name: name,
 		NumFields: len(env[0]),
 		Fields: env[0],
-		File: true,
 	})
 }
 

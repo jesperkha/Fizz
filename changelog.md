@@ -8,6 +8,8 @@
 
 - Fixed the semicolon error to now actually show when there is a semicolon missing, instead of just giving an expression error
 
+<br>
+
 ## Version 0.4.0
 
 **Whats new:**

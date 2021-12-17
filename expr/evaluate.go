@@ -34,8 +34,7 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 	return expr, ErrInvalidExpression
 }
 
-// Todo: add better documentation
-
+// Token types >= string are valid literal types
 func evalLiteral(literal *Expression) (value interface{}, err error) {
 	if literal.Value.Type >= lexer.STRING {
 		return literal.Value.Literal, err
@@ -50,6 +49,7 @@ func evalUnary(unary *Expression) (value interface{}, err error) {
 		return value, err
 	}
 
+	// Matches to operator
 	switch unary.Operand.Type {
 	case lexer.MINUS:
 		if isNumber(right) {
@@ -63,11 +63,13 @@ func evalUnary(unary *Expression) (value interface{}, err error) {
 		return util.GetType(right), err
 	}
 
+	// If none of the mentioned operators are present its an invalid one
 	op, line := unary.Operand.Lexeme, unary.Line
 	return value, fmt.Errorf(ErrInvalidUnaryOperator.Error(), op, line)
 }
 
 func evalBinary(binary *Expression) (value interface{}, err error) {
+	// Recursivly evaluates left and right expressions
 	left, err := EvaluateExpression(binary.Left)
 	if err != nil {
 		return nil, err
@@ -78,7 +80,7 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 		return nil, err
 	}
 
-	// Numbers are float64, set from lexer
+	// Operations if both are number types
 	if isNumber(right) && isNumber(left) {
 		vl, vr := left.(float64), right.(float64)
 		switch binary.Operand.Type {
@@ -104,11 +106,11 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 			if vr == 0 {
 				return nil, util.FormatError(ErrDivideByZero, binary.Line)
 			}
-
 			return vl / vr, err
 		}
 	}
 
+	// Types do not need to match for comparisons
 	switch binary.Operand.Type {
 	case lexer.EQUAL_EQUAL:
 		return left == right, err
@@ -125,19 +127,21 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 		return strings.Join([]string{left.(string), right.(string)}, ""), err
 	}
 
+	// If non of the previous checks worked the expression is invalid
 	typeLeft, typeRight := util.GetType(left), util.GetType(right)
 	op, line := binary.Operand.Lexeme, binary.Line
 	return nil, fmt.Errorf(ErrInvalidOperatorTypes.Error(), op, typeLeft, typeRight, line)
 }
 
-// Error is returned for function fail, unmatched arg number, or undefined name
 func evalCall(call *Expression) (value interface{}, err error) {
 	notFuncErr := fmt.Errorf(ErrNotFunction.Error(), call.Name, call.Line)
 	f, err := env.Get(call.Name)
 	if err != nil {
+		// Use not function instead of not variable
 		return value, notFuncErr
 	}
 
+	// Function should be of type env.Callable
 	if function, ok := f.(env.Callable); ok {
 		return evalCallableObject(call, function)
 	}
@@ -145,7 +149,8 @@ func evalCall(call *Expression) (value interface{}, err error) {
 	return value, notFuncErr
 }
 
-// Seperate function because evalGetter needs to evaluate functions that are not in the current scope but rather value passed in nested objects
+// Seperate function because evalGetter needs to be able to pass a reference to a function
+// and not just a name to get from the current env
 func evalCallableObject(call *Expression, f env.Callable) (value interface{}, err error) {
 	numArgs := len(call.Exprs)
 	if numArgs != f.NumArgs {
@@ -164,7 +169,9 @@ func evalCallableObject(call *Expression, f env.Callable) (value interface{}, er
 		args = append(args, v)
 	}
 
+	// Call function, error is returned and handled to add support for custom errors in libraries
 	val, err := f.Call(args...)
+	// Perform type check to avoid runtime errors with illegal Fizz types
 	if !validFizzType(val) {
 		return val, fmt.Errorf(ErrIllegalType.Error(), util.GetType(val))
 	}
@@ -176,7 +183,8 @@ func evalGetter(getter *Expression) (value interface{}, err error) {
 	var last interface{}
 	line := getter.Line
 	for idx, gtr := range getter.Exprs {
-		// For first token
+		// First token has to be object as a single name without
+		// a dot is just parsed as a normal variable
 		if util.GetType(last) == "nil" {
 			value, err = EvaluateExpression(&gtr)
 			if err != nil {
@@ -200,14 +208,15 @@ func evalGetter(getter *Expression) (value interface{}, err error) {
 		// Will not raise error because checked before
 		lastObj := last.(env.Object)
 
-		// Get current value
+		// Get the value of last.name
 		current, err := lastObj.Get(gtr.Name)
 		if err != nil {
 			return value, fmt.Errorf(err.Error(), lastObj.Name, gtr.Name, line)
 		}
 
-		// If function, set current as the return value of the function + args from gtr
+		// If function call, set current as the return value of the function + args from gtr
 		if gtr.Type == Call {
+			// Also check if the value actually is a function
 			if util.GetType(current) != "function" {
 				return value, fmt.Errorf(ErrNotFunction.Error(), getter.Name, line)
 			}
@@ -234,12 +243,7 @@ func isTruthy(value interface{}) bool {
 }
 
 func isNumber(value interface{}) bool {
-	switch value.(type) {
-	case int, float32, float64:
-		return true
-	}
-
-	return false
+	return util.GetType(value) == "number"
 }
 
 // Checks if type is valid for fizz (used for native functions)
