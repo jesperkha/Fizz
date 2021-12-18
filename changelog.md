@@ -4,10 +4,12 @@
 
 **Whats new:**
 
+- Arrays
 - New `:=` operator for variable declaration
 
 **Bug fixes and more:**
 
+- Prettier print for values
 - Fixed the semicolon error to now actually show when there is a semicolon missing, instead of just giving an expression error
 
 <br>

@@ -10,8 +10,7 @@ import (
 )
 
 var (
-	CurrentOrigin 	   string
-	currentReturnValue interface{}
+	CurrentOrigin string
 )
 
 // Goes through list of statements and executes them. Error is returned from statements exec method.
@@ -84,9 +83,10 @@ func execExit(stmt Statement) (err error) {
 
 // Raises error and assigns expr value to global currentReturnValue
 func execReturn(stmt Statement) (err error) {
+	e := ErrReturnOutsideFunc
 	if stmt.Expression == nil {
-		currentReturnValue = nil
-		return ErrReturnOutsideFunc
+		e.Value = nil
+		return e
 	}
 
 	value, err := expr.EvaluateExpression(stmt.Expression)
@@ -94,14 +94,16 @@ func execReturn(stmt Statement) (err error) {
 		return err
 	}
 
-	currentReturnValue = value
-	return ErrReturnOutsideFunc
+	e.Value = value
+	return e
 }
 
 func formatPrintValue(val interface{}) interface{} {
 	switch val.(type) {
-	case float64, string, bool, nil:
+	case float64, string, bool:
 		return val
+	case nil:
+		return "nil"
 	}
 
 	if o, ok := val.(env.Object); ok {
@@ -276,8 +278,8 @@ func execFunction(stmt Statement) (err error) {
 			err = ExecuteStatements(stmt.Then.Statements)
 			env.PopScope()
 			env.PopTempEnv()
-			if _, ok := err.(ConditionalError); ok {
-				return currentReturnValue, nil
+			if e, ok := err.(ConditionalError); ok {
+				return e.Value, nil
 			}
 			
 			return nil, util.WrapFilename(originCache, err)

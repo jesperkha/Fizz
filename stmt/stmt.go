@@ -70,9 +70,10 @@ const (
 )
 
 type ConditionalError struct {
-	Type int
-	Line int
-	Msg  string
+	Type  int
+	Line  int
+	Msg   string
+	Value interface{}
 }
 
 func (c ConditionalError) Error() string {
