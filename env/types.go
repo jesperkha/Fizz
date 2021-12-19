@@ -6,6 +6,7 @@ import (
 
 var (
 	ErrNotAField = errors.New("'%s' has no attribute '%s', line %d")
+	ErrIndexOutOfRange = errors.New("index out of range, line %d")
 )
 
 // Interface matches all Fizz object structs.
@@ -68,4 +69,14 @@ type Array struct {
 
 func (a Array) Type() string {
 	return "array"
+}
+
+// Gets value of array at index. Returns error if value is > len(arr) or
+// index is less than 0.
+func (a Array) Get(index int) (value interface{}, err error) {
+	if index >= len(a.Values) || index < 0 {
+		return value, ErrIndexOutOfRange
+	}
+
+	return a.Values[index], err
 }

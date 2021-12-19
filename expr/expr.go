@@ -17,11 +17,13 @@ var (
 	ErrNoExpression			= errors.New("empty expression, line %d")
 	ErrInvalidExpression    = errors.New("invalid expression, line %d")
 	ErrExpectedExpression   = errors.New("expected expression in group, line %d")
+	ErrNotInteger			= errors.New("index must be integer, line %d")
 	ErrCommaError           = errors.New("comma error, line %d")
 	ErrIncorrectArgs        = errors.New("'%s()' expected %d args, got %d, line %d")
 	ErrNotFunction          = errors.New("'%s' is not a function, line %d")
 	ErrNilValueError        = errors.New("unexpected nil value in expression, line %d")
 	ErrNotObject            = errors.New("type '%s' has no attributes, line %d")
+	ErrNotArray				= errors.New("variable '%s' is not an array, line %d")
 	ErrInvalidType			= errors.New("expr: unknown expression type, line %d")
 	ErrIllegalType = errors.New("unknown type '%s'")
 )
@@ -46,12 +48,14 @@ const (
 	Call
 	Getter
 	Array
+	Index
 
 	// ParseToken types
 	Single
 	TokenGroup
 	CallGroup
 	ArrayGroup
+	ArrayGetter
 )
 
 type Expression struct {
@@ -70,7 +74,6 @@ type ParseToken struct {
 	Type  int
 	Token lexer.Token
 	Inner []ParseToken
-	Args  [][]ParseToken
 }
 
 func ParseAndEval(tokens []lexer.Token) (value interface{}, err error) {

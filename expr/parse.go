@@ -99,25 +99,48 @@ func generateParseTokens(tokens []lexer.Token) (ptokens []ParseToken, err error)
 		}
 		
 		// Check and handle function call expression
-		// Todo: make function for parsing comma separated values
 		// connect to array parsing too
 		if token.Type == lexer.IDENTIFIER {
 			// Check if just identifier
-			if currentIdx+1 >= len(tokens) || tokens[currentIdx+1].Type != lexer.LEFT_PAREN {
+			if currentIdx+1 >= len(tokens) {
 				ptokens = append(ptokens, ParseToken{Type: Single, Token: token})
 				currentIdx++
 				continue
 			}
 
-			currentIdx++ // Skip function name
-			group, endIdx, err := parseCSV(tokens, currentIdx, lexer.LEFT_PAREN, lexer.RIGHT_PAREN)
-			if err != nil {
-				return ptokens, err
+			nextType := tokens[currentIdx+1].Type
+
+			// Function call
+			if nextType == lexer.LEFT_PAREN {
+				currentIdx++ // Skip function name
+				group, endIdx, err := parseCSV(tokens, currentIdx, lexer.LEFT_PAREN, lexer.RIGHT_PAREN)
+				if err != nil {
+					return ptokens, err
+				}
+	
+				ptokens = append(ptokens, ParseToken{Type: CallGroup, Token: token, Inner: group})
+				currentIdx = endIdx + 1
+				continue
 			}
 
-			ptokens = append(ptokens, ParseToken{Type: CallGroup, Token: token, Inner: group})
-			currentIdx = endIdx + 1
-			continue
+			// Array index getter
+			if nextType == lexer.LEFT_SQUARE {
+				currentIdx++
+				endIdx, eof := util.SeekClosingBracket(tokens, currentIdx, lexer.LEFT_SQUARE, lexer.RIGHT_SQUARE)
+				if eof {
+					return ptokens, ErrBracketError
+				}
+
+				interval := tokens[currentIdx+1:endIdx]
+				inner, err := generateParseTokens(interval)
+				if err != nil {
+					return ptokens, err
+				}
+
+				ptokens = append(ptokens, ParseToken{Type: ArrayGetter, Inner: inner, Token: token})
+				currentIdx = endIdx + 1
+				continue
+			}
 		}
 
 		// Not expression type symbol
@@ -159,6 +182,11 @@ func parsePTokens(tokens []ParseToken) *Expression {
 			}
 			
 			return &Expression{Type: Call, Line: line, Name: token.Token.Lexeme, Exprs: exprs}
+		}
+
+		// Array getter of index
+		if token.Type == ArrayGetter {
+			return &Expression{Type: Index, Name: token.Token.Lexeme, Line: line, Inner: parsePTokens(token.Inner)}
 		}
 
 		// Parse single variable

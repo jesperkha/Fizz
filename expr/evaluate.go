@@ -30,9 +30,12 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 		return evalGetter(expr)
 	case Array:
 		return evalArray(expr)
+	case Index:
+		return evalIndex(expr)
 	}
 
 	// Wont be reached
+	// Todo: (doing) add eval for array indexing
 	return expr, ErrInvalidType
 }
 
@@ -256,6 +259,41 @@ func evalArray(array *Expression) (value interface{}, err error) {
 	}
 
 	return env.Array{Values: values, Length: len(values)}, err
+}
+
+func evalIndex(array *Expression) (value interface{}, err error) {
+	arr, err := env.Get(array.Name)
+	if err != nil {
+		return value, err
+	}
+
+	a, ok := arr.(env.Array)
+	if !ok {
+		return value, fmt.Errorf(ErrNotArray.Error(), array.Name, array.Line)
+	}
+
+	if array.Inner.Type == EmptyExpression {
+		return value, fmt.Errorf(ErrNoExpression.Error(), array.Line)
+	}
+
+	index, err := EvaluateExpression(array.Inner)
+	if err != nil {
+		return value, err
+	}
+
+	if index, ok := index.(float64); ok {
+		if index == float64(int(index)) {
+			value, err = a.Get(int(index))
+			if err != nil {
+				return value, fmt.Errorf(err.Error(), array.Line)
+			}
+			
+			return value, err
+		}
+	}
+	
+	// Not integer
+	return value, fmt.Errorf(ErrNotInteger.Error(), array.Line)
 }
 
 func isTruthy(value interface{}) bool {
