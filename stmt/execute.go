@@ -269,6 +269,8 @@ func execFunction(stmt Statement) (err error) {
 			env.PushTempEnv(envCache)
 			env.PushScope()
 
+			// fmt.Println(envCache)
+
 			// Declare args
 			for idx, arg := range args {
 				// Cannot raise error because block is in own scope
