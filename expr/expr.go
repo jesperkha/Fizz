@@ -46,6 +46,8 @@ const (
 	Group
 	Variable
 	Call
+	Args
+
 	Getter
 	Array
 	Index

@@ -88,6 +88,27 @@ func SeekClosingBracket(tokens []lexer.Token, start int, beginT, endT int) (endI
 	return endIdx, true
 }
 
+// Skips token check if in group or array expression. Returns index of ending token or eof.
+func SeekBreakPoint(tokens []lexer.Token, verifier func(int, lexer.Token)bool) (targetIdx int, eof bool) {
+	parens := 0
+	targetIdx = -1
+	for idx, token := range tokens {
+		// Check before to allow for seeking parens
+		if parens == 0 && verifier(idx, token) {
+			targetIdx = idx
+		}
+
+		switch token.Type {
+		case lexer.LEFT_PAREN, lexer.LEFT_SQUARE:
+			parens++
+		case lexer.RIGHT_PAREN, lexer.RIGHT_SQUARE:
+			parens--
+		}
+	}
+
+	return targetIdx, targetIdx == -1
+}
+
 // Splits list of token by split type
 func SplitByToken(tokens []lexer.Token, split int) [][]lexer.Token {
 	numParen := 0

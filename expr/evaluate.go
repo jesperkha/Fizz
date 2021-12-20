@@ -26,8 +26,6 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 		return env.Get(expr.Name)
 	case Call:
 		return evalCall(expr)
-	case Getter:
-		return evalGetter(expr)
 	case Array:
 		return evalArray(expr)
 	case Index:
@@ -35,7 +33,6 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 	}
 
 	// Wont be reached
-	// Todo: (doing) add eval for array indexing
 	return expr, ErrInvalidType
 }
 
@@ -139,108 +136,45 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 }
 
 func evalCall(call *Expression) (value interface{}, err error) {
-	notFuncErr := fmt.Errorf(ErrNotFunction.Error(), call.Name, call.Line)
-	f, err := env.Get(call.Name)
+	callee, err := EvaluateExpression(call.Left)
 	if err != nil {
-		// Use not function instead of not variable
-		return value, notFuncErr
+		return value, err
 	}
-
+	
 	// Function should be of type env.Callable
-	if function, ok := f.(env.Callable); ok {
-		return evalCallableObject(call, function)
-	}
-
-	return value, notFuncErr
-}
-
-// Seperate function because evalGetter needs to be able to pass a reference to a function
-// and not just a name to get from the current env
-func evalCallableObject(call *Expression, f env.Callable) (value interface{}, err error) {
-	numArgs := len(call.Exprs)
-	if numArgs != f.NumArgs {
-		name, expected, line := call.Name, f.NumArgs, call.Line
-		return value, fmt.Errorf(ErrIncorrectArgs.Error(), name, expected, numArgs, line)
-	}
-
-	// Evaluated args to be passed to function
-	args := []interface{}{}
-	for _, arg := range call.Exprs {
-		v, err := EvaluateExpression(&arg)
-		if err != nil {
-			return value, err
-		}
-
-		args = append(args, v)
-	}
-
-	// Call function, error is returned and handled to add support for custom errors in libraries
-	val, err := f.Call(args...)
-	// Perform type check to avoid runtime errors with illegal Fizz types
-	if !validFizzType(val) {
-		return val, fmt.Errorf(ErrIllegalType.Error(), util.GetType(val))
-	}
-
-	return val, err
-}
-
-func evalGetter(getter *Expression) (value interface{}, err error) {
-	var last interface{}
-	line := getter.Line
-	for idx, gtr := range getter.Exprs {
-		// First token has to be object as a single name without
-		// a dot is just parsed as a normal variable
-		if util.GetType(last) == "nil" {
-			value, err = EvaluateExpression(&gtr)
+	if f, ok := callee.(env.Callable); ok {
+		args := []interface{}{}
+		// Single argument
+		if call.Inner.Type != Args && call.Inner.Inner.Type != EmptyExpression {
+			arg, err := EvaluateExpression(call.Inner)
 			if err != nil {
 				return value, err
 			}
 
-			last = value
-			continue
+			args = append(args, arg)
 		}
-
-		// Last has to be object to continue. If gtr.Name is empty its not an identifier
-		if util.GetType(last) != "object" || gtr.Name == "" {
-			value, err = EvaluateExpression(&gtr)
-			if err != nil {
-				return value, err
-			}
-
-			return value, fmt.Errorf(ErrNotObject.Error(), util.GetType(value), line)
-		}
-
-		// Will not raise error because checked before
-		lastObj := last.(env.Object)
-
-		// Get the value of last.name
-		current, err := lastObj.Get(gtr.Name)
-		if err != nil {
-			return value, fmt.Errorf(err.Error(), lastObj.Name, gtr.Name, line)
-		}
-
-		// If function call, set current as the return value of the function + args from gtr
-		if gtr.Type == Call {
-			// Also check if the value actually is a function
-			if util.GetType(current) != "function" {
-				return value, fmt.Errorf(ErrNotFunction.Error(), getter.Name, line)
-			}
-
-			current, err = evalCallableObject(&gtr, current.(env.Callable))
-			if err != nil {
-				return value, err
+		
+		// Argument list
+		if call.Inner.Type == Args {
+			for _, arg := range call.Inner.Exprs {
+				val, err := EvaluateExpression(&arg)
+				if err != nil {
+					return value, err
+				}
+				
+				args = append(args, val)
 			}
 		}
 
-		// For last token return the value
-		if idx == len(getter.Exprs)-1 {
-			return current, err
+		if len(args) != f.NumArgs {
+			return value, fmt.Errorf(ErrIncorrectArgs.Error(), f.Name, f.NumArgs, len(args), call.Line)
 		}
 
-		last = current
+		return f.Call(args...)
 	}
 
-	return value, err
+	// Todo: fix error message for not function error
+	return value, fmt.Errorf(ErrNotFunction.Error(), call.Name, call.Line)
 }
 
 func evalArray(array *Expression) (value interface{}, err error) {
@@ -302,9 +236,4 @@ func isTruthy(value interface{}) bool {
 
 func isNumber(value interface{}) bool {
 	return util.GetType(value) == "number"
-}
-
-// Checks if type is valid for fizz (used for native functions)
-func validFizzType(val interface{}) bool {
-	return util.SContains(LegalTypes, util.GetType(val))
 }

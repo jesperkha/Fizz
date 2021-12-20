@@ -4,7 +4,6 @@
 
 **Whats new:**
 
-- Arrays
 - New `:=` operator for variable declaration
 
 **Bug fixes and more:**
