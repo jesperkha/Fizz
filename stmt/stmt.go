@@ -61,6 +61,7 @@ type Statement struct {
 	Then       *Statement
 	Else       *Statement
 	Expression *expr.Expression
+	Left       *expr.Expression
 }
 
 const (

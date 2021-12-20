@@ -111,6 +111,11 @@ func SeekBreakPoint(tokens []lexer.Token, verifier func(int, lexer.Token)bool) (
 
 // Splits list of token by split type
 func SplitByToken(tokens []lexer.Token, split int) [][]lexer.Token {
+	return SplitByTokens(tokens, []int{split})
+}
+
+// Splits list of token by multiple split types
+func SplitByTokens(tokens []lexer.Token, splits []int) [][]lexer.Token {
 	numParen := 0
 	start := 0
 	result := [][]lexer.Token{}
@@ -120,11 +125,11 @@ func SplitByToken(tokens []lexer.Token, split int) [][]lexer.Token {
 			numParen++
 		case lexer.RIGHT_PAREN, lexer.RIGHT_SQUARE:
 			numParen--
-		case split:
-			if numParen == 0 {
-				result = append(result, tokens[start:idx])
-				start = idx + 1
-			}
+		}
+
+		if Contains(splits, token.Type) && numParen == 0 {
+			result = append(result, tokens[start:idx])
+			start = idx + 1
 		}
 	}
 

@@ -146,44 +146,33 @@ func execPrint(stmt Statement) (err error) {
 }
 
 func execVariable(stmt Statement) (err error) {
-	if stmt.Expression != nil {
-		val, err := expr.EvaluateExpression(stmt.Expression)
-		if err != nil {
-			return err
-		}
-
-		return env.Declare(stmt.Name, val)
+	if stmt.Left == nil || stmt.Expression == nil {
+		return ErrInvalidStatement
 	}
 
-	return env.Declare(stmt.Name, nil)
-}
-
-// Helper for execAssignment
-func assignToObject(objTokens []lexer.Token, name string, value interface{}) (err error) {
-	// Not object value assignment
-	if len(objTokens) == 0 {
-		return env.Assign(name, value)
-	}
-
-	// Get object to assign to
-	v, err := expr.ParseAndEval(objTokens[:len(objTokens)-2]) // exclude name
+	val, err := expr.EvaluateExpression(stmt.Expression)
 	if err != nil {
 		return err
 	}
 
-	if obj, ok := v.(env.Object); ok {
-		return obj.Set(name, value)
+	return env.Declare(stmt.Left.Name, val)
+}
+
+func assignValue(left *expr.Expression, value interface{}) error {
+	if left.Type == expr.Variable {
+		return env.Assign(left.Name, value)
+	}
+
+	val, err := expr.EvaluateExpression(left.Left)
+	if err != nil {
+		return err
+	}
+	
+	if obj, ok := val.(env.Object); ok {
+		return obj.Set(left.Right.Name, value)
 	}
 	
 	return ErrNonAssignable
-}
-
-func getObjectValue(stmt Statement) (value interface{}, err error) {
-	if len(stmt.ObjTokens) == 0 {
-		return env.Get(stmt.Name)
-	}
-
-	return expr.ParseAndEval(stmt.ObjTokens)
 }
 
 func execAssignment(stmt Statement) (err error) {
@@ -194,7 +183,7 @@ func execAssignment(stmt Statement) (err error) {
 
 	// Plain assignment
 	if stmt.Operator == lexer.EQUAL {
-		return assignToObject(stmt.ObjTokens, stmt.Name, val)
+		return assignValue(stmt.Left, val)
 	}
 
 	// Declare variable with special := operator
@@ -202,7 +191,7 @@ func execAssignment(stmt Statement) (err error) {
 		return execVariable(stmt)
 	}
 
-	oldVal, err := getObjectValue(stmt)
+	oldVal, err := expr.EvaluateExpression(stmt.Left)
 	if err != nil {
 		return err
 	}
@@ -219,7 +208,7 @@ func execAssignment(stmt Statement) (err error) {
 			return ErrInvalidOperator
 		}
 
-		return assignToObject(stmt.ObjTokens, stmt.Name, oldVal.(string)+val.(string))
+		return assignValue(stmt.Left, oldVal.(string)+val.(string))
 	}
 
 	// Float addition / subtraction
@@ -239,7 +228,7 @@ func execAssignment(stmt Statement) (err error) {
 			newVal = a / b
 		}
 
-		return assignToObject(stmt.ObjTokens, stmt.Name, newVal)
+		return assignValue(stmt.Left, newVal)
 	}
 
 	return ErrInvalidStatement

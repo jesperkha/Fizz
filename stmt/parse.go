@@ -64,8 +64,6 @@ func parseStatement(typ int, tokens []lexer.Token) (stmt Statement, err error) {
 		return parseAssignment(tokens)
 	case lexer.PRINT:
 		return parsePrint(tokens)
-	case lexer.VAR:
-		return parseVariable(tokens)
 	case lexer.ELSE:
 		return parseElse(tokens)
 	case lexer.BREAK:
@@ -189,57 +187,26 @@ func parsePrint(tokens []lexer.Token) (stmt Statement, err error) {
 	return Statement{Type: Print, Expression: &expr}, err
 }
 
-// Variable declaration
-func parseVariable(tokens []lexer.Token) (stmt Statement, err error) {
-	if len(tokens) < 4 {
-		return stmt, ErrInvalidStatement
-	}
-
-	name := tokens[1]
-	equals := tokens[2].Type == lexer.EQUAL
-	exprTokens := tokens[3:]
-
-	if name.Type == lexer.IDENTIFIER && equals {
-		initExpr, err := expr.ParseExpression(exprTokens)
-		return Statement{Type: Variable, Name: name.Lexeme, Expression: &initExpr}, err
-	}
-
-	return stmt, ErrInvalidStatement
-}
-
+// Also parses variable declaration with := operator
 func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 	if len(tokens) < 3 {
 		return parseExpression(tokens)
 	}
 
 	validOperands := []int{lexer.EQUAL, lexer.PLUS_EQUAL, lexer.MINUS_EQUAL, lexer.MULT_EQUAL, lexer.DIV_EQUAL, lexer.DEF_EQUAL}
-	operator := tokens[1].Type
-
-	// Checks if object value assignment. Handles error. Skips if not
-	if operator == lexer.DOT {
-		for idx, t := range tokens {
-			if !util.Contains(validOperands, t.Type) {
-				continue
-			}
-
-			left, right := tokens[:idx], tokens[idx+1:] // exclude operator
-			rightExpr, err := expr.ParseExpression(right)
-			return Statement{
-				Type: Assignment,
-				ObjTokens: left,
-				Name: left[len(left)-1].Lexeme,
-				Expression: &rightExpr,
-				Operator: t.Type,
-			}, err
-		}
-	}
-
-	if !util.Contains(validOperands, operator) {
+	splits := util.SplitByTokens(tokens, validOperands)
+	if len(splits) != 2 {
 		return parseExpression(tokens)
 	}
+	
+	left, err := expr.ParseExpression(splits[0])
+	if err != nil {
+		return stmt, err
+	}
 
-	expr, err := expr.ParseExpression(tokens[2:])
-	return Statement{Type: Assignment, Name: tokens[0].Lexeme, Expression: &expr, Operator: operator}, err
+	operator := tokens[len(splits[0])].Type
+	right, err := expr.ParseExpression(splits[1])
+	return Statement{Type: Assignment, Expression: &right, Left: &left, Operator: operator}, err
 }
 
 func parseFunc(tokens []lexer.Token, idx *int) (stmt Statement, err error) {

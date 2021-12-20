@@ -1,32 +1,32 @@
 # Valid cases, should not raise error
 > # This is a comment
 > type 1;
-> var age = 20;
+> age := 20;
 > age += 1;
 > if true { 1 + 1; }
 > while { break; }
 > repeat n < 10 { skip; }
 > func main(a, b) { return 1; } main(1, 2);
-> define p{n} var a = p(2); a.n == 2;
-> var b = p(p(p(1))); b.n.n.n == 1;
+> define p{n} a := p(2); a.n == 2;
+> b := p(p(p(1))); b.n.n.n == 1;
 > func closure() {
-    var i = 0;
+    i := 0;
     func add() {i += 1;}
     return add;
 }
-var f = closure(); f();
+f := closure(); f();
 
 ?
 
 # Invalid cases, should raise error
 > prt 30;
-> var a a = 0;
+> a a = 0;
 > func(){}
 > func main(a) {} main();
 > if {}
 > while a + 2 {}
 > repeat 20 {}
-> var c = p(1); c.n.n;
+> c := p(1); c.n.n;
 > b.n();
 > .b.n;
 > b.n.;

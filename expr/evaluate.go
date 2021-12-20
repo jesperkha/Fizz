@@ -30,7 +30,6 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 		return evalGetter(expr)
 	}
 
-	fmt.Println(expr.Type, Getter)
 	// Wont be reached
 	return expr, ErrInvalidType
 }
@@ -175,21 +174,24 @@ func evalCall(call *Expression) (value interface{}, err error) {
 	}
 
 	// Todo: fix error message for not function error
-	return value, fmt.Errorf(ErrNotFunction.Error(), call.Name, call.Line)
+	return value, fmt.Errorf(ErrNotFunction.Error(), util.GetType(callee), call.Line)
 }
 
 func evalGetter(getter *Expression) (value interface{}, err error) {
 	line := getter.Line
 	name := getter.Right.Name
+	// No name before dot raises error here. No name after dot raises error in lexer.
 	if getter.Left.Type == EmptyExpression {
 		return value, fmt.Errorf(ErrInvalidExpression.Error(), line)
 	}
 
+	// Recursively get parent expression, must be object
 	parent, err := EvaluateExpression(getter.Left)
 	if err != nil {
 		return value, err
 	}
 
+	// Only objects allow getter expressions
 	if obj, ok := parent.(env.Object); ok {
 		value, err = obj.Get(name)
 		if err != nil {
