@@ -1,6 +1,8 @@
 package expr
 
 import (
+	"fmt"
+
 	"github.com/jesperkha/Fizz/lexer"
 	"github.com/jesperkha/Fizz/util"
 )
@@ -10,7 +12,6 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return Expression{Type: EmptyExpression}, err
 	}
 
-	// Todo: parse dot getters
 	line := tokens[0].Line
 
 	// Argument list for function calls. If the arg list is empty it is handled as an empty group.
@@ -25,6 +26,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 			args = append(args, arg)
 		}
 
+		fmt.Println(args)
 		return Expression{Type: Args, Exprs: args, Line: line}, err
 	}
 
@@ -86,6 +88,26 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 
 		args, err := ParseExpression(tokens[targetIdx:])
 		return Expression{Type: Call, Left: &callee, Inner: &args, Line: line}, err
+	}
+
+	// Getter expression
+	// Splits by dot and parses the left side recursively
+	targetIdx, eof = util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
+		return t.Type == lexer.DOT
+	})
+
+	if !eof {
+		left, err := ParseExpression(tokens[:targetIdx])
+		if err != nil {
+			return expr, err
+		}
+
+		right, err := ParseExpression(tokens[targetIdx+1:])
+		if right.Type != Variable {
+			return expr, ErrExpectedName
+		}
+
+		return Expression{Type: Getter, Left: &left, Right: &right, Line: line}, err
 	}
 
 	// All expression types below only require one token. If more are found its and error.

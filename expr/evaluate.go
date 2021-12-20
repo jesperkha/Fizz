@@ -26,12 +26,11 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 		return env.Get(expr.Name)
 	case Call:
 		return evalCall(expr)
-	case Array:
-		return evalArray(expr)
-	case Index:
-		return evalIndex(expr)
+	case Getter:
+		return evalGetter(expr)
 	}
 
+	fmt.Println(expr.Type, Getter)
 	// Wont be reached
 	return expr, ErrInvalidType
 }
@@ -143,9 +142,11 @@ func evalCall(call *Expression) (value interface{}, err error) {
 	
 	// Function should be of type env.Callable
 	if f, ok := callee.(env.Callable); ok {
+		argToken := call.Inner.Inner
 		args := []interface{}{}
+
 		// Single argument
-		if call.Inner.Type != Args && call.Inner.Inner.Type != EmptyExpression {
+		if argToken.Type != Args && argToken.Type != EmptyExpression {
 			arg, err := EvaluateExpression(call.Inner)
 			if err != nil {
 				return value, err
@@ -155,8 +156,8 @@ func evalCall(call *Expression) (value interface{}, err error) {
 		}
 		
 		// Argument list
-		if call.Inner.Type == Args {
-			for _, arg := range call.Inner.Exprs {
+		if argToken.Type == Args {
+			for _, arg := range argToken.Exprs {
 				val, err := EvaluateExpression(&arg)
 				if err != nil {
 					return value, err
@@ -177,57 +178,28 @@ func evalCall(call *Expression) (value interface{}, err error) {
 	return value, fmt.Errorf(ErrNotFunction.Error(), call.Name, call.Line)
 }
 
-func evalArray(array *Expression) (value interface{}, err error) {
-	values := []interface{}{}
-	for _, expr := range array.Exprs {
-		if expr.Type == EmptyExpression {
-			return value, fmt.Errorf(ErrNoExpression.Error(), array.Line)
-		}
-		
-		val, err := EvaluateExpression(&expr)
+func evalGetter(getter *Expression) (value interface{}, err error) {
+	line := getter.Line
+	name := getter.Right.Name
+	if getter.Left.Type == EmptyExpression {
+		return value, fmt.Errorf(ErrInvalidExpression.Error(), line)
+	}
+
+	parent, err := EvaluateExpression(getter.Left)
+	if err != nil {
+		return value, err
+	}
+
+	if obj, ok := parent.(env.Object); ok {
+		value, err = obj.Get(name)
 		if err != nil {
-			return value, err
+			return value, fmt.Errorf(err.Error(), obj.Name, name, line)
 		}
 
-		values = append(values, val)
-	}
-
-	return env.Array{Values: values, Length: len(values)}, err
-}
-
-func evalIndex(array *Expression) (value interface{}, err error) {
-	arr, err := env.Get(array.Name)
-	if err != nil {
 		return value, err
 	}
 
-	a, ok := arr.(env.Array)
-	if !ok {
-		return value, fmt.Errorf(ErrNotArray.Error(), array.Name, array.Line)
-	}
-
-	if array.Inner.Type == EmptyExpression {
-		return value, fmt.Errorf(ErrNoExpression.Error(), array.Line)
-	}
-
-	index, err := EvaluateExpression(array.Inner)
-	if err != nil {
-		return value, err
-	}
-
-	if index, ok := index.(float64); ok {
-		if index == float64(int(index)) {
-			value, err = a.Get(int(index))
-			if err != nil {
-				return value, fmt.Errorf(err.Error(), array.Line)
-			}
-			
-			return value, err
-		}
-	}
-	
-	// Not integer
-	return value, fmt.Errorf(ErrNotInteger.Error(), array.Line)
+	return value, fmt.Errorf(ErrNotObject.Error(), util.GetType(parent), line)
 }
 
 func isTruthy(value interface{}) bool {

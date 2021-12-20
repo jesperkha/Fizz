@@ -2,4 +2,3 @@ bin
 dev_files
 .vscode
 main.fizz
-expr/parse2.go

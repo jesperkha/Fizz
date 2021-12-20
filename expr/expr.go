@@ -25,6 +25,7 @@ var (
 	ErrNotObject            = errors.New("type '%s' has no attributes, line %d")
 	ErrNotArray				= errors.New("variable '%s' is not an array, line %d")
 	ErrInvalidType			= errors.New("expr: unknown expression type, line %d")
+	ErrExpectedName			= errors.New("expected name after '.', line %d")
 	ErrIllegalType = errors.New("unknown type '%s'")
 )
 
