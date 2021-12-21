@@ -4,7 +4,7 @@
 
 **Whats new:**
 
-- New `:=` operator for variable declaration
+- New `:=` operator for variable declaration, removed `var` statement (temporary)
 
 **Bug fixes and more:**
 
