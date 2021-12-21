@@ -93,35 +93,32 @@ exit "goodbye"; // prints 'goodbye' and exits program
 
 ## <a id="var"></a> **Variables**
 
-You can declare a variable using the `var` statement or the `:=` operator. The value can be re-assigned later and even change type.
+You can declare a variable using the `:=` operator. The value can be re-assigned later and even change type.
 
 ```go
-var name = "John";
+name := "John";
 name = "Carl";
 name = 3;
 
 // Error, 'name' is already defined
-var name = "Susan";
-
-// same as 'var age = 10;'
-age := 10;
+name := "Susan";
 ```
 
 Local variables override higher level scopes:
 
 ```go
-var age = 10;
+age := 10;
 
 {
 	// Overrides global 'age' variable
-	var age = 20;
+	age := 20;
 }
 ```
 
 You can use shorthand assignment operators too:
 
 ```go
-var n = 1;
+n := 1;
 n += 2;
 n -= 2;
 n *= 2;
@@ -137,7 +134,7 @@ You can also use the `+=` operator with strings.
 Fizz features simple if and else statements, but not else-if. The 'and' operator is `&` and 'or' is `:`.
 
 ```go
-var height = 172;
+height := 172;
 
 if age > 158.8 {
     print "Taller than Kevin Hart";
@@ -153,7 +150,6 @@ if age > 158.8 {
 Fizz has a while statement similar to most other languages. If you leave the expression field empty it will just run forever.
 
 ```js
-
 while n < 10 {
     // loops until condition is false
 }
@@ -204,7 +200,7 @@ define Person {
     age
 }
 
-var john = Person("John", 31);
+john := Person("John", 31);
 print john.name; // "John"
 
 john.age = 99;
@@ -217,12 +213,12 @@ Under the hood, the `define` statement creates a function that returns an object
 
 ## <a id="import"></a> **File imports**
 
-You can import files by using the `import` statement. The given path, or name, is always relative to the file that the program started in. Circular imports are not allowed and an error will be raised if one is found.
+You can import files by using the `import` statement. The given path, or name, is always relative to the file that the program started in. Circular imports are not allowed and an error will be raised if one is found. The imported object name is the filename, so files with the same names cannot be imported in the same file. (in the future `import x as y` syntax will be added to fix this)
 
 ```js
 // other.fizz
 
-var name = "John";
+name := "John";
 ```
 
 ```js

@@ -107,7 +107,7 @@ func formatPrintValue(val interface{}) interface{} {
 	}
 
 	if o, ok := val.(env.Object); ok {
-		str := "{\n"
+		str := o.Name + ": {\n"
 		for key, value := range o.Fields {
 			str += fmt.Sprintf("    %s: %v\n", key, formatPrintValue(value))
 		}
@@ -242,13 +242,11 @@ func execBlock(stmt Statement) (err error) {
 }
 
 // Todo: implement callstack (add recursion limit when doing so)
-// when the interp model is redone to fit a more object/instance
-// approach the callstack should be implemented
 func execFunction(stmt Statement) (err error) {
 	// Store origin at point of function declaration as well as scope around it
 	originCache := CurrentOrigin
-	envCache := env.GetCurrentEnv()
-
+	var envCache env.Environment
+	
 	function := env.Callable{
 		Name: stmt.Name,
 		NumArgs: len(stmt.Params),
@@ -257,15 +255,15 @@ func execFunction(stmt Statement) (err error) {
 		Call: func(args ...interface{}) (interface{}, error) {
 			env.PushTempEnv(envCache)
 			env.PushScope()
-
+			
 			// fmt.Println(envCache)
-
+			
 			// Declare args
 			for idx, arg := range args {
 				// Cannot raise error because block is in own scope
 				env.Declare(stmt.Params[idx], arg)
 			}
-
+			
 			err = ExecuteStatements(stmt.Then.Statements)
 			env.PopScope()
 			env.PopTempEnv()
@@ -277,7 +275,10 @@ func execFunction(stmt Statement) (err error) {
 		},
 	}
 
-	return env.Declare(stmt.Name, function)
+	err = env.Declare(stmt.Name, function)
+	// Set after function is declared to allow using the function inside its body
+	envCache = env.GetCurrentEnv()
+	return err
 }
 
 func execIf(stmt Statement) (err error) {

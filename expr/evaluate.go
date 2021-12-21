@@ -173,7 +173,6 @@ func evalCall(call *Expression) (value interface{}, err error) {
 		return f.Call(args...)
 	}
 
-	// Todo: fix error message for not function error
 	return value, fmt.Errorf(ErrNotFunction.Error(), util.GetType(callee), call.Line)
 }
 

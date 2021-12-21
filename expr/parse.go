@@ -14,6 +14,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 
 	line := tokens[0].Line
 
+	// ARGUMENTS
 	// Argument list for function calls. If the arg list is empty it is handled as an empty group.
 	if splits := util.SplitByToken(tokens, lexer.COMMA); len(splits) != 1 {
 		args := []Expression{}
@@ -30,7 +31,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return Expression{Type: Args, Exprs: args, Line: line}, err
 	}
 
-	// Unary expressions
+	// UNARY
 	// Check if first token is a valid unary token type, if not skip to binary
 	unaryOperators := []int{lexer.MINUS, lexer.TYPE, lexer.NOT}
 	if util.Contains(unaryOperators, tokens[0].Type) {
@@ -38,7 +39,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return Expression{Type: Unary, Right: &right, Operand: tokens[0], Line: line}, err
 	}
 
-	// Binary expressions
+	// BINARY
 	// Find lowest precedense operator in token list. Split at that token and put into expression tree.
 	// Only check if not in a group. Then check if valid operator, skip if not.
 	lowest, lowestIdx := lexer.Token{Type: 999}, 0
@@ -61,7 +62,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return Expression{Type: Binary, Left: &left, Right: &right, Operand: tokens[lowestIdx], Line: line}, err
 	}
 
-	// Group expression
+	// GROUP
 	// Binary is already parsed so there cannot be another expression after the group. This means the last
 	// token MUST be a closing paren. Parses inner expression.
 	if tokens[0].Type == lexer.LEFT_PAREN {
@@ -73,36 +74,38 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return Expression{Type: Group, Inner: &inner, Line: line}, err
 	}
 
-	// Call expression
+	// CALL
 	// Search for left paren, then parse the left part of the expression. Also parse the args of the caller.
 	// Start cannot be set to 0 in loop because that would be a group expression
-	targetIdx, eof := util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
+	targetCall, eofCall := util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
 		return t.Type == lexer.LEFT_PAREN
 	})
 
-	if !eof {
-		callee, err := ParseExpression(tokens[:targetIdx])
-		if err != nil {
-			return expr, err
-		}
-
-		args, err := ParseExpression(tokens[targetIdx:])
-		return Expression{Type: Call, Left: &callee, Inner: &args, Line: line}, err
-	}
-
-	// Getter expression
-	// Splits by dot and parses the left side recursively
-	targetIdx, eof = util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
+	// Also check where the closest dot is. If a dot comes after the last call, it should be parsed as a getter.
+	// The only other option is for the call to be last (or error).
+	targetDot, eofDot := util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
 		return t.Type == lexer.DOT
 	})
 
-	if !eof {
-		left, err := ParseExpression(tokens[:targetIdx])
+	if !eofCall && targetCall > targetDot {
+		callee, err := ParseExpression(tokens[:targetCall])
 		if err != nil {
 			return expr, err
 		}
 
-		right, err := ParseExpression(tokens[targetIdx+1:])
+		args, err := ParseExpression(tokens[targetCall:])
+		return Expression{Type: Call, Left: &callee, Inner: &args, Line: line}, err
+	}
+
+	// GETTER
+	// Splits by dot and parses the left side recursively
+	if !eofDot {
+		left, err := ParseExpression(tokens[:targetDot])
+		if err != nil {
+			return expr, err
+		}
+
+		right, err := ParseExpression(tokens[targetDot+1:])
 		if right.Type != Variable {
 			return expr, ErrExpectedName
 		}
@@ -115,11 +118,13 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return expr, ErrInvalidExpression
 	}
 
-	// Variable expression
+	// VARIABLE
+	// Variables have a different expression type
 	if tokens[0].Type == lexer.IDENTIFIER {
 		return Expression{Type: Variable, Name: tokens[0].Lexeme, Line: line}, err
 	}
 
-	// Literal expression
+	// LITERAL
+	// Only other option is a literal, the only error this can cause is an undefined variable
 	return Expression{Type: Literal, Value: tokens[0], Line: line}, err
 }
