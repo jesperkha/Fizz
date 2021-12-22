@@ -48,6 +48,7 @@ const (
 	Exit
 	Object
 	Import
+	Include
 )
 
 type Statement struct {

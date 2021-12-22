@@ -61,7 +61,7 @@ func executeStatement(stmt Statement) error {
 		return execExit(stmt)
 	case Object:
 		return execObject(stmt)
-	case Import:
+	case Import, Include:
 		return nil // Handled in interp
 	}
 
@@ -146,16 +146,7 @@ func execPrint(stmt Statement) (err error) {
 }
 
 func execVariable(stmt Statement) (err error) {
-	if stmt.Left == nil || stmt.Expression == nil {
-		return ErrInvalidStatement
-	}
-
-	val, err := expr.EvaluateExpression(stmt.Expression)
-	if err != nil {
-		return err
-	}
-
-	return env.Declare(stmt.Left.Name, val)
+	return err
 }
 
 func assignValue(left *expr.Expression, value interface{}) error {
@@ -188,7 +179,11 @@ func execAssignment(stmt Statement) (err error) {
 
 	// Declare variable with special := operator
 	if stmt.Operator == lexer.DEF_EQUAL {
-		return execVariable(stmt)
+		if stmt.Left == nil || stmt.Expression == nil {
+			return ErrInvalidStatement
+		}
+
+		return env.Declare(stmt.Left.Name, val)
 	}
 
 	oldVal, err := expr.EvaluateExpression(stmt.Left)

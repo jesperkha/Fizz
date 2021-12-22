@@ -63,6 +63,7 @@ const (
 	BREAK
 	SKIP
 	IMPORT
+	INCLUDE
 	REPEAT
 	RETURN
 
@@ -118,21 +119,22 @@ var doubleTokenLookup = map[string]int{
 }
 
 var keyWordLookup = map[string]int{
-	"if":     IF,
-	"else":   ELSE,
-	"nil":    NIL,
-	"print":  PRINT,
-	"return": RETURN,
-	"exit":   EXIT,
-	"define": DEFINE,
-	"var":    VAR,
-	"true":   TRUE,
-	"false":  FALSE,
-	"while":  WHILE,
-	"func":   FUNC,
-	"type":   TYPE,
-	"break":  BREAK,
-	"import": IMPORT,
-	"repeat": REPEAT,
-	"skip":   SKIP,
+	"if":      IF,
+	"else":    ELSE,
+	"nil":     NIL,
+	"print":   PRINT,
+	"return":  RETURN,
+	"exit":    EXIT,
+	"define":  DEFINE,
+	"var":     VAR,
+	"true":    TRUE,
+	"false":   FALSE,
+	"while":   WHILE,
+	"func":    FUNC,
+	"type":    TYPE,
+	"break":   BREAK,
+	"import":  IMPORT,
+	"repeat":  REPEAT,
+	"skip":    SKIP,
+	"include": INCLUDE,
 }

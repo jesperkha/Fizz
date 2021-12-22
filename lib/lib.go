@@ -9,8 +9,10 @@ import (
 	"github.com/jesperkha/Fizz/util"
 )
 
+// Todo: make dynamic folder import
+
 type i interface{}
-type FuncMap map[string]i
+type FuncMap map[string]interface{}
 
 var (
 	LibList = map[string]FuncMap{}
@@ -27,8 +29,8 @@ func Add(libName string, functions FuncMap) {
 }
 
 // Imports all included libs to running fizz process
-func IncludeLibraries(names []string) error {
-	for _, name := range names {
+func IncludeLibraries(includes []string) error {
+	for _, name := range includes {
 		// Check if name is in list of valid libs
 		library, ok := LibList[name]
 		if !ok {
@@ -40,13 +42,18 @@ func IncludeLibraries(names []string) error {
 		// import and the functions are added the same way as normal imports.
 		env.PushScope()
 		for funcName, f := range library {
+			// Cache values because they are used in the Call member, which will use
+			// the closured version of the variables, and they will always be the last
+			// used in the loop. Cache makes sure its always the ones at definition.
+			nameCache, funcCache := funcName, f
+
 			// Create function. -1 ignores number of args in parsing
 			callable := env.Callable{
 				NumArgs: -1,
 				Origin: name,
 				Name: funcName,
 				Call: func(args ...interface{}) (interface{}, error) {
-					return CallFunc(funcName, f, args)
+					return CallFunc(nameCache, funcCache, args)
 				},
 			}
 

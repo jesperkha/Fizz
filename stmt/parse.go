@@ -76,6 +76,8 @@ func parseStatement(typ int, tokens []lexer.Token) (stmt Statement, err error) {
 		return parseExit(tokens)
 	case lexer.IMPORT:
 		return parseImport(tokens)
+	case lexer.INCLUDE:
+		return parseInclude(tokens)
 	}
 
 	return parseExpression(tokens)
@@ -125,6 +127,18 @@ func parseImport(tokens []lexer.Token) (stmt Statement, err error) {
 	if str, ok := tokens[1].Literal.(string); ok {
 		name := strings.TrimSuffix(str, ".fizz")
 		return Statement{Type: Import, Name: name}, err
+	}
+
+	return stmt, ErrExpectedName
+}
+
+func parseInclude(tokens []lexer.Token) (stmt Statement, err error) {
+	if len(tokens) != 2 {
+		return stmt, ErrInvalidStatement
+	}
+
+	if name, ok := tokens[1].Literal.(string); ok {
+		return Statement{Type: Include, Name: name}, err
 	}
 
 	return stmt, ErrExpectedName

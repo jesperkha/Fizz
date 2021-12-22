@@ -56,11 +56,10 @@ func Interperate(filename string, input string) (e env.Environment, err error) {
 	// This means that all imports are run before anything else; they are "hoisted".
 	// Even declaring a variable with the same name as the file before importing it will
 	// raise an error as the file is imported before the variable is created.
+	includes := []string{}
 	for _, s := range statements {
-		// Todo: add proper include statement check
-		err = lib.IncludeLibraries([]string{"std"})
-		if err != nil {
-			return e, err
+		if s.Type == stmt.Include {
+			includes = append(includes, s.Name)
 		}
 
 		if s.Type != stmt.Import {
@@ -83,6 +82,13 @@ func Interperate(filename string, input string) (e env.Environment, err error) {
 		if err = env.AddImportedFile(name, e); err != nil {
 			return e, err
 		}
+	}
+
+	// Include the mentioned libraries in this file. Returns error if names are not
+	// valid library names. The lib package parses the Go functions into Fizz callables.
+	err = lib.IncludeLibraries(includes)
+	if err != nil {
+		return e, err
 	}
 	
 	// Set origin point for function declarations. This makes sure that errors give
