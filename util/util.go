@@ -148,13 +148,27 @@ func GetType(value interface{}) string {
 	}
 
 	switch value.(type) {
-	case float64:
+	case float64, float32, int:
 		return "number"
 	case nil:
 		return "nil"
 	}
 
 	return reflect.TypeOf(value).Name()
+}
+
+// Gets fizz type name from reflect name
+func GetLibType(typ string) string {
+	switch typ {
+	case "Object":
+		return "object"
+	case "Callable":
+		return "function"
+	case "Array":
+		return "array"
+	}
+
+	return typ
 }
 
 // Adds filename to error message if not already done

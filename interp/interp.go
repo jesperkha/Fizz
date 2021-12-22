@@ -8,6 +8,7 @@ import (
 
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/lexer"
+	"github.com/jesperkha/Fizz/lib"
 	"github.com/jesperkha/Fizz/stmt"
 	"github.com/jesperkha/Fizz/util"
 )
@@ -56,6 +57,12 @@ func Interperate(filename string, input string) (e env.Environment, err error) {
 	// Even declaring a variable with the same name as the file before importing it will
 	// raise an error as the file is imported before the variable is created.
 	for _, s := range statements {
+		// Todo: add proper include statement check
+		err = lib.IncludeLibraries([]string{"std"})
+		if err != nil {
+			return e, err
+		}
+
 		if s.Type != stmt.Import {
 			continue
 		}

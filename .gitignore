@@ -1,4 +1,9 @@
 bin
-dev_files
 .vscode
 main.fizz
+dev_files
+
+# Ignore non-essential libraries
+# lib/*
+# !lib/lib.go
+# !lib/std/

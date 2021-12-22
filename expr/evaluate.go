@@ -166,11 +166,14 @@ func evalCall(call *Expression) (value interface{}, err error) {
 			}
 		}
 
-		if len(args) != f.NumArgs {
+		// -1 is set from /lib and should be ignored as it is handled there
+		if len(args) != f.NumArgs && f.NumArgs != -1 {
 			return value, fmt.Errorf(ErrIncorrectArgs.Error(), f.Name, f.NumArgs, len(args), call.Line)
 		}
 
-		return f.Call(args...)
+		// Errors from lib need line format
+		value, err = f.Call(args...)
+		return value, util.FormatError(err, call.Line)
 	}
 
 	return value, fmt.Errorf(ErrNotFunction.Error(), util.GetType(callee), call.Line)

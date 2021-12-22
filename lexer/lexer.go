@@ -51,6 +51,7 @@ func GetTokens(input string) (tokens []Token, err error) {
 			case COMMENT:
 				seekCharacter(input, &currentIdx, '\n')
 				continue
+			// Todo: add docstring parsing (inside function body)
 			}
 
 			// Check for double symbol (!=, >= etc)
