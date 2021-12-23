@@ -15,7 +15,7 @@ var Includes map[string]interface{}
 func init() {
 	Includes = map[string]interface{}{
 		"input":    getStdin,
-		"soString": toString,
+		"toString": toString,
 	}
 }
 

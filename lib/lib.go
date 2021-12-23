@@ -9,8 +9,6 @@ import (
 	"github.com/jesperkha/Fizz/util"
 )
 
-// Todo: make dynamic folder import
-
 type i interface{}
 type FuncMap map[string]interface{}
 

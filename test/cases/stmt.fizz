@@ -15,6 +15,7 @@
     return add;
 }
 f := closure(); f();
+> include "std"; std.toString(1);
 
 ?
 
