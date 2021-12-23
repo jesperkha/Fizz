@@ -8,11 +8,14 @@ import (
 
 type i interface{}
 
-// Inits all the functions in this package to lib
-func Get() map[string]interface{} {
-	return map[string]interface{}{
-		"input": getStdin,
-		"toString": toString,
+var Includes map[string]interface{}
+
+// Inits all the functions in this package to lib. Added to include.go when running
+// script for adding new libraries.
+func init() {
+	Includes = map[string]interface{}{
+		"input":    getStdin,
+		"soString": toString,
 	}
 }
 

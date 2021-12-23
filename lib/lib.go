@@ -15,7 +15,7 @@ type i interface{}
 type FuncMap map[string]interface{}
 
 var (
-	LibList = map[string]FuncMap{}
+	LibList   = map[string]FuncMap{}
 	ErrNotLib = errors.New("%s is not a library")
 )
 
@@ -50,8 +50,8 @@ func IncludeLibraries(includes []string) error {
 			// Create function. -1 ignores number of args in parsing
 			callable := env.Callable{
 				NumArgs: -1,
-				Origin: name,
-				Name: funcName,
+				Origin:  name,
+				Name:    funcName,
 				Call: func(args ...interface{}) (interface{}, error) {
 					return CallFunc(nameCache, funcCache, args)
 				},
@@ -102,10 +102,10 @@ func CallFunc(name string, function i, args []interface{}) (val i, err error) {
 			// Get fizz names for types
 			expect := util.GetLibType(paramType.Name())
 			got := util.GetType(value)
-			
+
 			// Do crazy error shenanigans to avoid writing twice
 			s := "%s() expected arg %d to be %s, got %s"
-			e := fmt.Sprintf(s, name, idx + 1, expect, got)
+			e := fmt.Sprintf(s, name, idx+1, expect, got)
 			return val, errors.New(e + ", line %d")
 		}
 
@@ -115,7 +115,7 @@ func CallFunc(name string, function i, args []interface{}) (val i, err error) {
 	// Call function with args
 	res := f.Call(argsIn)
 	value := res[0].Interface()
-	// Get error. Return interface value is techically never nil so an 
+	// Get error. Return interface value is techically never nil so an
 	// explicit check is performed.
 	if res[1].IsNil() {
 		err = nil

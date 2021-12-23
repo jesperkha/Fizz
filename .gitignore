@@ -3,7 +3,5 @@ bin
 main.fizz
 dev_files
 
-# Ignore non-essential libraries
-# lib/*
-# !lib/lib.go
-# !lib/std/
+# Ignore buildable file
+lib/include.go
