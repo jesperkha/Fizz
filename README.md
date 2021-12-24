@@ -39,7 +39,7 @@ This roadmap highlights progress for the development of Fizz:
 
 ## <a id="language-documentation"></a> Language documentation
 
-You can find all the basic info you need about Fizz [here](./docs/LANG.md). For a deeper understanding of how Fizz works its suggested to simply look at the source code.
+You can find all the basic info you need about Fizz [here](./docs/lang.md). For a deeper understanding of how Fizz works its suggested to simply look at the source code.
 
 <br>
 

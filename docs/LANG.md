@@ -1,7 +1,9 @@
-# **Fizz language documentation**
+# <a id="top"></a> **Fizz language documentation**
 
 - [Overview](#overview)
+- [Grammar](#grammar)
 - [Types](#types)
+- [Keywords](#keywords)
 - [Expressions and operators](#expr)
 - [Print and Type](#prt)
 - [Variables](#var)
@@ -11,6 +13,7 @@
 - [Functions](#func)
 - [Objects](#obj)
 - [File imports](#import)
+- [Libraries](#libraries)
 
 <br>
 
@@ -24,6 +27,12 @@
 - Fizz is dynamically typed, meaning type checks are only performed at runtime
 - Comments are created with a hashtag `#` (as mentioned above) and end at the first found newline
 - All statements that do not have a block tied to them must end with a semicolon `;`. This, of course, means you can have all your code on one line
+
+<br>
+
+## <a id="grammar"></a> **Grammar**
+
+A definitive grammar sheet can be found [here](./grammar.md).
 
 <br>
 
@@ -47,28 +56,38 @@ Fizz is strongly typed, meaning unmatched types in certain expressions will caus
 
 <br>
 
+## <a id="keywords"></a> **Keywords**
+
+Keyword names are reserved and cannot be used for variable names. Here is a list of all keywords in Fizz:
+
+```
+var       print     type       func
+exit      skip      break      return
+false     nil       include    if
+import    define    true       while
+```
+
+<br>
+
 ## <a id="expr"></a> **Expressions and operators**
 
 Fizz features a lot of standard syntax similar to other languages. For example, all normal expressions using the basic arithmetic and logic operators will work in Fizz, including the modulo operator and the hat operator. Plus can also be used for joining strings.
 
 Operators:
 
-- `+` (for strings too)
-- `-` (also unary)
-- `*`
-- `/`
-- `%`
-- `^`
-- `<`
-- `>`
-- `!` (unary)
-- `==`
-- `!=`
-- `>=`
-- `<=`
-- `&`
-- `:`
-- `type` (unary)
+- Binary operators:
+  ```go
+  +   -   *   /   %   ^   <
+  >   ==  !=  >=  <=  &   :
+  ```
+- Unary operators:
+  ```go
+  -   !  type
+  ```
+- Assignment operators:
+  ```go
+  =   :=
+  ```
 
 <br>
 
@@ -80,8 +99,6 @@ In Fizz, `print` is a _statement_, not a function. However, `type` is an _operat
 print "Hello";
 print type "World";
 ```
-
-**Exit**
 
 Theres also an `exit` statement. It's almost identical to `print`, but it also exits the program at execution. If an expression is not given, `exit` will just quit without printing anything.
 
@@ -239,3 +256,35 @@ main.fizz   other.fizz
 $ fizz main
 John
 ```
+
+<br>
+
+## <a id="libraries"></a> **Libraries**
+
+Fizz libraries are different from imports. They are not other Fizz files, but rather Go files. This is to make it possible for functionality to be added to fizz without baking it straight in. You can read the [library documentation](./libraries.md) to find out how they work and how to create your own.
+
+Fizz has a standard library built in. To use it, use the `include` keyword.
+
+```go
+include "std";
+
+age := 32;
+print "John is " + std.toString(age); // prints: John is 32
+// Causes no type error because age is converted to a string
+```
+
+```go
+include "std";
+
+// Will prompt the terminal and wait for user input.
+// Continues at newline or exit with ctrl-C.
+meters := std.input("Enter height in meters: ");
+
+feet := std.toNumber(meters) * 3.281;
+print "You are: " + std.toString(feet) + " feet tall";
+// Built in string formatting will come soon dont worry ;)
+```
+
+<br>
+
+[Go to top](#top)
