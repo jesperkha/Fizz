@@ -14,7 +14,7 @@ import (
 )
 
 var parser = term.NewFlagParser(
-	[]string{"v"},
+	[]string{},
 	[]string{"version", "help"},
 )
 

@@ -5,6 +5,7 @@
 **Whats new:**
 
 - New `:=` operator for variable declaration, removed `var` statement (temporary)
+- Library support (see .github/LIB)
 
 **Bug fixes and more:**
 

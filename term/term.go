@@ -1,6 +1,7 @@
 package term
 
 import (
+	_ "embed"
 	"errors"
 	"fmt"
 	"os"
@@ -10,7 +11,9 @@ import (
 // Terminal argument flag parser
 
 var (
-	ErrNotValidArg = errors.New("flag name '%s' is not defined for parser")
+	//go:embed help.txt 
+	HELP string
+	ErrNotValidArg = errors.New("flag name '%s' is not defined")
 	ErrTooManyFiles = errors.New("cannot run more than one file")
 )
 

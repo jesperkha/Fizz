@@ -76,7 +76,6 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 
 	// ARRAY
 	// Same as group parsing but with square bracket. Handled differently in eval.
-	// Todo: implement array parsing
 
 	// CALL
 	// Search for left paren, then parse the left part of the expression. Also parse the args of the caller.

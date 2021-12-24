@@ -8,7 +8,7 @@ import (
 
 type i interface{}
 
-var Includes map[string]interface{}
+var Includes = map[string]interface{}{}
 
 // Inits all the functions in this package to lib. Added to include.go when running
 // script for adding new libraries.

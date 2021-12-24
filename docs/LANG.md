@@ -1,4 +1,4 @@
-# **Fizz**
+# **Fizz language documentation**
 
 - [Overview](#overview)
 - [Types](#types)
