@@ -133,6 +133,7 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 	return nil, fmt.Errorf(ErrInvalidOperatorTypes.Error(), op, typeLeft, typeRight, line)
 }
 
+// Todo: function caching if flag is active
 func evalCall(call *Expression) (value interface{}, err error) {
 	callee, err := EvaluateExpression(call.Left)
 	if err != nil {

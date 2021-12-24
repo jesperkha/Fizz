@@ -1,6 +1,6 @@
-<img src="./.github/img/logo.svg" width="10%">
+# **Fizz**
 
-**Fizz** is an interpreted programming language built with Go. The main use cases for Fizz will be file management, simple http requests, and general terminal scripting. The built in libraries (not added yet) will support all of these features, including documentation with examples.
+Fizz is an interpreted programming language built with Go. The main use cases for Fizz will be file management, simple http requests, and general terminal scripting. The built in libraries (not added yet) will support all of these features, including documentation with examples.
 
 <br>
 
@@ -20,7 +20,7 @@
 
 <br>
 
-## <a id="roadmap"></a> **Roadmap**
+## <a id="roadmap"></a> Roadmap
 
 This roadmap highlights progress for the development of Fizz:
 
@@ -37,18 +37,17 @@ This roadmap highlights progress for the development of Fizz:
 
 <br>
 
-## <a id="language-documentation"></a> **Language documentation**
+## <a id="language-documentation"></a> Language documentation
 
 You can find all the basic info you need about Fizz [here](./docs/LANG.md). For a deeper understanding of how Fizz works its suggested to simply look at the source code.
 
 <br>
 
-## <a id="installation"></a> **Installation**
+## <a id="installation"></a> Installation
 
 <a id="pre-built-binaries"></a> Pre-built binaries:
 
 - [Latest Release v0.4.0](https://github.com/jesperkha/Fizz/releases/tag/v0.4.0)
-- ~~[Test Release](https://github.com/jesperkha/Fizz/releases/tag/test-release)~~
 
 <a id="building-from-source"></a> Build from source:
 
@@ -57,7 +56,7 @@ You can find all the basic info you need about Fizz [here](./docs/LANG.md). For 
 
 <a id="extensions"></a> Extensions:
 
-[Syntax highlighting](https://github.com/jesperkha/fizz-extensions)
+- [Syntax highlighting](https://github.com/jesperkha/fizz-extensions)
 
 <br>
 

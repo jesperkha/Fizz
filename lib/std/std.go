@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+// Todo: add math, string, memory, and io functions
+
 type i interface{}
 
 var Includes = map[string]interface{}{}

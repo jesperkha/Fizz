@@ -1,7 +1,13 @@
+# Buildable binaries
 bin
-.vscode
-main.fizz
-dev_files
+export
 
-# Ignore buildable file
+# Temp files for development
+dev_files
+main.fizz
+
+# vscode
+.vscode
+
+# Buildable
 lib/include.go

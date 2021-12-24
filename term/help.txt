@@ -2,5 +2,5 @@ use:
     fizz [flags] [filename]
 
 flags:
-    --help	what you are reading now
-    --version	print fizz version
+    --help  what you are reading now
+    --version   print fizz version
