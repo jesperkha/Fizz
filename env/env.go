@@ -14,7 +14,7 @@ type valueMap map[string]interface{}
 // order will be from low to high level scopes.
 type Environment []valueMap
 
-var currentEnv = Environment{{}}
+var currentEnv = StandardEnvironment
 var tempEnv = currentEnv
 
 // Creates new environment, replacing the old one. Returns old environment. For
@@ -26,7 +26,7 @@ func NewEnvironment() Environment {
 	}
 
 	oldEnv := currentEnv
-	currentEnv = Environment{{}}
+	currentEnv = StandardEnvironment
 	return oldEnv
 }
 

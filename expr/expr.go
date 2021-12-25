@@ -23,7 +23,6 @@ var (
 	ErrNotFunction          = errors.New("type %s is not a function, line %d")
 	ErrNilValueError        = errors.New("unexpected nil value in expression, line %d")
 	ErrNotObject            = errors.New("type %s has no attributes, line %d")
-	ErrNotArray				= errors.New("variable '%s' is not an array, line %d")
 	ErrInvalidType			= errors.New("expr: unknown expression type, line %d")
 	ErrExpectedName			= errors.New("expected name after dot, line %d")
 	ErrIllegalType = errors.New("unknown type '%s'")
@@ -39,7 +38,6 @@ var LegalTypes = []string{
 }
 
 const (
-	// Expression types
 	EmptyExpression = iota
 	Literal
 	Unary
@@ -48,17 +46,9 @@ const (
 	Variable
 	Call
 	Args
-
 	Getter
 	Array
 	Index
-
-	// ParseToken types
-	Single
-	TokenGroup
-	CallGroup
-	ArrayGroup
-	ArrayGetter
 )
 
 type Expression struct {

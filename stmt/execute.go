@@ -149,6 +149,7 @@ func execVariable(stmt Statement) (err error) {
 	return err
 }
 
+// Todo: make array assignment
 func assignValue(left *expr.Expression, value interface{}) error {
 	if left.Type == expr.Variable {
 		return env.Assign(left.Name, value)

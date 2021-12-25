@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 // Todo: add math, string, memory, and io functions
@@ -12,25 +13,26 @@ type i interface{}
 
 var Includes = map[string]interface{}{}
 
-// Inits all the functions in this package to lib. Added to include.go when running
-// script for adding new libraries.
 func init() {
 	Includes = map[string]interface{}{
-		"input":    getStdin,
+		"input":    input,
 		"toString": toString,
+		"toNumber": toNumber,
 	}
 }
 
 var scanner = bufio.NewScanner(os.Stdin)
 
-// Gets input from standard input. Returns said input. Assumes terminal is interactive.
-func getStdin(prompt string) (input i, err error) {
+func input(prompt string) (input i, err error) {
 	fmt.Print(prompt)
 	scanner.Scan()
 	return scanner.Text(), nil
 }
 
-// Converts any value into string literal
 func toString(val i) (str i, err error) {
 	return fmt.Sprint(val), err
+}
+
+func toNumber(val string) (num i, err error) {
+	return strconv.ParseFloat(val, 64)
 }

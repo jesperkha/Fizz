@@ -1,8 +1,6 @@
 package expr
 
 import (
-	"fmt"
-
 	"github.com/jesperkha/Fizz/lexer"
 	"github.com/jesperkha/Fizz/util"
 )
@@ -27,7 +25,6 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 			args = append(args, arg)
 		}
 
-		fmt.Println(args)
 		return Expression{Type: Args, Exprs: args, Line: line}, err
 	}
 
@@ -63,20 +60,30 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	}
 
 	// GROUP
-	// Binary is already parsed so there cannot be another expression after the group. This means the last
-	// token MUST be a closing paren. Parses inner expression.
-	if tokens[0].Type == lexer.LEFT_PAREN {
-		if tokens[len(tokens)-1].Type != lexer.RIGHT_PAREN {
-			return expr, ErrParenError
-		}
+	// Binary is already parsed so there can either be a single group or a chained call / getter.
+	// First gets the endIdx of the first group. Its a single group expression is the closing paren
+	// is the last token in the list. Paren error if eof, doesnt matter how many calls come after.
+	endIdx, eof := util.SeekClosingBracket(tokens, 0, lexer.LEFT_PAREN, lexer.RIGHT_PAREN)
+	if eof {
+		return expr, ErrParenError
+	}
 
+	if tokens[0].Type == lexer.LEFT_PAREN && endIdx == len(tokens)-1 {
 		inner, err := ParseExpression(tokens[1:len(tokens)-1])
 		return Expression{Type: Group, Inner: &inner, Line: line}, err
 	}
 
 	// ARRAY
-	// Same as group parsing but with square bracket. Handled differently in eval.
-	// Todo: make array parsing
+	// Same as group parsing but with square bracket.
+	endIdx, eof = util.SeekClosingBracket(tokens, 0, lexer.LEFT_SQUARE, lexer.RIGHT_SQUARE)
+	if eof {
+		return expr, ErrBracketError
+	}
+
+	if tokens[0].Type == lexer.LEFT_SQUARE && endIdx == len(tokens)-1 {
+		inner, err := ParseExpression(tokens[1:len(tokens)-1])
+		return Expression{Type: Array, Inner: &inner, Line: line}, err
+	}
 
 	// CALL
 	// Search for left paren, then parse the left part of the expression. Also parse the args of the caller.
@@ -85,11 +92,31 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return t.Type == lexer.LEFT_PAREN
 	})
 
+	// Array index getter has same pritority as call
+	targetIndex, eofIndex := util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
+		return t.Type == lexer.LEFT_SQUARE
+	})
+
 	// Also check where the closest dot is. If a dot comes after the last call, it should be parsed as a getter.
 	// The only other option is for the call to be last (or error).
 	targetDot, eofDot := util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
 		return t.Type == lexer.DOT
 	})
+	
+	if !eofIndex && targetIndex > targetDot {
+		array, err := ParseExpression(tokens[:targetIndex])
+		if err != nil {
+			return expr, err
+		}
+
+		endIdx, eof := util.SeekClosingBracket(tokens, targetIndex, lexer.LEFT_SQUARE, lexer.RIGHT_SQUARE)
+		if eof {
+			return expr, ErrBracketError
+		}
+
+		arg, err := ParseExpression(tokens[targetIndex+1:endIdx])
+		return Expression{Type: Index, Left: &array, Right: &arg, Line: line}, err
+	}
 
 	if !eofCall && targetCall > targetDot {
 		callee, err := ParseExpression(tokens[:targetCall])
@@ -131,4 +158,4 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	// LITERAL
 	// Only other option is a literal, the only error this can cause is an undefined variable
 	return Expression{Type: Literal, Value: tokens[0], Line: line}, err
-}
+} 

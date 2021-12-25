@@ -51,6 +51,8 @@ const (
 	Include
 )
 
+// Todo: make range statement and remove repeat
+
 type Statement struct {
 	Type       int
 	Line       int

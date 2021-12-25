@@ -28,10 +28,14 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 		return evalCall(expr)
 	case Getter:
 		return evalGetter(expr)
+	case Array:
+		return evalArray(expr)
+	case Index:
+		return evalIndex(expr)
 	}
 
 	// Wont be reached
-	return expr, ErrInvalidType
+	return expr, ErrInvalidExpression
 }
 
 // Token types >= string are valid literal types
@@ -207,10 +211,84 @@ func evalGetter(getter *Expression) (value interface{}, err error) {
 	return value, fmt.Errorf(ErrNotObject.Error(), util.GetType(parent), line)
 }
 
+func evalArray(array *Expression) (value interface{}, err error) {
+	inner := array.Inner
+	if inner.Type == EmptyExpression {
+		return env.Array{}, err
+	}
+
+	values := []interface{}{}
+	// Single argument
+	if inner.Type != Args && inner.Type != EmptyExpression {
+		v, err := EvaluateExpression(inner)
+		if err != nil {
+			return value, err
+		}
+
+		values = append(values, v)
+	}
+
+	// Multiple arguments
+	if inner.Type == Args {
+		for _, expr := range inner.Exprs {
+			v, err := EvaluateExpression(&expr)
+			if err != nil {
+				return value, err
+			}
+	
+			values = append(values, v)
+		}
+	}
+
+	return env.Array{Values: values, Length: len(values)}, err
+}
+
+func evalIndex(array *Expression) (value interface{}, err error) {
+	line := array.Line
+	arr, err := EvaluateExpression(array.Left)
+	if err != nil {
+		return value, err
+	}
+
+	index, err := EvaluateExpression(array.Right)
+	if err != nil {
+		return value, err
+	}
+
+	// Todo: string indexing
+	if a, ok := arr.(env.Array); ok {
+		// Get index as integer. If not return error
+		indexInt, ok := isInt(index)
+		if !ok {
+			return value, fmt.Errorf(ErrNotInteger.Error(), line)
+		}
+
+		// Env handles getting index and errors for out of range etc
+		value, err = a.Get(indexInt)
+		if err != nil {
+			return value, fmt.Errorf(err.Error(), line)
+		}
+
+		return value, err
+	}
+
+	// arr is not array
+	return value, fmt.Errorf(env.ErrNotArray.Error(), util.GetType(arr), line)
+}
+
 func isTruthy(value interface{}) bool {
 	return value != false && value != nil
 }
 
 func isNumber(value interface{}) bool {
 	return util.GetType(value) == "number"
+}
+
+func isInt(value interface{}) (int, bool) {
+	if v, ok := value.(float64); ok {
+		iv := int(v)
+		return iv, v == float64(iv)
+	}
+
+	return -1, false
 }

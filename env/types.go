@@ -7,6 +7,7 @@ import (
 var (
 	ErrNotAField = errors.New("'%s' has no attribute '%s', line %d")
 	ErrIndexOutOfRange = errors.New("index out of range, line %d")
+	ErrNotArray = errors.New("value of '%s' is not an array, line %d")
 )
 
 // Interface matches all Fizz object structs.

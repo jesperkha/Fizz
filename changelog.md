@@ -4,13 +4,15 @@
 
 **Whats new:**
 
+- Arrays
+- Libraries (beta)
 - New `:=` operator for variable declaration, removed `var` statement (temporary)
-- Library support (see .github/LIB)
 
 **Bug fixes and more:**
 
 - Prettier print for values
 - Fixed the semicolon error to now actually show when there is a semicolon missing, instead of just giving an expression error
+- Fixed error that would occur when calling group expressions
 
 <br>
 
