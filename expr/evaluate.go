@@ -214,7 +214,7 @@ func evalGetter(getter *Expression) (value interface{}, err error) {
 func evalArray(array *Expression) (value interface{}, err error) {
 	inner := array.Inner
 	if inner.Type == EmptyExpression {
-		return env.Array{}, err
+		return &env.Array{}, err
 	}
 
 	values := []interface{}{}
@@ -240,7 +240,7 @@ func evalArray(array *Expression) (value interface{}, err error) {
 		}
 	}
 
-	return env.Array{Values: values, Length: len(values)}, err
+	return &env.Array{Values: &values, Length: len(values)}, err
 }
 
 func evalIndex(array *Expression) (value interface{}, err error) {
@@ -261,7 +261,7 @@ func evalIndex(array *Expression) (value interface{}, err error) {
 		return value, fmt.Errorf(ErrNotInteger.Error(), line)
 	}
 	
-	if a, ok := arr.(env.Array); ok {
+	if a, ok := arr.(*env.Array); ok {
 		// Env handles getting index and errors for out of range etc
 		value, err = a.Get(indexInt)
 		if err != nil {

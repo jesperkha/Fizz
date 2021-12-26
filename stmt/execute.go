@@ -119,9 +119,9 @@ func formatPrintValue(val interface{}) interface{} {
 		return o.Name + "()"
 	}
 
-	if o, ok := val.(env.Array); ok {
+	if a, ok := val.(*env.Array); ok {
 		str := "["
-		for i, v := range o.Values {
+		for i, v := range *a.Values {
 			if i != 0 {
 				str += ", "
 			}
@@ -172,7 +172,7 @@ func assignValue(left *expr.Expression, value interface{}) error {
 	}
 
 	// If array assign value to index of parent expression
-	if arr, ok := val.(env.Array); ok {
+	if arr, ok := val.(*env.Array); ok {
 		index, err := expr.EvaluateExpression(left.Right)
 		if err != nil {
 			return err

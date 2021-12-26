@@ -5,7 +5,6 @@
 **Whats new:**
 
 - Arrays
-- Libraries (beta)
 - New `:=` operator for variable declaration, removed `var` statement (temporary)
 
 **Bug fixes and more:**

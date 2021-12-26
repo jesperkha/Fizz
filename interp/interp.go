@@ -86,6 +86,7 @@ func Interperate(filename string, input string) (e env.Environment, err error) {
 
 	// Include the mentioned libraries in this file. Returns error if names are not
 	// valid library names. The lib package parses the Go functions into Fizz callables.
+	// Todo: comment out when compliling for v5
 	err = lib.IncludeLibraries(includes)
 	if err != nil {
 		return e, err

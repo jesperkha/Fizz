@@ -63,10 +63,10 @@ func (o *Object) Set(name string, value interface{}) (err error) {
 	return ErrNotAField
 }
 
-// Todo: add .len .push and .pop
+// Todo: fix reference shit for value and length 
 // Stores length value for ease of use. Append elements with += operator.
 type Array struct {
-	Values []interface{}
+	Values *[]interface{}
 	Length int
 }
 
@@ -77,38 +77,38 @@ func (a Array) Type() string {
 // Gets value of array at index. Returns error if value is > len(arr) or
 // index is less than 0.
 func (a Array) Get(index int) (value interface{}, err error) {
-	if index >= len(a.Values) || index < 0 {
+	if index >= len(*a.Values) || index < 0 {
 		return value, ErrIndexOutOfRange
 	}
 
-	return a.Values[index], err
+	return (*a.Values)[index], err
 }
 
 // Sets value at given index.
 func (a Array) Set(index int, value interface{}) error {
-	if index >= len(a.Values) || index < 0 {
+	if index >= a.Length || index < 0 {
 		return ErrIndexOutOfRange
 	}
 
-	a.Values[index] = value
+	(*a.Values)[index] = value
 	return nil
 }
 
 // Pushes new value to end of array
-func (a Array) Push(value interface{}) {
-	a.Values = append(a.Values, value)
+func (a *Array) Push(value interface{}) {
+	*a.Values = append(*a.Values, value)
 	a.Length++
 }
 
 // Removes value at end of array and returns it. Returns error if
 // length of array is 0.
-func (a Array) Pop() (value interface{}, err error) {
+func (a *Array) Pop() (value interface{}, err error) {
 	if a.Length == 0 {
 		return nil, ErrEmptyArray
 	}
 
-	popped := a.Values[len(a.Values)-1]
-	a.Values = a.Values[:a.Length-1]
+	popped, _ := a.Get(a.Length-1)
+	*a.Values = (*a.Values)[:a.Length-1]
 	a.Length--
 	return popped, nil
 }

@@ -223,7 +223,7 @@ Under the hood, the `define` statement creates a function that returns an object
 
 ## <a id="arrays"></a> **Arrays**
 
-Arrays in Fizz are just an array of values, of which can be any type. You get get the value of a specific index in an array by using the index getter syntax. Indexes begin at 0.
+Arrays in Fizz are just an array of values, of which can be any type. You get get the value of a specific index in an array by using the index getter syntax. Indexes begin at 0. Additionally, you can get the length of an array with the built in `len` function.
 
 ```go
 names := ["John", "Susan", "Carl"];
@@ -231,6 +231,8 @@ print names[0]; // John
 
 names[2] = "Timmy";
 print names; // ["John", "Susan", "Timmy"]
+
+print len(name); // 3
 ```
 
 <br>
@@ -267,6 +269,10 @@ John
 <br>
 
 ## <a id="libraries"></a> **Libraries**
+
+<!-- Todo: remove in v6 -->
+
+> Version 0.6.0 or higher
 
 Fizz libraries are different from imports. They are not other Fizz files, but rather Go files. This is to make it possible for functionality to be added to fizz without baking it straight in. You can read the [library documentation](./libraries.md) to find out how they work and how to create your own.
 

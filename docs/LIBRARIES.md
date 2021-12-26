@@ -10,7 +10,7 @@
 
 ## <a id="overview"></a> **Overview**
 
-Fizz version 0.5.0 or higher allows for Go libraries to be included in your Fizz code. Use the `include` statement followed by the library name to use it:
+Fizz version 0.6.0 or higher allows for Go libraries to be included in your Fizz code. Use the `include` statement followed by the library name to use it:
 
 ```go
 include "std";
