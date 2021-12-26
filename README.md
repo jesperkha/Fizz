@@ -31,7 +31,7 @@ This roadmap highlights progress for the development of Fizz:
 - ✔️ Objects
 - ✔️ File import
 - ✔️ Go -> Fizz library support
-- ❌ Arrays
+- ✔️ Arrays
 - ❌ Hashtables
 - ❌ Full language documentation
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/lexer"
+	"github.com/jesperkha/Fizz/lib"
 	"github.com/jesperkha/Fizz/stmt"
 	"github.com/jesperkha/Fizz/util"
 )
@@ -55,11 +56,11 @@ func Interperate(filename string, input string) (e env.Environment, err error) {
 	// This means that all imports are run before anything else; they are "hoisted".
 	// Even declaring a variable with the same name as the file before importing it will
 	// raise an error as the file is imported before the variable is created.
-	// includes := []string{}
+	includes := []string{}
 	for _, s := range statements {
-		// if s.Type == stmt.Include {
-		// 	includes = append(includes, s.Name)
-		// }
+		if s.Type == stmt.Include {
+			includes = append(includes, s.Name)
+		}
 
 		if s.Type != stmt.Import {
 			continue
@@ -85,11 +86,10 @@ func Interperate(filename string, input string) (e env.Environment, err error) {
 
 	// Include the mentioned libraries in this file. Returns error if names are not
 	// valid library names. The lib package parses the Go functions into Fizz callables.
-	// Todo: remove commented code
-	// err = lib.IncludeLibraries(includes)
-	// if err != nil {
-	// 	return e, err
-	// }
+	err = lib.IncludeLibraries(includes)
+	if err != nil {
+		return e, err
+	}
 	
 	// Set origin point for function declarations. This makes sure that errors give
 	// the correct filename when printed.
