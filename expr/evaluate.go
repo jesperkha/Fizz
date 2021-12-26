@@ -240,7 +240,7 @@ func evalArray(array *Expression) (value interface{}, err error) {
 		}
 	}
 
-	return &env.Array{Values: &values, Length: len(values)}, err
+	return &env.Array{Values: values, Length: len(values)}, err
 }
 
 func evalIndex(array *Expression) (value interface{}, err error) {

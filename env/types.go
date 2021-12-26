@@ -63,10 +63,9 @@ func (o *Object) Set(name string, value interface{}) (err error) {
 	return ErrNotAField
 }
 
-// Todo: fix reference shit for value and length 
 // Stores length value for ease of use. Append elements with += operator.
 type Array struct {
-	Values *[]interface{}
+	Values []interface{}
 	Length int
 }
 
@@ -77,11 +76,11 @@ func (a Array) Type() string {
 // Gets value of array at index. Returns error if value is > len(arr) or
 // index is less than 0.
 func (a Array) Get(index int) (value interface{}, err error) {
-	if index >= len(*a.Values) || index < 0 {
+	if index >= len(a.Values) || index < 0 {
 		return value, ErrIndexOutOfRange
 	}
 
-	return (*a.Values)[index], err
+	return a.Values[index], err
 }
 
 // Sets value at given index.
@@ -90,13 +89,13 @@ func (a Array) Set(index int, value interface{}) error {
 		return ErrIndexOutOfRange
 	}
 
-	(*a.Values)[index] = value
+	a.Values[index] = value
 	return nil
 }
 
 // Pushes new value to end of array
 func (a *Array) Push(value interface{}) {
-	*a.Values = append(*a.Values, value)
+	a.Values = append(a.Values, value)
 	a.Length++
 }
 
@@ -108,7 +107,7 @@ func (a *Array) Pop() (value interface{}, err error) {
 	}
 
 	popped, _ := a.Get(a.Length-1)
-	*a.Values = (*a.Values)[:a.Length-1]
+	a.Values = a.Values[:a.Length-1]
 	a.Length--
 	return popped, nil
 }

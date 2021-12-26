@@ -121,7 +121,7 @@ func formatPrintValue(val interface{}) interface{} {
 
 	if a, ok := val.(*env.Array); ok {
 		str := "["
-		for i, v := range *a.Values {
+		for i, v := range a.Values {
 			if i != 0 {
 				str += ", "
 			}
