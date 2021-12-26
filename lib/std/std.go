@@ -14,7 +14,7 @@ type i interface{}
 
 var (
 	Includes = map[string]interface{}{}
-	scanner = bufio.NewScanner(os.Stdin)
+	scanner  = bufio.NewScanner(os.Stdin)
 
 	ErrNotNumber = errors.New("string could not be converted to number, line %d")
 )

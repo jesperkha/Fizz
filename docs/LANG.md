@@ -235,6 +235,27 @@ print names; // ["John", "Susan", "Timmy"]
 print len(name); // 3
 ```
 
+### Push
+
+To push elements into an array use the built-in `push` function:
+
+```go
+arr := [1, 2, 3];
+push(arr, 4);
+
+print arr; // [1, 2, 3, 4]
+```
+
+### Pop
+
+There is also a `pop` function to remove and return the last element:
+
+```go
+arr := [1, 2, 3];
+print pop(arr); // 3
+print arr;      // [1, 2]
+```
+
 <br>
 
 ## <a id="import"></a> **File imports**
