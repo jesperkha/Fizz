@@ -205,3 +205,12 @@ func GetPlainFilename(path string) string {
 	split := strings.Split(path, "/")
 	return split[len(split)-1]
 }
+
+func IsInt(value interface{}) (int, bool) {
+	if v, ok := value.(float64); ok {
+		iv := int(v)
+		return iv, v == float64(iv)
+	}
+
+	return -1, false
+}

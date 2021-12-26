@@ -8,10 +8,11 @@
 - [Print and Type](#prt)
 - [Variables](#var)
 - [If statements and logic](#if)
-- [While and repeat](#while)
+- [While loop](#while)
 - [Break and skip](#break)
 - [Functions](#func)
 - [Objects](#obj)
+- [Arrays](#arrays)
 - [File imports](#import)
 - [Libraries](#libraries)
 
@@ -162,7 +163,7 @@ if age > 158.8 {
 
 <br>
 
-## <a id="while"></a> **While and repeat**
+## <a id="while"></a> **While loop**
 
 Fizz has a while statement similar to most other languages. If you leave the expression field empty it will just run forever.
 
@@ -173,14 +174,6 @@ while n < 10 {
 
 while {
     // loops until break or program exit
-}
-```
-
-(Temporary: will be replaced with a range statement) The repeat statement is a little different. It is a condenced 'for' loop. You first declare a variable name followed by a legal repeat operator and range. Currently, only `<` is allowed.
-
-```go
-repeat n < 10 {
-    // (creates n) loops 10 times, incrementing n
 }
 ```
 
@@ -211,7 +204,7 @@ print add(5, 2); // 7
 
 Object structures can be defined with the `define` keyword. This creates a object template which you can use to make your own structured data. The fields of the object do not have a specific type, unlike languages like C and Go. Object values support reassignment too.
 
-```js
+```go
 define Person {
     name
     age
@@ -228,11 +221,25 @@ Under the hood, the `define` statement creates a function that returns an object
 
 <br>
 
+## <a id="arrays"></a> **Arrays**
+
+Arrays in Fizz are just an array of values, of which can be any type. You get get the value of a specific index in an array by using the index getter syntax. Indexes begin at 0.
+
+```go
+names := ["John", "Susan", "Carl"];
+print names[0]; // John
+
+names[2] = "Timmy";
+print names; // ["John", "Susan", "Timmy"]
+```
+
+<br>
+
 ## <a id="import"></a> **File imports**
 
 You can import files by using the `import` statement. The given path, or name, is always relative to the file that the program started in. Circular imports are not allowed and an error will be raised if one is found. The imported object name is the filename, so files with the same names cannot be imported in the same file. (in the future `import x as y` syntax will be added to fix this)
 
-```js
+```go
 // other.fizz
 
 name := "John";

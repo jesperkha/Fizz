@@ -7,7 +7,8 @@ import (
 var (
 	ErrNotAField = errors.New("'%s' has no attribute '%s', line %d")
 	ErrIndexOutOfRange = errors.New("index out of range, line %d")
-	ErrNotArray = errors.New("value of '%s' is not an array, line %d")
+	ErrNotArray = errors.New("type %s is not an array, line %d")
+	ErrEmptyArray = errors.New("cannot pop from empty array, line %d")
 )
 
 // Interface matches all Fizz object structs.
@@ -62,6 +63,7 @@ func (o *Object) Set(name string, value interface{}) (err error) {
 	return ErrNotAField
 }
 
+// Todo: add .len .push and .pop
 // Stores length value for ease of use. Append elements with += operator.
 type Array struct {
 	Values []interface{}
@@ -80,4 +82,33 @@ func (a Array) Get(index int) (value interface{}, err error) {
 	}
 
 	return a.Values[index], err
+}
+
+// Sets value at given index.
+func (a Array) Set(index int, value interface{}) error {
+	if index >= len(a.Values) || index < 0 {
+		return ErrIndexOutOfRange
+	}
+
+	a.Values[index] = value
+	return nil
+}
+
+// Pushes new value to end of array
+func (a Array) Push(value interface{}) {
+	a.Values = append(a.Values, value)
+	a.Length++
+}
+
+// Removes value at end of array and returns it. Returns error if
+// length of array is 0.
+func (a Array) Pop() (value interface{}, err error) {
+	if a.Length == 0 {
+		return nil, ErrEmptyArray
+	}
+
+	popped := a.Values[len(a.Values)-1]
+	a.Values = a.Values[:a.Length-1]
+	a.Length--
+	return popped, nil
 }

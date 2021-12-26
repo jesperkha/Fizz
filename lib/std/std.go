@@ -2,6 +2,7 @@ package std
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -11,7 +12,12 @@ import (
 
 type i interface{}
 
-var Includes = map[string]interface{}{}
+var (
+	Includes = map[string]interface{}{}
+	scanner = bufio.NewScanner(os.Stdin)
+
+	ErrNotNumber = errors.New("string could not be converted to number, line %d")
+)
 
 func init() {
 	Includes = map[string]interface{}{
@@ -20,8 +26,6 @@ func init() {
 		"toNumber": toNumber,
 	}
 }
-
-var scanner = bufio.NewScanner(os.Stdin)
 
 func input(prompt string) (input i, err error) {
 	fmt.Print(prompt)
@@ -34,5 +38,10 @@ func toString(val i) (str i, err error) {
 }
 
 func toNumber(val string) (num i, err error) {
-	return strconv.ParseFloat(val, 64)
+	num, err = strconv.ParseFloat(val, 64)
+	if err != nil {
+		return num, ErrNotNumber
+	}
+
+	return num, err
 }

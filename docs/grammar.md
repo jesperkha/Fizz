@@ -28,7 +28,7 @@ assignStmt  -> (getter | identifier) "=" expression ";"
 block       -> "{" declaration* "}"
 
 # Expressions
-expression -> literal | unary | binary | group | call | array | getter
+expression -> literal | unary | binary | group | call | array | getter | index
 literal    -> "true" | "false" | "nil" | identifier | number | string
 unary      -> ("-", "!", "type") expression
 binary     -> expression operator expression
@@ -36,6 +36,7 @@ group      -> "(" expression ")"
 call       -> expression "(" expression? ("," expression)* ")"*
 array      -> "[" expression? ("," expression)* "]"
 getter     -> expression "." identfier
+index      -> array "[" expression "]"
 
 # Operators
 operator -> "+" | "-" | "*" | "/" | "^" | "%" | "&" |

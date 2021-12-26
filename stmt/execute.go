@@ -149,19 +149,41 @@ func execVariable(stmt Statement) (err error) {
 	return err
 }
 
-// Todo: make array assignment
 func assignValue(left *expr.Expression, value interface{}) error {
 	if left.Type == expr.Variable {
 		return env.Assign(left.Name, value)
 	}
 
+	// First evaluate the entire expression to pluck out any
+	// errors that are harder to check for later
+	if _, err := expr.EvaluateExpression(left); err != nil {
+		return err
+	}
+
+	// Get left expression of left expression (parent)
 	val, err := expr.EvaluateExpression(left.Left)
 	if err != nil {
 		return err
 	}
 	
+	// If object assign to name of parent expression
 	if obj, ok := val.(env.Object); ok {
 		return obj.Set(left.Right.Name, value)
+	}
+
+	// If array assign value to index of parent expression
+	if arr, ok := val.(env.Array); ok {
+		index, err := expr.EvaluateExpression(left.Right)
+		if err != nil {
+			return err
+		}
+		
+		indexInt, ok := util.IsInt(index)
+		if !ok {
+			return expr.ErrNotInteger
+		}
+
+		return arr.Set(indexInt, value)
 	}
 	
 	return ErrNonAssignable
@@ -300,13 +322,15 @@ func execWhile(stmt Statement) (err error) {
 			if err != nil {
 				return err
 			}
-
+			
 			if val == nil || val == false {
 				break
 			}
 		}
-
+		
+		env.PushScope()
 		err = ExecuteStatements(stmt.Then.Statements)
+		env.PopScope()
 		if e, ok := err.(ConditionalError); ok {
 			switch e.Type {
 			case BREAK:

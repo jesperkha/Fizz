@@ -255,14 +255,13 @@ func evalIndex(array *Expression) (value interface{}, err error) {
 		return value, err
 	}
 
-	// Todo: string indexing
+	// Get index as integer. If not return error
+	indexInt, ok := util.IsInt(index)
+	if !ok {
+		return value, fmt.Errorf(ErrNotInteger.Error(), line)
+	}
+	
 	if a, ok := arr.(env.Array); ok {
-		// Get index as integer. If not return error
-		indexInt, ok := isInt(index)
-		if !ok {
-			return value, fmt.Errorf(ErrNotInteger.Error(), line)
-		}
-
 		// Env handles getting index and errors for out of range etc
 		value, err = a.Get(indexInt)
 		if err != nil {
@@ -272,7 +271,16 @@ func evalIndex(array *Expression) (value interface{}, err error) {
 		return value, err
 	}
 
-	// arr is not array
+	// Get string index
+	if s, ok := arr.(string); ok {
+		if indexInt > len(s) {
+			return value, env.ErrIndexOutOfRange
+		}
+
+		return string(s[indexInt]), err
+	}
+
+	// arr is not array (or string)
 	return value, fmt.Errorf(env.ErrNotArray.Error(), util.GetType(arr), line)
 }
 
@@ -282,13 +290,4 @@ func isTruthy(value interface{}) bool {
 
 func isNumber(value interface{}) bool {
 	return util.GetType(value) == "number"
-}
-
-func isInt(value interface{}) (int, bool) {
-	if v, ok := value.(float64); ok {
-		iv := int(v)
-		return iv, v == float64(iv)
-	}
-
-	return -1, false
 }
