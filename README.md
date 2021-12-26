@@ -47,7 +47,7 @@ You can find all the basic info you need about Fizz [here](./docs/lang.md). For 
 
 <a id="pre-built-binaries"></a> Pre-built binaries:
 
-- [Latest Release v0.4.0](https://github.com/jesperkha/Fizz/releases/tag/v0.4.0)
+- [Latest Release v0.5.0](https://github.com/jesperkha/Fizz/releases/tag/v0.5.0)
 
 <a id="building-from-source"></a> Build from source:
 
