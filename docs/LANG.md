@@ -295,7 +295,7 @@ John
 
 > Version 0.6.0 or higher
 
-Fizz libraries are different from imports. They are not other Fizz files, but rather Go files. This is to make it possible for functionality to be added to fizz without baking it straight in. You can read the [library documentation](./libraries.md) to find out how they work and how to create your own.
+Fizz libraries are different from imports. They are not other Fizz files, but rather Go files. This is to make it possible for functionality to be added to Fizz without baking it straight in. You can read the [library documentation](./libraries.md) to find out how they work and how to create your own.
 
 Fizz has a standard library built in. To use it, use the `include` keyword.
 
