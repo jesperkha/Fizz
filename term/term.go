@@ -11,9 +11,9 @@ import (
 // Terminal argument flag parser
 
 var (
-	//go:embed help.txt 
-	HELP string
-	ErrNotValidArg = errors.New("flag name '%s' is not defined")
+	//go:embed help.txt
+	HELP            string
+	ErrNotValidArg  = errors.New("flag name '%s' is not defined")
 	ErrTooManyFiles = errors.New("cannot run more than one file")
 )
 

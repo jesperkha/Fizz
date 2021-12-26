@@ -25,7 +25,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		if err != nil {
 			return statements, util.FormatError(err, line)
 		}
-		
+
 		// Parse any other type of statement.
 		if currentStmt.Type == NotStatement {
 			// Seeks a semicolon since all other statements end with a semicolon
@@ -33,9 +33,9 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 			if eof {
 				return statements, util.FormatError(ErrNoSemicolon, line)
 			}
-			
+
 			currentIdx = endIdx // Skip to end of statement to section off token list
-			
+
 			// Get tokens in interval between last semicolon and current one
 			tokenInterval := tokens[startIndex:currentIdx]
 			if len(tokenInterval) == 0 {
@@ -53,7 +53,7 @@ func ParseStatements(tokens []lexer.Token) (statements []Statement, err error) {
 		statements = append(statements, currentStmt)
 		currentIdx++
 	}
-	
+
 	return statements, err
 }
 
@@ -212,7 +212,7 @@ func parseAssignment(tokens []lexer.Token) (stmt Statement, err error) {
 	if len(splits) != 2 {
 		return parseExpression(tokens)
 	}
-	
+
 	left, err := expr.ParseExpression(splits[0])
 	if err != nil {
 		return stmt, err

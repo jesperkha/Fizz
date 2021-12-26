@@ -19,12 +19,12 @@ var parser = term.NewFlagParser(
 )
 
 func init() {
-	parser.Assign("--version", func ()  {
+	parser.Assign("--version", func() {
 		fmt.Printf("Fizz %s\n", VERSION)
 		os.Exit(0)
 	})
 
-	parser.Assign("--help", func ()  {
+	parser.Assign("--help", func() {
 		fmt.Printf(term.HELP)
 		os.Exit(0)
 	})

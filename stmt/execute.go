@@ -22,11 +22,11 @@ func ExecuteStatements(stmts []Statement) (err error) {
 				cerr.Msg = fmt.Sprintf(cerr.Msg, line)
 				return cerr
 			}
-			
+
 			return util.FormatError(err, line)
 		}
 	}
-	
+
 	return err
 }
 
@@ -111,7 +111,7 @@ func formatPrintValue(val interface{}) interface{} {
 		for key, value := range o.Fields {
 			str += fmt.Sprintf("    %s: %v\n", key, formatPrintValue(value))
 		}
-	
+
 		return str + "}"
 	}
 
@@ -165,7 +165,7 @@ func assignValue(left *expr.Expression, value interface{}) error {
 	if err != nil {
 		return err
 	}
-	
+
 	// If object assign to name of parent expression
 	if obj, ok := val.(env.Object); ok {
 		return obj.Set(left.Right.Name, value)
@@ -177,7 +177,7 @@ func assignValue(left *expr.Expression, value interface{}) error {
 		if err != nil {
 			return err
 		}
-		
+
 		indexInt, ok := util.IsInt(index)
 		if !ok {
 			return expr.ErrNotInteger
@@ -185,7 +185,7 @@ func assignValue(left *expr.Expression, value interface{}) error {
 
 		return arr.Set(indexInt, value)
 	}
-	
+
 	return ErrNonAssignable
 }
 
@@ -264,31 +264,31 @@ func execFunction(stmt Statement) (err error) {
 	// Store origin at point of function declaration as well as scope around it
 	originCache := CurrentOrigin
 	var envCache env.Environment
-	
+
 	function := env.Callable{
-		Name: stmt.Name,
+		Name:    stmt.Name,
 		NumArgs: len(stmt.Params),
-		Origin: CurrentOrigin,
+		Origin:  CurrentOrigin,
 		// Call function and set param variables to scope
 		Call: func(args ...interface{}) (interface{}, error) {
 			env.PushTempEnv(envCache)
 			env.PushScope()
-			
+
 			// fmt.Println(envCache)
-			
+
 			// Declare args
 			for idx, arg := range args {
 				// Cannot raise error because block is in own scope
 				env.Declare(stmt.Params[idx], arg)
 			}
-			
+
 			err = ExecuteStatements(stmt.Then.Statements)
 			env.PopScope()
 			env.PopTempEnv()
 			if e, ok := err.(ConditionalError); ok {
 				return e.Value, nil
 			}
-			
+
 			return nil, util.WrapFilename(originCache, err)
 		},
 	}
@@ -322,12 +322,12 @@ func execWhile(stmt Statement) (err error) {
 			if err != nil {
 				return err
 			}
-			
+
 			if val == nil || val == false {
 				break
 			}
 		}
-		
+
 		env.PushScope()
 		err = ExecuteStatements(stmt.Then.Statements)
 		env.PopScope()

@@ -89,7 +89,7 @@ func SeekClosingBracket(tokens []lexer.Token, start int, beginT, endT int) (endI
 }
 
 // Skips token check if in group or array expression. Returns index of ending token or eof.
-func SeekBreakPoint(tokens []lexer.Token, verifier func(int, lexer.Token)bool) (targetIdx int, eof bool) {
+func SeekBreakPoint(tokens []lexer.Token, verifier func(int, lexer.Token) bool) (targetIdx int, eof bool) {
 	parens := 0
 	targetIdx = -1
 	for idx, token := range tokens {
@@ -137,7 +137,7 @@ func SplitByTokens(tokens []lexer.Token, splits []int) [][]lexer.Token {
 	if len(tokens) != 0 {
 		result = append(result, tokens[start:])
 	}
-	
+
 	return result
 }
 
@@ -184,7 +184,7 @@ func WrapFilename(filename string, err error) error {
 	return err
 }
 
-type pair struct { a, b string }
+type pair struct{ a, b string }
 type UniquePairs map[pair]bool
 
 // Returns true if pair is already present in map

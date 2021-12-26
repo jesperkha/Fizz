@@ -5,16 +5,16 @@ import (
 )
 
 var (
-	ErrNotAField = errors.New("'%s' has no attribute '%s', line %d")
+	ErrNotAField       = errors.New("'%s' has no attribute '%s', line %d")
 	ErrIndexOutOfRange = errors.New("index out of range, line %d")
-	ErrNotArray = errors.New("type %s is not an array, line %d")
-	ErrEmptyArray = errors.New("cannot pop from empty array, line %d")
+	ErrNotArray        = errors.New("type %s is not an array, line %d")
+	ErrEmptyArray      = errors.New("cannot pop from empty array, line %d")
 )
 
 // Interface matches all Fizz object structs.
 // Type() returns the name of the object
 type FizzObject interface {
-	Type()  string
+	Type() string
 }
 
 // Callable object is a function. The origin is the name of the file it
@@ -106,7 +106,7 @@ func (a *Array) Pop() (value interface{}, err error) {
 		return nil, ErrEmptyArray
 	}
 
-	popped, _ := a.Get(a.Length-1)
+	popped, _ := a.Get(a.Length - 1)
 	a.Values = a.Values[:a.Length-1]
 	a.Length--
 	return popped, nil

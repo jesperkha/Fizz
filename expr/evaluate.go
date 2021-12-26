@@ -143,7 +143,7 @@ func evalCall(call *Expression) (value interface{}, err error) {
 	if err != nil {
 		return value, err
 	}
-	
+
 	// Function should be of type env.Callable
 	if f, ok := callee.(env.Callable); ok {
 		argToken := call.Inner.Inner
@@ -158,7 +158,7 @@ func evalCall(call *Expression) (value interface{}, err error) {
 
 			args = append(args, arg)
 		}
-		
+
 		// Argument list
 		if argToken.Type == Args {
 			for _, arg := range argToken.Exprs {
@@ -166,7 +166,7 @@ func evalCall(call *Expression) (value interface{}, err error) {
 				if err != nil {
 					return value, err
 				}
-				
+
 				args = append(args, val)
 			}
 		}
@@ -235,7 +235,7 @@ func evalArray(array *Expression) (value interface{}, err error) {
 			if err != nil {
 				return value, err
 			}
-	
+
 			values = append(values, v)
 		}
 	}
@@ -260,7 +260,7 @@ func evalIndex(array *Expression) (value interface{}, err error) {
 	if !ok {
 		return value, fmt.Errorf(ErrNotInteger.Error(), line)
 	}
-	
+
 	if a, ok := arr.(*env.Array); ok {
 		// Env handles getting index and errors for out of range etc
 		value, err = a.Get(indexInt)

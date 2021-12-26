@@ -54,7 +54,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		if err != nil {
 			return expr, err
 		}
-	
+
 		right, err := ParseExpression(tokens[lowestIdx+1:])
 		return Expression{Type: Binary, Left: &left, Right: &right, Operand: tokens[lowestIdx], Line: line}, err
 	}
@@ -69,7 +69,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	}
 
 	if tokens[0].Type == lexer.LEFT_PAREN && endIdx == len(tokens)-1 {
-		inner, err := ParseExpression(tokens[1:len(tokens)-1])
+		inner, err := ParseExpression(tokens[1 : len(tokens)-1])
 		return Expression{Type: Group, Inner: &inner, Line: line}, err
 	}
 
@@ -81,7 +81,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	}
 
 	if tokens[0].Type == lexer.LEFT_SQUARE && endIdx == len(tokens)-1 {
-		inner, err := ParseExpression(tokens[1:len(tokens)-1])
+		inner, err := ParseExpression(tokens[1 : len(tokens)-1])
 		return Expression{Type: Array, Inner: &inner, Line: line}, err
 	}
 
@@ -102,7 +102,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	targetDot, eofDot := util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
 		return t.Type == lexer.DOT
 	})
-	
+
 	if !eofIndex && targetIndex > targetDot {
 		array, err := ParseExpression(tokens[:targetIndex])
 		if err != nil {
@@ -114,7 +114,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 			return expr, ErrBracketError
 		}
 
-		arg, err := ParseExpression(tokens[targetIndex+1:endIdx])
+		arg, err := ParseExpression(tokens[targetIndex+1 : endIdx])
 		return Expression{Type: Index, Left: &array, Right: &arg, Line: line}, err
 	}
 
@@ -158,4 +158,4 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	// LITERAL
 	// Only other option is a literal, the only error this can cause is an undefined variable
 	return Expression{Type: Literal, Value: tokens[0], Line: line}, err
-} 
+}

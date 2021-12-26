@@ -23,7 +23,7 @@ func runTestFile(path string) error {
 			if err != nil && typ == 0 {
 				return fmt.Errorf("valid case %d, got err: %s", idx+1, err.Error())
 			}
-	
+
 			if err == nil && typ == 1 {
 				return fmt.Errorf("invalid case %d, got no error: %s", idx+1, string(cas))
 			}

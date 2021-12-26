@@ -90,9 +90,9 @@ func PopScope() {
 // The fields are the values in the global scope of the environment (index 0).
 func AddImportedFile(name string, env Environment) error {
 	return Declare(name, Object{
-		Name: name,
+		Name:      name,
 		NumFields: len(env[0]),
-		Fields: env[0],
+		Fields:    env[0],
 	})
 }
 

@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	ErrFileNotFound = errors.New("cannot find file with name: '%s'")
-	ErrNonFizzFile  = errors.New("cannot run non-Fizz file")
+	ErrFileNotFound   = errors.New("cannot find file with name: '%s'")
+	ErrNonFizzFile    = errors.New("cannot run non-Fizz file")
 	ErrCircularImport = errors.New("circular import not allowed, %s <-> %s")
 )
 
@@ -65,7 +65,7 @@ func Interperate(filename string, input string) (e env.Environment, err error) {
 		if s.Type != stmt.Import {
 			continue
 		}
-		
+
 		// Checks for circular imports. Add() returns true if the pair already exists.
 		name := util.GetPlainFilename(s.Name)
 		if this := util.GetPlainFilename(filename); importPairs.Add(name, this) {
@@ -76,7 +76,7 @@ func Interperate(filename string, input string) (e env.Environment, err error) {
 		if err != nil {
 			return e, err
 		}
-		
+
 		// Adds the global environment of the imported file to the env of the current one.
 		// It is added as an object instance with the name of the file without the fizz suffix.
 		if err = env.AddImportedFile(name, e); err != nil {
@@ -90,17 +90,17 @@ func Interperate(filename string, input string) (e env.Environment, err error) {
 	if err != nil {
 		return e, err
 	}
-	
+
 	// Set origin point for function declarations. This makes sure that errors give
 	// the correct filename when printed.
 	stmt.CurrentOrigin = filename
-	
+
 	// Finally executes statement tokens. This is the only step that has any effect
 	// on the actual input program as the others were just breaking it up into usable
 	// pieces. While the interpreter is still running, the values of variables will be
 	// remembered as the environments are never reset at runtime.
 	err = stmt.ExecuteStatements(statements)
-	return env.NewEnvironment(),  err
+	return env.NewEnvironment(), err
 }
 
 // Runs a fizz file. Imports are run as files and the environment is extracted and

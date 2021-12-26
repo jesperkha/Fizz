@@ -1,5 +1,15 @@
 # Fizz update changelog
 
+## Version 0.6.0
+
+**Whats new:**
+
+- Libraries
+
+**Bug fixes and more:**
+
+<br>
+
 ## Version 0.5.0
 
 **Whats new:**
