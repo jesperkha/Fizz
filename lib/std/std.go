@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-// Todo: add math, string, memory, and io functions
+// Standard library for common io, string, time, and exec fuctionality
 
 type i interface{}
 
@@ -45,3 +45,8 @@ func toNumber(val string) (num i, err error) {
 
 	return num, err
 }
+
+// read, write, append file
+// time, localTime
+// lower, upper, capitalize
+// copy, run
