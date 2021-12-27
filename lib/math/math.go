@@ -26,15 +26,7 @@ func init() {
 		"sqrt":  math.Sqrt,
 	}
 
-	for name, f := range noErr {
-		Includes[name] = func(num float64) (val i, err error) {
-			return f(num), err
-		}
-	}
-
 	Includes = map[string]interface{}{
-		// Divides with no decimal/remainder
-		"rdiv": rdiv,
 		// Max of a and b
 		"max": max,
 		// Min of a and b
@@ -44,11 +36,13 @@ func init() {
 		// Converts degrees to radians
 		"rad": rad,
 	}
-}
 
-func rdiv(num float64) (val i, err error) {
-	val, _ = math.Modf(num)
-	return val, err
+	for name, f := range noErr {
+		fun := f // Store function in closure to keep definition for current name
+		Includes[name] = func(num float64) (val i, err error) {
+			return fun(num), err
+		}
+	}
 }
 
 func max(a float64, b float64) (val i, err error) {
