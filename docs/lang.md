@@ -14,6 +14,7 @@
 - [Functions](#func)
 - [Objects](#obj)
 - [Arrays](#arrays)
+- [Reference](#ref)
 - [File imports](#import)
 - [Libraries](#libraries)
 
@@ -265,6 +266,39 @@ There is also a `pop` function to remove and return the last element:
 arr := [1, 2, 3];
 print pop(arr); // 3
 print arr;      // [1, 2]
+```
+
+<br>
+
+## <a id="ref"></a> **Reference**
+
+In Fizz, objects and arrays are passed by reference. This means you can modify them directly when passing them as a function argument:
+
+```go
+food := ["bread", "pasta", "rice"];
+
+func addCarrot(arr) {
+  push(arr, "carrot");
+}
+
+addCarrot(food);
+print food; // ["bread", "pasta", "rice", "carrot"]
+```
+
+```go
+define Phone {
+  brand
+  version
+}
+
+iphone := Phone("Apple", 1);
+
+func upgrade(phone) {
+  phone.version += 1;
+}
+
+upgrade(iphone);
+print iphone.version; // 2
 ```
 
 <br>
