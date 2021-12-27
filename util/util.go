@@ -173,7 +173,7 @@ func GetLibType(typ string) string {
 
 // Adds filename to error message if not already done
 func WrapFilename(filename string, err error) error {
-	if err == nil {
+	if err == nil || err.Error() == "" {
 		return err
 	}
 

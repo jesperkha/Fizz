@@ -74,6 +74,8 @@ func parseStatement(typ int, tokens []lexer.Token) (stmt Statement, err error) {
 		return parseReturn(tokens)
 	case lexer.EXIT:
 		return parseExit(tokens)
+	case lexer.ERROR:
+		return parseError(tokens)
 	case lexer.IMPORT:
 		return parseImport(tokens)
 	case lexer.INCLUDE:
@@ -199,6 +201,15 @@ func parsePrint(tokens []lexer.Token) (stmt Statement, err error) {
 
 	expr, err := expr.ParseExpression(tokens[1:])
 	return Statement{Type: Print, Expression: &expr}, err
+}
+
+func parseError(tokens []lexer.Token) (stmt Statement, err error) {
+	if len(tokens) == 1 {
+		return stmt, ErrExpectedExpression
+	}
+
+	expr, err := expr.ParseExpression(tokens[1:])
+	return Statement{Type: Error, Expression: &expr}, err
 }
 
 // Also parses variable declaration with := operator

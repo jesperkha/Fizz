@@ -5,6 +5,7 @@
 **Whats new:**
 
 - Libraries
+- Error statement
 
 **Bug fixes and more:**
 

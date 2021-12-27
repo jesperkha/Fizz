@@ -14,11 +14,12 @@ objDec      -> "define" identifier "{"
                 "}"
 
 # Statements
-statement   -> exprStmt | printStmt | exitStmt | ifStmt | whileStmt |
+statement   -> exprStmt | printStmt | exitStmt | errorStmt | ifStmt | whileStmt |
                returnStmt | importStmt | includeStmt | assignStmt | block
 exprStmt    -> expression ";"
 printStmt   -> "print" expression ";"
 exitStmt    -> "exit" expression? ";"
+errorStmt   -> "error" expression ";"
 ifStmt      -> "if" expression block ("else" block)?
 whileStmt   -> "while" expression block
 returnStmt  -> "return" expression? ";"

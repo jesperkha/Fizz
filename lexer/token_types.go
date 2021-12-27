@@ -58,6 +58,7 @@ const (
 	ELSE
 	PRINT
 	EXIT
+	ERROR
 	VAR
 	WHILE
 	BREAK
@@ -137,4 +138,5 @@ var keyWordLookup = map[string]int{
 	"repeat":  REPEAT,
 	"skip":    SKIP,
 	"include": INCLUDE,
+	"error":   ERROR,
 }

@@ -49,6 +49,7 @@ const (
 	Object
 	Import
 	Include
+	Error
 )
 
 // Todo: make range statement and remove repeat

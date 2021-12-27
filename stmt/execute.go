@@ -59,6 +59,8 @@ func executeStatement(stmt Statement) error {
 		return execFunction(stmt)
 	case Exit:
 		return execExit(stmt)
+	case Error:
+		return execError(stmt)
 	case Object:
 		return execObject(stmt)
 	case Import, Include:
@@ -78,6 +80,16 @@ func execExit(stmt Statement) (err error) {
 		}
 	}
 
+	return ErrProgramExit
+}
+
+func execError(stmt Statement) (err error) {
+	value, err := expr.EvaluateExpression(stmt.Expression)
+	if err != nil {
+		return err
+	}
+
+	util.PrintError(fmt.Errorf("%s", formatPrintValue(value)))
 	return ErrProgramExit
 }
 

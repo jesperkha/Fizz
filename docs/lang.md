@@ -6,6 +6,7 @@
 - [Keywords](#keywords)
 - [Expressions and operators](#expr)
 - [Print and Type](#prt)
+- [Error and Exit](#error)
 - [Variables](#var)
 - [If statements and logic](#if)
 - [While loop](#while)
@@ -101,10 +102,20 @@ print "Hello";
 print type "World";
 ```
 
-Theres also an `exit` statement. It's almost identical to `print`, but it also exits the program at execution. If an expression is not given, `exit` will just quit without printing anything.
+<br>
 
-```js
-exit "goodbye"; // prints 'goodbye' and exits program
+## <a id="error"></a> **Error and Exit**
+
+The `error` statement prints out a message (or value) as an error and exits the program.
+
+```go
+error "some error occured"; // prints message as error and exits
+```
+
+Theres also an `exit` statement. This will just print the value out (same as `print`) and then exit with no error. If an expression is not given, `exit` will just quit without printing anything.
+
+```go
+exit "goodbye"; // prints message and exits
 ```
 
 <br>
