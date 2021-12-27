@@ -61,4 +61,4 @@ func appendFile(filename string, content string) (val i, err error) {
 	return val, err
 }
 
-// read dir, curdir, 
+// read dir, curdir,

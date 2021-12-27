@@ -13,10 +13,10 @@ type i interface{}
 type FuncMap map[string]interface{}
 
 var (
-	LibList   = map[string]FuncMap{}
-	ErrNotLib = errors.New("'%s' is not a library")
+	LibList        = map[string]FuncMap{}
+	ErrNotLib      = errors.New("'%s' is not a library")
 	ErrNotFunction = errors.New("in lib %s, '%s' is not a function")
-	ErrNumReturn = errors.New("in lib %s, '%s()' return incorrect number of values")
+	ErrNumReturn   = errors.New("in lib %s, '%s()' return incorrect number of values")
 	ErrReturnTypes = errors.New("in lib %s, '%s()' does not return (interface{}, error)")
 )
 

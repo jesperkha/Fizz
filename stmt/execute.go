@@ -89,7 +89,7 @@ func execError(stmt Statement) (err error) {
 	if err != nil {
 		return err
 	}
-	
+
 	return errors.New(formatPrintValue(value))
 }
 
