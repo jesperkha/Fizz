@@ -1,6 +1,7 @@
 package stmt
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/jesperkha/Fizz/env"
@@ -88,9 +89,8 @@ func execError(stmt Statement) (err error) {
 	if err != nil {
 		return err
 	}
-
-	util.PrintError(fmt.Errorf("%s", formatPrintValue(value)))
-	return ErrProgramExit
+	
+	return errors.New(formatPrintValue(value))
 }
 
 // Raises error and assigns expr value to global currentReturnValue
@@ -110,10 +110,10 @@ func execReturn(stmt Statement) (err error) {
 	return e
 }
 
-func formatPrintValue(val interface{}) interface{} {
+func formatPrintValue(val interface{}) string {
 	switch val.(type) {
 	case float64, string, bool:
-		return val
+		return fmt.Sprint(val)
 	case nil:
 		return "nil"
 	}
