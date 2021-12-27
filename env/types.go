@@ -27,7 +27,7 @@ type Callable struct {
 	NumArgs int
 }
 
-func (c Callable) Type() string {
+func (c *Callable) Type() string {
 	return "function"
 }
 
@@ -39,12 +39,12 @@ type Object struct {
 	Name      string
 }
 
-func (o Object) Type() string {
+func (o *Object) Type() string {
 	return "object"
 }
 
 // Gets value from object. Used for getter syntax "name.value"
-func (o Object) Get(name string) (value interface{}, err error) {
+func (o *Object) Get(name string) (value interface{}, err error) {
 	if val, ok := o.Fields[name]; ok {
 		return val, err
 	}

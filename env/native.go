@@ -4,7 +4,7 @@ package env
 
 var StandardEnvironment = Environment{{
 	// Returns length of array or string
-	"len": Callable{
+	"len": &Callable{
 		NumArgs: 1,
 		Call: func(i ...interface{}) (interface{}, error) {
 			if arr, ok := i[0].(*Array); ok {
@@ -20,7 +20,7 @@ var StandardEnvironment = Environment{{
 	},
 
 	// Append new element to end of array
-	"push": Callable{
+	"push": &Callable{
 		NumArgs: 2,
 		Call: func(i ...interface{}) (interface{}, error) {
 			if arr, ok := i[0].(*Array); ok {
@@ -33,7 +33,7 @@ var StandardEnvironment = Environment{{
 	},
 
 	// Remove last element and return it
-	"pop": Callable{
+	"pop": &Callable{
 		NumArgs: 1,
 		Call: func(i ...interface{}) (interface{}, error) {
 			if arr, ok := i[0].(*Array); ok {

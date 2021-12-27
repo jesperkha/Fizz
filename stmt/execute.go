@@ -106,7 +106,7 @@ func formatPrintValue(val interface{}) interface{} {
 		return "nil"
 	}
 
-	if o, ok := val.(env.Object); ok {
+	if o, ok := val.(*env.Object); ok {
 		str := o.Name + ": {\n"
 		for key, value := range o.Fields {
 			str += fmt.Sprintf("    %s: %v\n", key, formatPrintValue(value))
@@ -115,7 +115,7 @@ func formatPrintValue(val interface{}) interface{} {
 		return str + "}"
 	}
 
-	if o, ok := val.(env.Callable); ok {
+	if o, ok := val.(*env.Callable); ok {
 		return o.Name + "()"
 	}
 
@@ -167,7 +167,7 @@ func assignValue(left *expr.Expression, value interface{}) error {
 	}
 
 	// If object assign to name of parent expression
-	if obj, ok := val.(env.Object); ok {
+	if obj, ok := val.(*env.Object); ok {
 		return obj.Set(left.Right.Name, value)
 	}
 
@@ -265,7 +265,7 @@ func execFunction(stmt Statement) (err error) {
 	originCache := CurrentOrigin
 	var envCache env.Environment
 
-	function := env.Callable{
+	function := &env.Callable{
 		Name:    stmt.Name,
 		NumArgs: len(stmt.Params),
 		Origin:  CurrentOrigin,
@@ -387,7 +387,7 @@ func execRepeat(stmt Statement) (err error) {
 }
 
 func execObject(stmt Statement) (err error) {
-	err = env.Declare(stmt.Name, env.Callable{
+	err = env.Declare(stmt.Name, &env.Callable{
 		NumArgs: len(stmt.Params),
 		Call: func(args ...interface{}) (interface{}, error) {
 			obj := env.Object{Fields: map[string]interface{}{}, Name: stmt.Name}
@@ -395,7 +395,7 @@ func execObject(stmt Statement) (err error) {
 				obj.Fields[field] = args[i]
 			}
 
-			return obj, err
+			return &obj, err
 		},
 	})
 

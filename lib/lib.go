@@ -46,7 +46,7 @@ func IncludeLibraries(includes []string) error {
 			nameCache, funcCache := funcName, f
 
 			// Create function. -1 ignores number of args in parsing
-			callable := env.Callable{
+			callable := &env.Callable{
 				NumArgs: -1,
 				Origin:  name,
 				Name:    funcName,

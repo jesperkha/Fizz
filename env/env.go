@@ -89,7 +89,7 @@ func PopScope() {
 // Adds environment from imported file to current env. Values are passed as an object.
 // The fields are the values in the global scope of the environment (index 0).
 func AddImportedFile(name string, env Environment) error {
-	return Declare(name, Object{
+	return Declare(name, &Object{
 		Name:      name,
 		NumFields: len(env[0]),
 		Fields:    env[0],

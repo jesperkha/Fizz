@@ -145,7 +145,7 @@ func evalCall(call *Expression) (value interface{}, err error) {
 	}
 
 	// Function should be of type env.Callable
-	if f, ok := callee.(env.Callable); ok {
+	if f, ok := callee.(*env.Callable); ok {
 		argToken := call.Inner.Inner
 		args := []interface{}{}
 
@@ -199,7 +199,7 @@ func evalGetter(getter *Expression) (value interface{}, err error) {
 	}
 
 	// Only objects allow getter expressions
-	if obj, ok := parent.(env.Object); ok {
+	if obj, ok := parent.(*env.Object); ok {
 		value, err = obj.Get(name)
 		if err != nil {
 			return value, fmt.Errorf(err.Error(), obj.Name, name, line)
