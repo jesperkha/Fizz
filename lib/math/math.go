@@ -2,7 +2,7 @@ package math
 
 import "math"
 
-// Standard math library for most common mathematical operations
+// Standard math package for most common mathematical operations
 
 type i interface{}
 
@@ -54,7 +54,7 @@ func min(a float64, b float64) (val i, err error) {
 }
 
 func rad(num float64) (val i, err error) {
-	return float64((math.Pi * 2 * num) / 360), err
+	return (math.Pi * 2 * num) / 360, err
 }
 
 func deg(num float64) (val i, err error) {

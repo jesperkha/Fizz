@@ -277,7 +277,7 @@ func execFunction(stmt Statement) (err error) {
 	originCache := CurrentOrigin
 	var envCache env.Environment
 
-	function := &env.Callable{
+	function := env.Callable{
 		Name:    stmt.Name,
 		NumArgs: len(stmt.Params),
 		Origin:  CurrentOrigin,
@@ -305,7 +305,7 @@ func execFunction(stmt Statement) (err error) {
 		},
 	}
 
-	err = env.Declare(stmt.Name, function)
+	err = env.Declare(stmt.Name, &function)
 	// Set after function is declared to allow using the function inside its body
 	envCache = env.GetCurrentEnv()
 	return err

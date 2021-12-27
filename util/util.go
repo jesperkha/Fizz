@@ -144,7 +144,7 @@ func SplitByTokens(tokens []lexer.Token, splits []int) [][]lexer.Token {
 // Returns Fizz name for value
 func GetType(value interface{}) string {
 	if i, ok := value.(env.FizzObject); ok {
-		return i.Type()
+		return (i).Type()
 	}
 
 	switch value.(type) {

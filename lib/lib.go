@@ -14,16 +14,37 @@ type FuncMap map[string]interface{}
 
 var (
 	LibList   = map[string]FuncMap{}
-	ErrNotLib = errors.New("%s is not a library")
+	ErrNotLib = errors.New("'%s' is not a library")
+	ErrNotFunction = errors.New("in lib %s, '%s' is not a function")
+	ErrNumReturn = errors.New("in lib %s, '%s()' return incorrect number of values")
+	ErrReturnTypes = errors.New("in lib %s, '%s()' does not return (interface{}, error)")
 )
 
 // Adds inclusion map to global include list if lib name is required
 func Add(libName string, functions FuncMap) {
 	if _, ok := LibList[libName]; ok {
-		util.ErrorAndExit(fmt.Errorf("duplicate library name '%s'", libName))
+		util.ErrorAndExit(fmt.Errorf("duplicate package name '%s'", libName))
 	}
 
 	LibList[libName] = functions
+}
+
+// Checks if function is valid. Returns error if not.
+func VerifyFunction(lib string, fname string, f i) error {
+	if reflect.TypeOf(f).Kind() != reflect.Func {
+		return fmt.Errorf(ErrNotFunction.Error(), lib, fname)
+	}
+
+	typ := reflect.TypeOf(f)
+	if typ.NumOut() != 2 {
+		return fmt.Errorf(ErrNumReturn.Error(), lib, fname)
+	}
+
+	if typ.Out(0).Kind() != reflect.Interface || typ.Out(1).Kind() != reflect.Interface {
+		return fmt.Errorf(ErrReturnTypes.Error(), lib, fname)
+	}
+
+	return nil
 }
 
 // Imports all included libs to running fizz process
@@ -40,13 +61,19 @@ func IncludeLibraries(includes []string) error {
 		// import and the functions are added the same way as normal imports.
 		env.PushScope()
 		for funcName, f := range library {
+			// Verify functions at runtime to not lag on startup
+			err := VerifyFunction(name, funcName, f)
+			if err != nil {
+				return err
+			}
+
 			// Cache values because they are used in the Call member, which will use
 			// the closured version of the variables, and they will always be the last
 			// used in the loop. Cache makes sure its always the ones at definition.
 			nameCache, funcCache := funcName, f
 
 			// Create function. -1 ignores number of args in parsing
-			callable := &env.Callable{
+			callable := env.Callable{
 				NumArgs: -1,
 				Origin:  name,
 				Name:    funcName,
@@ -56,7 +83,7 @@ func IncludeLibraries(includes []string) error {
 			}
 
 			// Declare to scope it was required in
-			if err := env.Declare(funcName, callable); err != nil {
+			if err := env.Declare(funcName, &callable); err != nil {
 				return err
 			}
 		}
@@ -77,7 +104,7 @@ func IncludeLibraries(includes []string) error {
 // Returns error if args or types dont match. Name of function and name given do
 // not need to match.
 func CallFunc(name string, function i, args []interface{}) (val i, err error) {
-	// Get function as type
+	// Get value as type
 	f := reflect.ValueOf(function)
 
 	// Check if num args are valid
