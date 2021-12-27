@@ -15,7 +15,7 @@
     return add;
 }
 f := closure(); f();
-> include "std"; std.toString(1);
+> include "str"; str.toString(1);
 > [1, 2, 3][0] = 4;
 > ([1, 2, 3])[0] = 4;
 > [[1, 2, 3]][0][0] = 4;
