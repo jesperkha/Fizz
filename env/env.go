@@ -96,9 +96,10 @@ func AddImportedFile(name string, env Environment) error {
 	})
 }
 
-// Gets a snapshot of the current env. Used for composing closures for functions and
-// also file imports. Unsafe: will get a temp env if there is one active.
-func GetCurrentEnv() Environment {
+// Gets a snapshot of the current env. Used to disallow changes made to the current
+// env to be accessed in closures. More static approach. Unsafe: gets temp env if
+// one is in use.
+func GetCurrentEnvSnapshot() Environment {
 	temp := Environment{}
 	for idx, m := range currentEnv {
 		temp = append(temp, valueMap{})
@@ -108,6 +109,12 @@ func GetCurrentEnv() Environment {
 	}
 
 	return temp
+}
+
+// Returns the current env. Used instead of GetCurrentEnvSnapshot to allow for the
+// enviroment changes to be available inside a closure.
+func GetCurrentEnv() Environment {
+	return currentEnv
 }
 
 // Sets a new temporary envirnoment. Used for closures since envs are not passed as
