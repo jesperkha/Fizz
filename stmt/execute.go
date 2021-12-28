@@ -90,7 +90,7 @@ func execError(stmt Statement) (err error) {
 		return err
 	}
 
-	return errors.New(formatPrintValue(value))
+	return errors.New(util.FormatPrintValue(value))
 }
 
 // Raises error and assigns expr value to global currentReturnValue
@@ -110,50 +110,13 @@ func execReturn(stmt Statement) (err error) {
 	return e
 }
 
-func formatPrintValue(val interface{}) string {
-	switch val.(type) {
-	case float64, string, bool:
-		return fmt.Sprint(val)
-	case nil:
-		return "nil"
-	}
-
-	if o, ok := val.(*env.Object); ok {
-		str := o.Name + ": {\n"
-		for key, value := range o.Fields {
-			str += fmt.Sprintf("    %s: %v\n", key, formatPrintValue(value))
-		}
-
-		return str + "}"
-	}
-
-	if o, ok := val.(*env.Callable); ok {
-		return o.Name + "()"
-	}
-
-	if a, ok := val.(*env.Array); ok {
-		str := "["
-		for i, v := range a.Values {
-			if i != 0 {
-				str += ", "
-			}
-
-			str += fmt.Sprintf("%v", formatPrintValue(v))
-		}
-
-		return str + "]"
-	}
-
-	return ""
-}
-
 func execPrint(stmt Statement) (err error) {
 	value, err := expr.EvaluateExpression(stmt.Expression)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(formatPrintValue(value))
+	fmt.Println(util.FormatPrintValue(value))
 	return nil
 }
 

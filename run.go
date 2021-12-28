@@ -14,7 +14,7 @@ import (
 )
 
 var parser = term.NewFlagParser(
-	[]string{},
+	[]string{"e"},
 	[]string{"version", "help"},
 )
 
@@ -42,8 +42,14 @@ func RunInterpeter(args []string) {
 		path := strings.Join(split[:len(split)-1], "/")
 		name := split[len(split)-1]
 		os.Chdir(path)
-		if _, err = interp.RunFile(name); err != nil && err != stmt.ErrProgramExit {
+
+		e, err := interp.RunFile(name)
+		if err != nil && err != stmt.ErrProgramExit {
 			util.ErrorAndExit(err)
+		}
+
+		if parser.Flags["-e"] {
+			fmt.Println(util.FormatPrintValue(e))
 		}
 
 		return

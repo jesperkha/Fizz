@@ -25,6 +25,54 @@ func FormatError(err error, line int) error {
 	return err
 }
 
+// Converts value to string in proper representation format
+func FormatPrintValue(val interface{}) string {
+	switch val.(type) {
+	case float64, string, bool:
+		return fmt.Sprint(val)
+	case nil:
+		return "nil"
+	}
+
+	if e, ok := val.(env.Environment); ok {
+		glob := e[0]
+		total := ""
+		for k, v := range glob {
+			total += fmt.Sprintf("%s: %s\n", k, FormatPrintValue(v))
+		}
+
+		return total
+	}
+
+	if o, ok := val.(*env.Object); ok {
+		str := o.Name + ": {\n"
+		for key, value := range o.Fields {
+			str += fmt.Sprintf("    %s: %v\n", key, FormatPrintValue(value))
+		}
+
+		return str + "}"
+	}
+
+	if o, ok := val.(*env.Callable); ok {
+		return o.Name + "()"
+	}
+
+	if a, ok := val.(*env.Array); ok {
+		str := "["
+		for i, v := range a.Values {
+			if i != 0 {
+				str += ", "
+			}
+
+			str += fmt.Sprintf("%v", FormatPrintValue(v))
+		}
+
+		return str + "]"
+	}
+
+	return ""
+}
+
 // Prints red error message to console
 func PrintError(err error) {
 	if err == nil {

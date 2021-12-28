@@ -166,7 +166,7 @@ Fizz features simple if and else statements, but not else-if. The 'and' operator
 ```go
 height := 172;
 
-if age > 158.8 {
+if height > 158.8 {
     print "Taller than Kevin Hart";
 } else {
     print "Not taller than Kevin Hart";
