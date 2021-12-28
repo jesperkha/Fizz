@@ -27,6 +27,11 @@ def add_doc(c: str):
     docs = []
     start = 0
     for idx, l in enumerate(c):
+        notab = l.replace("\t", "")
+        if notab.startswith("/*") and l.count("*/") == 1:
+            docs.append(("", f"{notab[3:len(notab)-3]}\n"))
+            continue
+
         if l.startswith("/*"):
             start = idx
         if l.startswith("*/"):

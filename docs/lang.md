@@ -336,31 +336,28 @@ John
 
 ## <a id="libraries"></a> **Libraries**
 
-<!-- Todo: remove in v6 -->
-
-> Version 0.6.0 or higher
-
 Fizz libraries are different from imports. They are not other Fizz files, but rather Go files. This is to make it possible for functionality to be added to Fizz without baking it straight in. You can read the [library documentation](./libraries.md) to find out how they work and how to create your own.
 
 Fizz has a standard library built in. To use it, use the `include` keyword.
 
 ```go
-include "std";
+include "str";
 
 age := 32;
-print "John is " + std.toString(age); // prints: John is 32
+print "John is " + str.toString(age); // prints: John is 32
 // Causes no type error because age is converted to a string
 ```
 
 ```go
-include "std";
+include "io";
+include "str";
 
 // Will prompt the terminal and wait for user input.
 // Continues at newline or exit with ctrl-C.
-meters := std.input("Enter height in meters: ");
+meters := io.input("Enter height in meters: ");
 
-feet := std.toNumber(meters) * 3.281;
-print "You are: " + std.toString(feet) + " feet tall";
+feet := str.toNumber(meters) * 3.281;
+print "You are: " + str.toString(feet) + " feet tall";
 // Built in string formatting will come soon dont worry ;)
 ```
 

@@ -61,3 +61,33 @@ func curDir() string
 
 <br>
 
+## **`exists`**
+
+Returns true if file exists.
+
+```go
+func exists(filename string) bool
+```
+
+<br>
+
+## **`newDir`**
+
+Creates new directory.
+
+```go
+func newDir(name string)
+```
+
+<br>
+
+## **`newFile`**
+
+Creates new file. If the file already exists it will be overwritten.
+
+```go
+func newFile(name string)
+```
+
+<br>
+

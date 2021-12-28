@@ -12,28 +12,36 @@ var (
 
 func init() {
 	noErr := map[string]func(float64) float64{
-		"sin":   math.Sin,
-		"asin":  math.Asin,
-		"cos":   math.Cos,
-		"acos":  math.Acos,
-		"tan":   math.Tan,
-		"atan":  math.Atan,
+		/* func sin(num float64) float64 */
+		"sin": math.Sin,
+		/* func asin(num float64) float64 */
+		"asin": math.Asin,
+		/* func cos(num float64) float64 */
+		"cos": math.Cos,
+		/* func acos(num float64) float64 */
+		"acos": math.Acos,
+		/* func tan(num float64) float64 */
+		"tan": math.Tan,
+		/* func atan(num float64) float64 */
+		"atan": math.Atan,
+		/* func floor(num float64) float64 */
 		"floor": math.Floor,
-		"ceil":  math.Ceil,
-		"abs":   math.Abs,
-		"ln":    math.Log,
+		/* func ceil(num float64) int */
+		"ceil": math.Ceil,
+		/* func abs(num float64) int */
+		"abs": math.Abs,
+		/* func ln(num float64) int */
+		"ln": math.Log,
+		/* func log10(num float64) float64 */
 		"log10": math.Log10,
-		"sqrt":  math.Sqrt,
+		/* func sqrt(num float64) float64 */
+		"sqrt": math.Sqrt,
 	}
 
 	Includes = map[string]interface{}{
-		// Max of a and b
 		"max": max,
-		// Min of a and b
 		"min": min,
-		// Converts radians to degrees
 		"deg": deg,
-		// Converts degrees to radians
 		"rad": rad,
 	}
 
@@ -45,18 +53,28 @@ func init() {
 	}
 }
 
+/* func max(a float64, b float64) float64 */
 func max(a float64, b float64) (val i, err error) {
 	return math.Max(a, b), err
 }
 
+/* func min(a float64, b float64) float64 */
 func min(a float64, b float64) (val i, err error) {
 	return math.Min(a, b), err
 }
 
+/*
+	Converts degrees to radians
+	func rad(deg float64) float64
+*/
 func rad(num float64) (val i, err error) {
 	return (math.Pi * 2 * num) / 360, err
 }
 
+/*
+	Converts radians to degrees
+	func deg(rad float64) float64
+*/
 func deg(num float64) (val i, err error) {
 	return (num * 360) / (2 * math.Pi), err
 }

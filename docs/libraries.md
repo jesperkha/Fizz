@@ -5,17 +5,18 @@
   - [Setup](#setup)
   - [Content](#content)
   - [Build](#build)
+  - [Docs](#docs)
 
 <br>
 
 ## <a id="overview"></a> **Overview**
 
-Fizz version 0.6.0 or higher allows for Go libraries to be included in your Fizz code. Use the `include` statement followed by the library name to use it:
+Fizz allows for Go libraries to be included in your Fizz code. Use the `include` statement followed by the library name to use it:
 
 ```go
-include "std";
+include "io";
 
-name := std.input("Enter name: ");
+name := io.input("Enter name: ");
 ```
 
 <br>
@@ -98,3 +99,29 @@ main.fizz
 $ fizz main
 Hello, John
 ```
+
+<br>
+
+## <a id="docs"></a> Automatic documentation
+
+Additionally, you can make simple documentation for your library. Use the following format to add documentation to your functions:
+
+```go
+/*
+    Returns a greeting to the name given.
+    func sayHello(name string) string
+*/
+func sayHello(name string) (val interface{}, err error) {
+    return "Hello, " + name, err
+}
+```
+
+This will automatically be added to a markdown file in the same directory by running the `autodocs.py` file. It will result in this:
+
+> ## **`sayHello`**
+>
+> Returns a greeting to the name given.
+>
+> ```go
+> func sayHello(name string) string
+> ```

@@ -30,6 +30,9 @@ func init() {
 		"appendFile": appendFile,
 		"readDir":    readDir,
 		"curDir":     curDir,
+		"exists":     exists,
+		"newDir":     newDir,
+		"newFile":    newFile,
 	}
 }
 
@@ -113,4 +116,32 @@ func readDir(dir string) (val i, err error) {
 */
 func curDir() (str i, err error) {
 	return os.Getwd()
+}
+
+/*
+	Returns true if file exists.
+	func exists(filename string) bool
+*/
+func exists(filename string) (val i, err error) {
+	_, e := os.Open(filename)
+	return e == nil, err
+}
+
+/*
+	Creates new directory.
+	func newDir(name string)
+*/
+func newDir(dirname string) (val i, err error) {
+	os.Mkdir(dirname, os.ModeAppend)
+	return nil, err
+}
+
+/*
+	Creates new file. If the file already exists it will be overwritten.
+	func newFile(name string)
+*/
+func newFile(filename string) (val i, err error) {
+	f, err := os.Create(filename)
+	f.Close()
+	return val, err
 }
