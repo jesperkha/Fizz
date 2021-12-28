@@ -1,0 +1,63 @@
+# Methods in io library
+
+## **`input`**
+
+Gets user input from stdin.
+
+```go
+func input(prompt string) string
+```
+
+<br>
+
+## **`readFile`**
+
+Reads file and returns text.
+This is some extra line
+
+```go
+func readFile(filename string) string
+```
+
+<br>
+
+## **`writeFile`**
+
+Writes content to file. Overwrites previous file content.
+
+```go
+func writeFile(filename string, content string)
+```
+
+<br>
+
+## **`appendFile`**
+
+Appends content to file.
+
+```go
+func appendFile(filename string, content string)
+```
+
+<br>
+
+## **`readDir`**
+
+Returns list of files/directories in dir.
+
+```go
+func readDir(dir string) []string
+```
+
+<br>
+
+## **`curDir`**
+
+Returns current working directory
+
+```go
+func curDir() string
+```
+
+<br>
+

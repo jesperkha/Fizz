@@ -9,6 +9,8 @@
 
 **Bug fixes and more:**
 
+- Automatic documentation for libraries
+
 <br>
 
 ## Version 0.5.0
