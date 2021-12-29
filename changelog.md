@@ -1,5 +1,13 @@
 # Fizz update changelog
 
+## Version 0.7.0
+
+**Whats new:**
+
+**Bug fixes and more:**
+
+- Changed env to allow acces to definitions / reassignments _after_ a closure was formed
+
 ## Version 0.6.0
 
 **Whats new:**

@@ -235,7 +235,6 @@ func execBlock(stmt Statement) (err error) {
 }
 
 // Todo: implement callstack (add recursion limit when doing so)
-// Todo: only stop recording new declarations in local scope for closures
 func execFunction(stmt Statement) (err error) {
 	// Store origin at point of function declaration as well as scope around it
 	originCache := CurrentOrigin

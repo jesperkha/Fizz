@@ -10,7 +10,8 @@ const (
 
 	EQUAL_EQUAL
 	NOT_EQUAL
-
+	IN
+	
 	GREATER
 	LESS
 	GREATER_EQUAL
@@ -139,4 +140,5 @@ var keyWordLookup = map[string]int{
 	"skip":    SKIP,
 	"include": INCLUDE,
 	"error":   ERROR,
+	"in": 	   IN,
 }
