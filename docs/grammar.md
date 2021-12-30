@@ -12,7 +12,8 @@ objDec      -> "define" identifier "{" identifier* "}"
 
 # Statements
 statement   -> exprStmt | printStmt | exitStmt | errorStmt | ifStmt | whileStmt |
-               returnStmt | importStmt | includeStmt | assignStmt | enumStmt | block
+               returnStmt | importStmt | includeStmt | assignStmt | enumStmt |
+               repeatStmt | block
 exprStmt    -> expression ";"
 printStmt   -> "print" expression ";"
 exitStmt    -> "exit" expression? ";"
@@ -24,6 +25,7 @@ importStmt  -> "import" string ";"
 includeStmt -> "include" string ";"
 assignStmt  -> (getter | identifier) "=" expression ";"
 enumStmt    -> "enum" "{" identifier* "}"
+repeatStmt  -> "repeat" expression block
 block       -> "{" declaration* "}"
 
 # Expressions

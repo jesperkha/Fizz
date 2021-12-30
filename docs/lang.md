@@ -8,15 +8,22 @@
 - [Keywords](#keywords)
 - [Expressions and operators](#expr)
 
-**Syntax and statements:**
+**Variables and printing:**
 
 - [Print and Type](#prt)
 - [Error and Exit](#error)
 - [Variables](#var)
 - [Enums](#enums)
+
+**Conditionals and loops:**
+
 - [If statements and logic](#if)
 - [While loop](#while)
+- [Repeat loop](#repeat)
 - [Break and skip](#break)
+
+**Objects:**
+
 - [Functions](#func)
 - [Objects](#obj)
 - [Arrays](#arrays)
@@ -217,6 +224,19 @@ while n < 10 {
 
 while {
     // loops until break or program exit
+}
+```
+
+<br>
+
+## <a id="repeat"></a> **Repeat loop**
+
+A repeat loop is another basic flow controller that just executes a block n times.
+
+```go
+// prints "hi" 5 times
+repeat 5 {
+  print "hi";
 }
 ```
 

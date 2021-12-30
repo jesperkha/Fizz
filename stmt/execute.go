@@ -337,37 +337,32 @@ func execWhile(stmt Statement) (err error) {
 }
 
 func execRepeat(stmt Statement) (err error) {
-	name := stmt.Expression.Left.Name
-	// Push new scope to avoid clashing when defining new variable
-	// Block is in child scope anyway
 	env.PushScope()
-	env.Declare(name, float64(0))
+	v, err := expr.EvaluateExpression(stmt.Expression)
+	if err != nil {
+		return err
+	}
 
-	for {
-		val, err := expr.EvaluateExpression(stmt.Expression)
-		if err != nil {
-			return err
-		}
+	r, ok := util.IsInt(v)
+	if !ok {
+		return ErrExpectedInteger
+	}
 
-		if val == false { // Explicit check for false because interface, stfu
-			break
-		}
-
+	for i := 0; i < r; i++ {
 		// Break and skip return errors that are handled here
 		err = ExecuteStatements(stmt.Then.Statements)
 		if e, ok := err.(ConditionalError); ok {
 			switch e.Type {
 			case BREAK:
-				return nil
+				break
 			case SKIP:
-				if oldVal, err := env.Get(name); err == nil {
-					env.Assign(name, oldVal.(float64)+1)
-				}
 				continue
 			}
 		}
 
-		return err
+		if err != nil {
+			return err
+		}
 	}
 
 	env.PopScope()

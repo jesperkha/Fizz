@@ -5,7 +5,6 @@
 > age += 1;
 > if true { 1 + 1; }
 > while { break; }
-> repeat n < 10 { skip; }
 > func main(a, b) { return 1; } main(1, 2);
 > define p{n} a := p(2); a.n == 2;
 > b := p(p(p(1))); b.n.n.n == 1;
@@ -20,6 +19,7 @@ f := closure(); f();
 > ([1, 2, 3])[0] = 4;
 > [[1, 2, 3]][0][0] = 4;
 > enum { one two three } 1 + one;
+> repeat (20 - 1) {}
 
 ?
 
@@ -30,7 +30,6 @@ f := closure(); f();
 > func main(a) {} main();
 > if {}
 > while a + 2 {}
-> repeat 20 {}
 > c := p(1); c.n.n;
 > b.n();
 > .b.n;
@@ -38,3 +37,4 @@ f := closure(); f();
 > [1, 2, 3][0][0] = 4;
 > (1, 2, 3)[0] = 4;
 > enum { 1 two }
+> repeat (1, 2) {}

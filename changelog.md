@@ -5,6 +5,7 @@
 **Whats new:**
 
 - Enums
+- New repeat statement
 
 **Bug fixes and more:**
 

@@ -384,16 +384,6 @@ func parseRepeat(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 		return stmt, err
 	}
 
-	if stmt.Expression.Type != expr.Binary {
-		return stmt, ErrInvalidStatement
-	}
-
-	notLess := stmt.Expression.Operand.Type != lexer.LESS
-	notIdentifier := stmt.Expression.Left.Type != expr.Variable
-	if notLess || notIdentifier {
-		return stmt, ErrInvalidStatement
-	}
-
 	return Statement{Type: Repeat, Expression: stmt.Expression, Then: &block}, err
 }
 
