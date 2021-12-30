@@ -8,14 +8,11 @@ fizzProgram -> declaration*
 declaration -> varDec | funcDec | objDec | statement
 varDec      -> identifier ":=" expression ";"
 funcDec     -> "func" "(" identifier? ("," identifier)* ")" block
-objDec      -> "define" identifier "{"
-                    identifier? ("," identifier)* |
-                    identifier? (newline identifier)*
-                "}"
+objDec      -> "define" identifier "{" identifier* "}"
 
 # Statements
 statement   -> exprStmt | printStmt | exitStmt | errorStmt | ifStmt | whileStmt |
-               returnStmt | importStmt | includeStmt | assignStmt | block
+               returnStmt | importStmt | includeStmt | assignStmt | enumStmt | block
 exprStmt    -> expression ";"
 printStmt   -> "print" expression ";"
 exitStmt    -> "exit" expression? ";"
@@ -26,6 +23,7 @@ returnStmt  -> "return" expression? ";"
 importStmt  -> "import" string ";"
 includeStmt -> "include" string ";"
 assignStmt  -> (getter | identifier) "=" expression ";"
+enumStmt    -> "enum" "{" identifier* "}"
 block       -> "{" declaration* "}"
 
 # Expressions

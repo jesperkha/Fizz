@@ -4,6 +4,8 @@
 
 **Whats new:**
 
+- Enums
+
 **Bug fixes and more:**
 
 - Changed env to allow acces to definitions / reassignments _after_ a closure was formed

@@ -64,6 +64,8 @@ func executeStatement(stmt Statement) error {
 		return execError(stmt)
 	case Object:
 		return execObject(stmt)
+	case Enum:
+		return execEnum(stmt)
 	case Import, Include:
 		return nil // Handled in interp
 	}
@@ -71,7 +73,18 @@ func executeStatement(stmt Statement) error {
 	// Will never be returned since all types are pre-defined.
 	// However it is nice to have in case rework is done and types
 	// get mixed up or new types are only partially added.
-	return ErrInvalidStmtType
+	return ErrInvalidStmtType 
+}
+
+func execEnum(stmt Statement) (err error) {
+	for curVal, name := range stmt.Params {
+		err = env.Declare(name, float64(curVal))
+		if err != nil {
+			return err
+		}
+	}
+
+	return err
 }
 
 func execExit(stmt Statement) (err error) {

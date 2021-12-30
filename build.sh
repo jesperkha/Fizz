@@ -1,13 +1,18 @@
 set -e
 
-echo adding libraries...
+echo -n "adding libraries... "
 python lib/build.py
+echo "done"
 
-echo linting code...
+echo -n "generating docs... "
+python lib/autodocs.py
+echo "done"
+
+echo -n "linting code... "
 go vet .
+echo "done"
 
-echo building binary...
+echo -n "building binary... "
 [ ! -d "./bin" ] && mkdir bin
-go build -o ./bin/fizz.exe run.go main.go
-
-echo "done!"
+go build -o ./bin/fizz.exe .
+echo "done"

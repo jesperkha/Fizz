@@ -32,7 +32,7 @@ This roadmap highlights progress for the development of Fizz:
 - ✔️ File import
 - ✔️ Go -> Fizz library support
 - ✔️ Arrays
-- ❌ Enums
+- ✔️ Enums
 - ❌ Full language documentation
 
 <br>

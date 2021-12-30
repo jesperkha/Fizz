@@ -1,13 +1,19 @@
 # <a id="top"></a> **Fizz language documentation**
 
+**Language specifics:**
+
 - [Overview](#overview)
 - [Grammar](#grammar)
 - [Types](#types)
 - [Keywords](#keywords)
 - [Expressions and operators](#expr)
+
+**Syntax and statements:**
+
 - [Print and Type](#prt)
 - [Error and Exit](#error)
 - [Variables](#var)
+- [Enums](#enums)
 - [If statements and logic](#if)
 - [While loop](#while)
 - [Break and skip](#break)
@@ -15,6 +21,9 @@
 - [Objects](#obj)
 - [Arrays](#arrays)
 - [Reference](#ref)
+
+**Files and imports**
+
 - [File imports](#import)
 - [Libraries](#libraries)
 
@@ -156,6 +165,28 @@ n /= 2;
 ```
 
 You can also use the `+=` operator with strings.
+
+<br>
+
+## <a id="enums"></a> **Enums**
+
+Fizz also has enums to quickly create a lot a variables with unique values.
+
+```go
+enum {
+  banana
+  apple
+  orange
+}
+
+enum {
+  pear
+}
+
+print banana; // 0
+print orange; // 2
+print pear;   // 0
+```
 
 <br>
 

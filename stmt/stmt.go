@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/jesperkha/Fizz/expr"
-	"github.com/jesperkha/Fizz/lexer"
 )
 
 var (
@@ -50,6 +49,7 @@ const (
 	Import
 	Include
 	Error
+	Enum
 )
 
 // Todo: make range statement and remove repeat
@@ -61,7 +61,6 @@ type Statement struct {
 	Operator   int
 	Name       string
 	Params     []string
-	ObjTokens  []lexer.Token
 	Statements []Statement
 	Then       *Statement
 	Else       *Statement

@@ -11,7 +11,7 @@ const (
 	EQUAL_EQUAL
 	NOT_EQUAL
 	IN
-	
+
 	GREATER
 	LESS
 	GREATER_EQUAL
@@ -55,8 +55,10 @@ const (
 	// Statement tokens
 	FUNC
 	DEFINE
+	ENUM
 	IF
 	ELSE
+	RANGE
 	PRINT
 	EXIT
 	ERROR
@@ -140,5 +142,7 @@ var keyWordLookup = map[string]int{
 	"skip":    SKIP,
 	"include": INCLUDE,
 	"error":   ERROR,
-	"in": 	   IN,
+	"in":      IN,
+	"enum":    ENUM,
+	"range":   RANGE,
 }

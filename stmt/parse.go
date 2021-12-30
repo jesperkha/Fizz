@@ -100,6 +100,8 @@ func parseComplexStatement(typ int, tokens []lexer.Token, idx *int) (stmt Statem
 		return parseFunc(tokens, idx)
 	case lexer.DEFINE:
 		return parseObject(tokens, idx)
+	case lexer.ENUM:
+		return parseEnum(tokens, idx)
 	}
 
 	return stmt, err
@@ -119,6 +121,34 @@ func seekToken(tokens []lexer.Token, start int, target int) (endIdx int, eof boo
 	}
 
 	return 0, true
+}
+
+func parseEnum(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
+	i := *idx
+	if len(tokens[i:]) < 3 {
+		return stmt, ErrInvalidStatement
+	}
+
+	if tokens[i+1].Type != lexer.LEFT_BRACE {
+		return stmt, ErrExpectedBlock
+	}
+
+	endIdx, eof := seekToken(tokens, i, lexer.RIGHT_BRACE)
+	if eof {
+		return stmt, ErrNoBrace
+	}
+
+	names := []string{}
+	for _, t := range tokens[i+2:endIdx] {
+		if t.Type != lexer.IDENTIFIER {
+			return stmt, ErrExpectedIdentifier
+		}
+
+		names = append(names, t.Lexeme)
+	}
+
+	*idx = endIdx
+	return Statement{Type: Enum, Params: names}, err
 }
 
 func parseImport(tokens []lexer.Token) (stmt Statement, err error) {
@@ -367,6 +397,7 @@ func parseRepeat(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	return Statement{Type: Repeat, Expression: stmt.Expression, Then: &block}, err
 }
 
+// Todo: make not special case and just check the tokens between brackets
 func parseObject(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	if len(tokens[*idx:]) < 4 {
 		return stmt, ErrInvalidStatement

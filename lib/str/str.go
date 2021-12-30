@@ -17,6 +17,7 @@ var (
 	Includes = map[string]interface{}{}
 
 	ErrNotNumber = errors.New("string could not be converted to number, line %d")
+	ErrNotString = errors.New("expected string value in array, line %d")
 )
 
 func init() {
@@ -26,6 +27,7 @@ func init() {
 		"upper":    upper,
 		"capital":  capital,
 		"split":    split,
+		"join": join,
 		"replace":  replace,
 		"toNumber": toNumber,
 	}
@@ -74,6 +76,24 @@ func split(str string, split string) (val i, err error) {
 	}
 
 	return &env.Array{Values: splits}, err
+}
+
+/*
+	Joins array of strings into one string with the substring.
+	func join(strings []string, sub string) string
+*/
+func join(str *env.Array, sub string) (val i, err error) {
+	s := []string{}
+	for _, i := range str.Values {
+		if newStr, ok := i.(string); ok {
+			s = append(s, newStr)
+			continue
+		}
+
+		return val, ErrNotString
+	}
+
+	return strings.Join(s, sub), err
 }
 
 /*
