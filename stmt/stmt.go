@@ -24,6 +24,7 @@ var (
 	ErrExpectedName       = errors.New("expected filename at import, line %d")
 	ErrCannotImport       = errors.New("cannot import outside of global scope, line %d")
 	ErrExpectedInteger    = errors.New("expected expression to be integer, line %d")
+	ErrExpectedNumber = errors.New("expected expression to be number, line %d")
 	ErrProgramExit        = errors.New("")
 
 	ErrReturnOutsideFunc = ConditionalError{Msg: "cannot use return outside of a function, line %d", Type: RETURN}
@@ -51,6 +52,7 @@ const (
 	Include
 	Error
 	Enum
+	Range
 )
 
 // Todo: make range statement and remove repeat
@@ -60,7 +62,6 @@ type Statement struct {
 	Type       int
 	Line       int
 	Operator   int
-	Range 	   int
 	Name       string
 	Params     []string
 	Statements []Statement

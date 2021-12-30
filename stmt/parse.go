@@ -102,6 +102,8 @@ func parseComplexStatement(typ int, tokens []lexer.Token, idx *int) (stmt Statem
 		return parseObject(tokens, idx)
 	case lexer.ENUM:
 		return parseEnum(tokens, idx)
+	case lexer.RANGE:
+		return parseRange(tokens, idx)
 	}
 
 	return stmt, err
@@ -121,6 +123,40 @@ func seekToken(tokens []lexer.Token, start int, target int) (endIdx int, eof boo
 	}
 
 	return 0, true
+}
+
+func parseRange(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
+	i := *idx
+	if len(tokens[i:]) < 6 {
+		return stmt, ErrInvalidStatement
+	}
+
+	_, block, err := getExpressionAndBlock(tokens, idx, true)
+	if err != nil {
+		return stmt, err
+	}
+
+	// Get left and right side of 'in'
+	endIdx, _ := seekToken(tokens, i, lexer.LEFT_BRACE)
+	interval := tokens[i+1:endIdx]
+	split := util.SplitByToken(interval, lexer.IN)
+	if len(split) != 2 {
+		return stmt, ErrInvalidStatement
+	}
+
+	left, err := expr.ParseExpression(split[0])
+	if err != nil {
+		return stmt, err
+	}
+
+	if left.Type != expr.Variable {
+		return stmt, ErrExpectedIdentifier
+	}
+
+	name := left.Name
+	// Right side is just expression passed into private function
+	right, err := expr.ParseExpression(split[1])
+	return Statement{Type: Range, Expression: &right, Name: name, Then: &block}, err
 }
 
 func parseEnum(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
@@ -387,7 +423,6 @@ func parseRepeat(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	return Statement{Type: Repeat, Expression: stmt.Expression, Then: &block}, err
 }
 
-// Todo: make not special case and just check the tokens between brackets
 func parseObject(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	if len(tokens[*idx:]) < 4 {
 		return stmt, ErrInvalidStatement

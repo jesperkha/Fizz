@@ -66,6 +66,8 @@ func executeStatement(stmt Statement) error {
 		return execObject(stmt)
 	case Enum:
 		return execEnum(stmt)
+	case Range:
+		return execRange(stmt)
 	case Import, Include:
 		return nil // Handled in interp
 	}
@@ -74,6 +76,35 @@ func executeStatement(stmt Statement) error {
 	// However it is nice to have in case rework is done and types
 	// get mixed up or new types are only partially added.
 	return ErrInvalidStmtType 
+}
+
+func execRange(stmt Statement) (err error) {
+	var rangeable *env.Array
+	e := stmt.Expression
+	if e.Type == expr.Array {
+		v, err := expr.EvaluateExpression(e)
+		if err != nil {
+			return err
+		}
+
+		rangeable = v.(*env.Array)
+	} else {
+		// Call built in range function to get rangable array
+		// Cannot be called from code because range is a keyword
+		callee := expr.Expression{Type: expr.Variable, Name: "range"}
+		inner := expr.Expression{Type: expr.Group, Inner: stmt.Expression}
+
+		f := expr.Expression{Type: expr.Call, Left: &callee, Inner: &inner}
+		v, err := expr.EvaluateExpression(&f)
+		if err != nil {
+			return err
+		}
+
+		rangeable = v.(*env.Array)
+	}
+
+	util.FormatPrintValue(rangeable)
+	return err
 }
 
 func execEnum(stmt Statement) (err error) {
