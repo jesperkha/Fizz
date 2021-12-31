@@ -24,7 +24,8 @@ var (
 	ErrExpectedName       = errors.New("expected filename at import, line %d")
 	ErrCannotImport       = errors.New("cannot import outside of global scope, line %d")
 	ErrExpectedInteger    = errors.New("expected expression to be integer, line %d")
-	ErrExpectedNumber = errors.New("expected expression to be number, line %d")
+	ErrExpectedNumber     = errors.New("expected expression to be number, line %d")
+	ErrInfiniteLoop       = errors.New("infinite loop in range statement not allowed, line %d")
 	ErrProgramExit        = errors.New("")
 
 	ErrReturnOutsideFunc = ConditionalError{Msg: "cannot use return outside of a function, line %d", Type: RETURN}

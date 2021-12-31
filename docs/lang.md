@@ -20,6 +20,7 @@
 - [If statements and logic](#if)
 - [While loop](#while)
 - [Repeat loop](#repeat)
+- [Range loop](#range)
 - [Break and skip](#break)
 
 **Objects:**
@@ -237,6 +238,50 @@ A repeat loop is another basic flow controller that just executes a block n time
 // prints "hi" 5 times
 repeat 5 {
   print "hi";
+}
+```
+
+<br>
+
+## <a id="range"></a> **Range loop**
+
+The range loop is a more advanced form of loop, kind of a hybrid bewteen pythons `for _ in _` statements and other languages `for` loops. The simplest use case is to just give one argument to the right side of `in`. This will just loop with `n` going from 0 to 9:
+
+```go
+range n in 10 {
+  print n;
+}
+```
+
+Providing two arguments defines a start and end for the loop:
+
+```go
+// Goes from 3 to 7
+range n in 3, 8 {
+  print n;
+}
+```
+
+Three arguments define start, end, and iteration:
+
+```go
+range n in 0, 5, 0.5 {
+  print n;
+}
+
+// error: infinite loop not allowed for range statement
+range q in 0, 5, -1 {
+
+}
+```
+
+Additionally, you can range over an array:
+
+```go
+days := ["Monday", "Tuesday", "Wednesday"];
+
+range day in days {
+  print day;
 }
 ```
 

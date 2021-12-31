@@ -131,6 +131,8 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 		return strings.Join([]string{left.(string), right.(string)}, ""), err
 	}
 
+	// Todo: add in operator for array
+
 	// If non of the previous checks worked the expression is invalid
 	typeLeft, typeRight := util.GetType(left), util.GetType(right)
 	op, line := binary.Operand.Lexeme, binary.Line

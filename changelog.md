@@ -6,6 +6,7 @@
 
 - Enums
 - New repeat statement
+- Range statement
 
 **Bug fixes and more:**
 

@@ -131,6 +131,7 @@ func parseRange(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 		return stmt, ErrInvalidStatement
 	}
 
+	// Dont care about expression because of manual parsing
 	_, block, err := getExpressionAndBlock(tokens, idx, true)
 	if err != nil {
 		return stmt, err
@@ -138,7 +139,7 @@ func parseRange(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 
 	// Get left and right side of 'in'
 	endIdx, _ := seekToken(tokens, i, lexer.LEFT_BRACE)
-	interval := tokens[i+1:endIdx]
+	interval := tokens[i+1 : endIdx]
 	split := util.SplitByToken(interval, lexer.IN)
 	if len(split) != 2 {
 		return stmt, ErrInvalidStatement
@@ -149,14 +150,14 @@ func parseRange(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 		return stmt, err
 	}
 
+	// Only variables are identifiers
 	if left.Type != expr.Variable {
 		return stmt, ErrExpectedIdentifier
 	}
 
-	name := left.Name
 	// Right side is just expression passed into private function
 	right, err := expr.ParseExpression(split[1])
-	return Statement{Type: Range, Expression: &right, Name: name, Then: &block}, err
+	return Statement{Type: Range, Expression: &right, Name: left.Name, Then: &block}, err
 }
 
 func parseEnum(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
@@ -175,7 +176,7 @@ func parseEnum(tokens []lexer.Token, idx *int) (stmt Statement, err error) {
 	}
 
 	names := []string{}
-	for _, t := range tokens[i+2:endIdx] {
+	for _, t := range tokens[i+2 : endIdx] {
 		if t.Type != lexer.IDENTIFIER {
 			return stmt, ErrExpectedIdentifier
 		}

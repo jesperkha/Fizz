@@ -75,36 +75,7 @@ func executeStatement(stmt Statement) error {
 	// Will never be returned since all types are pre-defined.
 	// However it is nice to have in case rework is done and types
 	// get mixed up or new types are only partially added.
-	return ErrInvalidStmtType 
-}
-
-func execRange(stmt Statement) (err error) {
-	var rangeable *env.Array
-	e := stmt.Expression
-	if e.Type == expr.Array {
-		v, err := expr.EvaluateExpression(e)
-		if err != nil {
-			return err
-		}
-
-		rangeable = v.(*env.Array)
-	} else {
-		// Call built in range function to get rangable array
-		// Cannot be called from code because range is a keyword
-		callee := expr.Expression{Type: expr.Variable, Name: "range"}
-		inner := expr.Expression{Type: expr.Group, Inner: stmt.Expression}
-
-		f := expr.Expression{Type: expr.Call, Left: &callee, Inner: &inner}
-		v, err := expr.EvaluateExpression(&f)
-		if err != nil {
-			return err
-		}
-
-		rangeable = v.(*env.Array)
-	}
-
-	util.FormatPrintValue(rangeable)
-	return err
+	return ErrInvalidStmtType
 }
 
 func execEnum(stmt Statement) (err error) {
@@ -333,6 +304,22 @@ func execIf(stmt Statement) (err error) {
 	return err
 }
 
+func loopStatements(stmts []Statement) (brk bool, err error) {
+	env.PushScope()
+	err = ExecuteStatements(stmts)
+	env.PopScope()
+	if e, ok := err.(ConditionalError); ok {
+		switch e.Type {
+		case BREAK:
+			return true, nil
+		case SKIP:
+			return false, nil
+		}
+	}
+
+	return false, err
+}
+
 // Runs block if expression is nil too
 func execWhile(stmt Statement) (err error) {
 	for {
@@ -342,25 +329,19 @@ func execWhile(stmt Statement) (err error) {
 				return err
 			}
 
+			// Only falsy values for expression
 			if val == nil || val == false {
 				break
 			}
 		}
 
-		env.PushScope()
-		err = ExecuteStatements(stmt.Then.Statements)
-		env.PopScope()
-		if e, ok := err.(ConditionalError); ok {
-			switch e.Type {
-			case BREAK:
-				return nil
-			case SKIP:
-				continue
-			}
-		}
-
+		brk, err := loopStatements(stmt.Then.Statements)
 		if err != nil {
 			return err
+		}
+
+		if brk {
+			break
 		}
 	}
 
@@ -368,7 +349,6 @@ func execWhile(stmt Statement) (err error) {
 }
 
 func execRepeat(stmt Statement) (err error) {
-	env.PushScope()
 	v, err := expr.EvaluateExpression(stmt.Expression)
 	if err != nil {
 		return err
@@ -379,24 +359,18 @@ func execRepeat(stmt Statement) (err error) {
 		return ErrExpectedInteger
 	}
 
+	// Loop n times
 	for i := 0; i < r; i++ {
-		// Break and skip return errors that are handled here
-		err = ExecuteStatements(stmt.Then.Statements)
-		if e, ok := err.(ConditionalError); ok {
-			switch e.Type {
-			case BREAK:
-				break
-			case SKIP:
-				continue
-			}
-		}
-
+		brk, err := loopStatements(stmt.Then.Statements)
 		if err != nil {
 			return err
 		}
+
+		if brk {
+			break
+		}
 	}
 
-	env.PopScope()
 	return err
 }
 
@@ -413,5 +387,103 @@ func execObject(stmt Statement) (err error) {
 		},
 	})
 
+	return err
+}
+
+func getRangeable(args ...expr.Expression) (v *env.Array, err error) {
+	if len(args) > 3 {
+		return v, ErrInvalidStatement
+	}
+
+	// If array just return the array as the list of values to loop over
+	if len(args) == 1 {
+		val, err := expr.EvaluateExpression(&args[0])
+		if err != nil {
+			return v, err
+		}
+
+		if arr, ok := val.(*env.Array); ok {
+			return arr, err
+		}
+	}
+
+	// Else create array of numbers in range
+	a := []float64{}
+	for _, e := range args {
+		val, err := expr.EvaluateExpression(&e)
+		if err != nil {
+			return v, err
+		}
+
+		if num, ok := val.(float64); ok {
+			a = append(a, num)
+			continue
+		}
+
+		return v, ErrExpectedNumber
+	}
+
+	// Set each parameter based on how many there are
+	nums := [3]float64{}
+	switch len(a) {
+	case 1:
+		nums[0] = 0
+		nums[1] = a[0]
+		nums[2] = 1
+	case 2:
+		nums[0] = a[0]
+		nums[1] = a[1]
+		nums[2] = 1
+	case 3:
+		copy(nums[:], a)
+	}
+
+	// Check for infinite loop
+	zero := nums[2] == 0
+	negative := nums[1] > 0 && nums[2] <= 0
+	if zero || negative {
+		return v, ErrInfiniteLoop
+	}
+
+	// Create array
+	arr := env.Array{Values: []interface{}{}}
+	for i := nums[0]; i < nums[1]; i += nums[2] {
+		arr.Values = append(arr.Values, i)
+	}
+
+	return &arr, err
+}
+
+func execRange(stmt Statement) (err error) {
+	var rangeable *env.Array
+	e := stmt.Expression
+	name := stmt.Name
+
+	// Set rangeable
+	if e.Type == expr.Args {
+		rangeable, err = getRangeable(e.Exprs...)
+	} else {
+		rangeable, err = getRangeable(*e)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	env.PushScope()
+	env.Declare(name, 0.0)
+	for _, val := range rangeable.Values {
+		env.Assign(name, val)
+		brk, err := loopStatements(stmt.Then.Statements)
+		if err != nil {
+			return err
+		}
+
+		if brk {
+			break
+		}
+	}
+
+	env.PopScope()
 	return err
 }

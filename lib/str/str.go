@@ -27,7 +27,7 @@ func init() {
 		"upper":    upper,
 		"capital":  capital,
 		"split":    split,
-		"join": join,
+		"join":     join,
 		"replace":  replace,
 		"toNumber": toNumber,
 	}

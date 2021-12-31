@@ -43,12 +43,4 @@ var StandardEnvironment = Environment{{
 			return -1, ErrNotArray
 		},
 	},
-
-	"range": &Callable{
-		NumArgs: -1,
-		Call: func(i ...interface{}) (interface{}, error) {
-			// Todo: implement return of filled array based on args
-			return &Array{}, nil
-		},
-	},
 }}

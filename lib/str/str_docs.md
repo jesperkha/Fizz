@@ -50,6 +50,16 @@ func split(str string, split string) []string
 
 <br>
 
+## **`join`**
+
+Joins array of strings into one string with the substring.
+
+```go
+func join(strings []string, sub string) string
+```
+
+<br>
+
 ## **`replace`**
 
 Replaces all instances of substring with new string.
