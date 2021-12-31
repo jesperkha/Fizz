@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/jesperkha/Fizz/env"
+	"github.com/jesperkha/Fizz/util"
 )
 
 // Standard string package for common string fuctionality
@@ -23,6 +24,7 @@ var (
 func init() {
 	Includes = map[string]interface{}{
 		"toString": toString,
+		"format": format,
 		"lower":    lower,
 		"upper":    upper,
 		"capital":  capital,
@@ -39,6 +41,14 @@ func init() {
 */
 func toString(val i) (str i, err error) {
 	return fmt.Sprint(val), err
+}
+
+/*
+	Formats value to default Fizz print formatting.
+	func format(value interface{}) string
+*/
+func format(val i) (str i, err error) {
+	return util.FormatPrintValue(val), err
 }
 
 /*

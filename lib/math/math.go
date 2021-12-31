@@ -1,6 +1,10 @@
 package math
 
-import "math"
+import (
+	"math"
+	"math/rand"
+	"time"
+)
 
 // Standard math package for most common mathematical operations
 
@@ -11,6 +15,8 @@ var (
 )
 
 func init() {
+	rand.Seed(time.Hour.Milliseconds())
+
 	noErr := map[string]func(float64) float64{
 		/* func sin(num float64) float64 */
 		"sin": math.Sin,
@@ -43,6 +49,7 @@ func init() {
 		"min": min,
 		"deg": deg,
 		"rad": rad,
+		"random": random,
 	}
 
 	for name, f := range noErr {
@@ -77,4 +84,12 @@ func rad(num float64) (val i, err error) {
 */
 func deg(num float64) (val i, err error) {
 	return (num * 360) / (2 * math.Pi), err
+}
+
+/*
+	Gets random number bewteen 0 and 1
+	func rand() float64
+*/
+func random() (val i, err error) {
+	return rand.Float64(), err
 }
