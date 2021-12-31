@@ -1,13 +1,5 @@
 # Fizz update changelog
 
-## Version 1.0.1
-
-**Whats new:**
-
-- More library functions
-
-**Bug fixes and more:**
-
 ## Version 1.0.0
 
 **Whats new:**
@@ -22,6 +14,7 @@
 - Added new recursive equality check for objects and arrays
 - Implemented callstack and -f flag to show it
 - Error for exceeding recursion limit
+- Fixed bug where environments would be referenced and not copied
 
 ## Version 0.6.0
 

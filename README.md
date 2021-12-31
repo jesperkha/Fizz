@@ -66,7 +66,7 @@ Make sure to check out [the command line basics](./docs/cmd.md) too so you know 
 
 ## Installation
 
-Prebuilt binary of the [latest release (v1.0.1)](https://github.com/jesperkha/Fizz/releases/tag/v1.0.1).
+Prebuilt binary of the [latest release (v1.0.0)](https://github.com/jesperkha/Fizz/releases/tag/v1.0.0).
 
 You can also build from source. However, building from source from a non-release branch does not gurantee that everything works as expected as some things may be undergoing changes.
 
