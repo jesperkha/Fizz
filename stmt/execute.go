@@ -277,7 +277,6 @@ func execFunction(stmt Statement) (err error) {
 				return nil, util.WrapFilename(originCache, ErrMaximumRecursion)
 			}
 
-			// Todo: error occures for definitions even after popping
 			// Push closure scope into stack
 			env.PushTempEnv(envCache)
 			env.PushScope()

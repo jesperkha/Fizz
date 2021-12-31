@@ -15,7 +15,7 @@
     <a href="https://github.com/jesperkha/Fizz/issues">Report Bug</a>
     ·
     <a href="#installation">Download</a>
-  </p> 
+  </p>
 </div>
 
 <br>
