@@ -11,6 +11,7 @@
 **Bug fixes and more:**
 
 - Changed env to allow acces to definitions / reassignments _after_ a closure was formed
+- Added new recursive equality check for objects and arrays
 
 ## Version 0.6.0
 

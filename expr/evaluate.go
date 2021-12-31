@@ -38,6 +38,26 @@ func EvaluateExpression(expr *Expression) (value interface{}, err error) {
 	return expr, ErrInvalidExpression
 }
 
+// Performs equality check and parsing for arrays and object
+// because they are pointers and cannot be compared as addresses.
+func equal(left, right interface{}) bool {
+	l, r := util.GetType(left), util.GetType(right)
+
+	if l == "array" && r == "array" {
+		a, _ := left.(*env.Array)
+		b, _ := right.(*env.Array)
+		return a.IsEqual(b)
+	}
+
+	if l == "object" && r == "object" {
+		a, _ := left.(*env.Object)
+		b, _ := right.(*env.Object)
+		return a.IsEqual(b)
+	}
+
+	return left == right
+}
+
 // Token types >= string are valid literal types
 func evalLiteral(literal *Expression) (value interface{}, err error) {
 	if literal.Value.Type >= lexer.STRING {
@@ -73,6 +93,8 @@ func evalUnary(unary *Expression) (value interface{}, err error) {
 }
 
 func evalBinary(binary *Expression) (value interface{}, err error) {
+	opType := binary.Operand.Type
+
 	// Recursivly evaluates left and right expressions
 	left, err := EvaluateExpression(binary.Left)
 	if err != nil {
@@ -87,7 +109,7 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 	// Operations if both are number types
 	if isNumber(right) && isNumber(left) {
 		vl, vr := left.(float64), right.(float64)
-		switch binary.Operand.Type {
+		switch opType {
 		case lexer.PLUS:
 			return vl + vr, err
 		case lexer.MINUS:
@@ -115,11 +137,11 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 	}
 
 	// Types do not need to match for comparisons
-	switch binary.Operand.Type {
+	switch opType {
 	case lexer.EQUAL_EQUAL:
-		return left == right, err
+		return equal(left, right), err
 	case lexer.NOT_EQUAL:
-		return left != right, err
+		return !equal(left, right), err
 	case lexer.AND:
 		return isTruthy(left) && isTruthy(right), err
 	case lexer.OR:
@@ -127,11 +149,21 @@ func evalBinary(binary *Expression) (value interface{}, err error) {
 	}
 
 	// Support string addition
-	if util.GetType(left) == "string" && util.GetType(right) == "string" && binary.Operand.Type == lexer.PLUS {
+	if util.GetType(left) == "string" && util.GetType(right) == "string" && opType == lexer.PLUS {
 		return strings.Join([]string{left.(string), right.(string)}, ""), err
 	}
 
-	// Todo: add in operator for array
+	// Binary 'in' operator for arrays
+	if util.GetType(right) == "array" && opType == lexer.IN {
+		arr, _ := right.(*env.Array)
+		for _, v := range arr.Values {
+			if equal(v, left) {
+				return true, err
+			}
+		}
+
+		return false, err
+	}
 
 	// If non of the previous checks worked the expression is invalid
 	typeLeft, typeRight := util.GetType(left), util.GetType(right)

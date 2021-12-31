@@ -56,9 +56,6 @@ const (
 	Range
 )
 
-// Todo: make range statement and remove repeat
-// Todo: enum statement
-
 type Statement struct {
 	Type       int
 	Line       int

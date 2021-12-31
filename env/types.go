@@ -11,6 +11,33 @@ var (
 	ErrEmptyArray      = errors.New("cannot pop from empty array, line %d")
 )
 
+// Performs recursive equality check for objects and arrays.
+// Other cases returns standard equality check.
+func Equal(left, right interface{}) bool {
+	l, r := "", ""
+	if lo, ok := left.(FizzObject); ok {
+		l = lo.Type()
+	}
+
+	if ro, ok := right.(FizzObject); ok {
+		r = ro.Type()
+	}
+
+	if l == "array" && r == "array" {
+		a, _ := left.(*Array)
+		b, _ := right.(*Array)
+		return a.IsEqual(b)
+	}
+
+	if l == "object" && r == "object" {
+		a, _ := left.(*Object)
+		b, _ := right.(*Object)
+		return a.IsEqual(b)
+	}
+
+	return left == right
+}
+
 // Interface matches all Fizz object structs.
 // Type() returns the name of the object
 type FizzObject interface {
@@ -43,6 +70,26 @@ func (o *Object) Type() string {
 	return "object"
 }
 
+// Equality check for objects
+func (o *Object) IsEqual(a *Object) bool {
+	if o.NumFields != a.NumFields {
+		return false
+	}
+
+	for k, v := range o.Fields {
+		ov, err := a.Get(k)
+		if err != nil {
+			return false
+		}
+
+		if !Equal(v, ov) {
+			return false
+		}
+	}
+
+	return true
+}
+
 // Gets value from object. Used for getter syntax "name.value"
 func (o *Object) Get(name string) (value interface{}, err error) {
 	if val, ok := o.Fields[name]; ok {
@@ -71,6 +118,21 @@ type Array struct {
 
 func (a Array) Type() string {
 	return "array"
+}
+
+// Compare two arrays
+func (a *Array) IsEqual(o *Array) bool {
+	if a.Length != o.Length {
+		return false
+	}
+
+	for i, n := range a.Values {
+		if !Equal(o.Values[i], n) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // Gets value of array at index. Returns error if value is > len(arr) or
