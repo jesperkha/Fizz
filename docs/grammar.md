@@ -43,6 +43,7 @@ rangeable  -> array | expression ("," expression)*
 
 # Operators
 operator -> "+" | "-" | "*" | "/" | "^" | "%" | "&" |
-            ":" | "==" | "!=" | ">=" | "<=" | "<" | ">"
+            ":" | "==" | "!=" | ">=" | "<=" | "<" |
+            ">" | "in"
 assignOp -> "=" | ":="
 ```

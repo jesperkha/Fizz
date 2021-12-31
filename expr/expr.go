@@ -2,7 +2,6 @@ package expr
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/jesperkha/Fizz/lexer"
 )
@@ -28,15 +27,6 @@ var (
 	ErrIllegalType          = errors.New("unknown type '%s'")
 )
 
-var LegalTypes = []string{
-	"number",
-	"nil",
-	"string",
-	"function",
-	"bool",
-	"object",
-}
-
 const (
 	EmptyExpression = iota
 	Literal
@@ -61,43 +51,4 @@ type Expression struct {
 	Right   *Expression
 	Inner   *Expression
 	Exprs   []Expression
-}
-
-type ParseToken struct {
-	Type  int
-	Token lexer.Token
-	Inner []ParseToken
-}
-
-func ParseAndEval(tokens []lexer.Token) (value interface{}, err error) {
-	expr, err := ParseExpression(tokens)
-	if err != nil {
-		return value, err
-	}
-
-	return EvaluateExpression(&expr)
-}
-
-func PrintExpressionAST(expr Expression) {
-	fmt.Println(printAST(expr))
-}
-
-func printAST(expr Expression) string {
-	switch expr.Type {
-	case Literal:
-		return fmt.Sprintf("literal: %s", expr.Value.Lexeme)
-	case Unary:
-		return fmt.Sprintf("unary: %s [%s]", expr.Operand.Lexeme, printAST(*expr.Right))
-	case Binary:
-		left, right := printAST(*expr.Left), printAST(*expr.Right)
-		return fmt.Sprintf("binary: %s [%s, %s]", expr.Operand.Lexeme, left, right)
-	case Group:
-		return fmt.Sprintf("group: [%s]", printAST(*expr.Inner))
-	case Variable:
-		return fmt.Sprintf("variable: %s", expr.Name)
-	case Call:
-		return fmt.Sprintf("call: %s()", expr.Name)
-	}
-
-	return ""
 }

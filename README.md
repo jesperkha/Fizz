@@ -35,7 +35,11 @@
 
 ## About
 
-Fizz is a dynamic and interpreted programming language built with Go. It is strongly typed and comes with very readable, but accurate error messages. Fizz has most of the standard functionality that you would expect from modern programming languages. The library system also allows the user to implement their own features as Go functions and port them directly into Fizz. If you like this project, consider giving it a star 😉
+Fizz is a dynamic and interpreted programming language built with Go. It is strongly typed and comes with very readable, but accurate error messages.
+
+Fizz has most of the standard functionality that you would expect from modern programming languages. The library system also allows the user to implement their own features as Go functions and port them directly into Fizz.
+
+If you like this project, consider giving it a star 😉
 
 <br>
 
@@ -66,7 +70,7 @@ Make sure to check out [the command line basics](./docs/cmd.md) too so you know 
 
 ## Installation
 
-Prebuilt binary of the [latest release (v1.0.0)](https://github.com/jesperkha/Fizz/releases/tag/v1.0.0).
+Prebuilt binary of the [latest release (v1.0.1)](https://github.com/jesperkha/Fizz/releases/tag/v1.0.1).
 
 You can also build from source. However, building from source from a non-release branch does not gurantee that everything works as expected as some things may be undergoing changes.
 
@@ -87,7 +91,7 @@ Running the interpreter without giving a filename will run the terminal mode whe
 
 ### Run file
 
-Running the interpreter and giving a filename simply runs the code in the file and halts if an error occurs. Fizz files must end in the `.fizz` suffix. Both of the following are valid:
+Running the interpreter and giving a filename simply runs the code in the file and halts if an error occurs. Fizz files must end with the `.fizz` suffix. Both of the following are valid:
 
 ```console
 $ ./fizz myFile.fizz

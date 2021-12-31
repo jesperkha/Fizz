@@ -74,6 +74,8 @@ Fizz is strongly typed, meaning unmatched types in certain expressions will caus
 
 - `function` Type of function or object constructor
 
+- `array` Type of array instance
+
 <br>
 
 ## Keywords
@@ -81,10 +83,10 @@ Fizz is strongly typed, meaning unmatched types in certain expressions will caus
 Keyword names are reserved and cannot be used for variable names. Here is a list of all keywords in Fizz:
 
 ```
-var       print     type       func
-exit      skip      break      return
-false     nil       include    if
-import    define    true       while
+var       print     type       func      range
+exit      skip      break      return    in
+false     nil       include    if        enum
+import    define    true       while     repeat
 ```
 
 <br>
