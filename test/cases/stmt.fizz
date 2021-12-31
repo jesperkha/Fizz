@@ -45,3 +45,4 @@ f := closure(); f();
 > range 2 in 10 {}
 > range 1, 2, 3, 4 {}
 > range 0, 10, -1 {}
+> func a() {a();} a();

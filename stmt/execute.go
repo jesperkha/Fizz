@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	CurrentOrigin string
+	CurrentOrigin     string
+	MaxRecursionDepth = 1000
 )
 
 // Goes through list of statements and executes them. Error is returned from statements exec method.
@@ -249,7 +250,10 @@ func execBlock(stmt Statement) (err error) {
 	return err
 }
 
-// Todo: implement callstack (add recursion limit when doing so)
+// Monitor recursion
+var lastFunction = ""
+var recursionDepth = 0
+
 func execFunction(stmt Statement) (err error) {
 	// Store origin at point of function declaration as well as scope around it
 	originCache := CurrentOrigin
@@ -261,10 +265,21 @@ func execFunction(stmt Statement) (err error) {
 		Origin:  CurrentOrigin,
 		// Call function and set param variables to scope
 		Call: func(args ...interface{}) (interface{}, error) {
+			// Handle recursion errors
+			name := stmt.Name
+			if lastFunction == name {
+				recursionDepth++
+			} else {
+				lastFunction = name
+			}
+
+			if recursionDepth > MaxRecursionDepth {
+				return nil, util.WrapFilename(originCache, ErrMaximumRecursion)
+			}
+
+			// Push closure scope into stack
 			env.PushTempEnv(envCache)
 			env.PushScope()
-
-			// fmt.Println(envCache)
 
 			// Declare args
 			for idx, arg := range args {
@@ -277,6 +292,11 @@ func execFunction(stmt Statement) (err error) {
 			env.PopTempEnv()
 			if e, ok := err.(ConditionalError); ok {
 				return e.Value, nil
+			}
+
+			// Add to callstack
+			if err != nil {
+				env.FailCall(stmt.Name, originCache, stmt.Line)
 			}
 
 			return nil, util.WrapFilename(originCache, err)

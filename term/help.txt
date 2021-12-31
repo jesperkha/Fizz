@@ -1,6 +1,9 @@
 use:
-    fizz [flags] [filename]
+    fizz [flags?] [filename?]
 
 flags:
-    --help  what you are reading now
+    -e          print global env after finish
+    -f          print function callstack with errors
+
+    --help      what you are reading now
     --version   print fizz version

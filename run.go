@@ -14,7 +14,7 @@ import (
 )
 
 var parser = term.NewFlagParser(
-	[]string{"e"},
+	[]string{"e", "f"},
 	[]string{"version", "help"},
 )
 
@@ -43,13 +43,22 @@ func RunInterpeter(args []string) {
 		name := split[len(split)-1]
 		os.Chdir(path)
 
+		// Run file
 		e, err := interp.RunFile(name)
-		if err != nil && err != stmt.ErrProgramExit {
-			util.ErrorAndExit(err)
-		}
 
+		// Print global environment if flag is set first
 		if parser.Flags["-e"] {
 			fmt.Println(util.FormatPrintValue(e))
+		}
+
+		// Handle error
+		if err != nil && err != stmt.ErrProgramExit {
+			util.PrintError(err)
+			if c := env.GetCallstack(); parser.Flags["-f"] && len(c) > 0 {
+				util.PrintError(fmt.Errorf(c))
+			}
+
+			os.Exit(1)
 		}
 
 		return
@@ -79,7 +88,6 @@ func RunTerminal() {
 		// Continue with indent after braces
 		numBlocks += strings.Count(input, "{") - strings.Count(input, "}")
 		totalString += input + "\n" // Better error handling
-
 		if numBlocks <= 0 {
 			if _, err := interp.Interperate("", totalString); err != nil {
 				util.PrintError(err)

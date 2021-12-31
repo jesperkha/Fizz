@@ -87,13 +87,13 @@ func PrintError(err error) {
 // Prints error followed by program exit. Exit code 1 is reserved for crashes
 func ErrorAndExit(err error) {
 	PrintError(err)
-	os.Exit(0)
+	os.Exit(1)
 }
 
 // Prints msg and exits with code 0
 func PrintAndExit(msg interface{}) {
 	fmt.Println(msg)
-	os.Exit(0)
+	os.Exit(1)
 }
 
 // Checks if tokens is in tokenlist
@@ -219,7 +219,7 @@ func GetLibType(typ string) string {
 	return typ
 }
 
-// Adds filename to error message if not already done
+// Adds filename to error message if not already done. Returns nil if err is nil.
 func WrapFilename(filename string, err error) error {
 	if err == nil || err.Error() == "" {
 		return err

@@ -2,6 +2,13 @@ package env
 
 import (
 	"errors"
+	"fmt"
+	"strings"
+)
+
+const (
+	// Max number of function names printed upon error
+	CallStackSize = 10
 )
 
 var (
@@ -16,6 +23,26 @@ type Environment []valueMap
 
 var currentEnv = StandardEnvironment
 var tempEnv = currentEnv
+
+// Callstack is slice of names/origins of functions. It is only appended to from
+// failing functions, and the ripple back effect from the returned errors will
+// fill it with the names of the failed functions.
+var callStack = []string{}
+
+// Appends failed function to callstack.
+func FailCall(name string, origin string, line int) {
+	callStack = append(callStack, fmt.Sprintf("\tat %s() in %s, line %d", name, origin, line))
+}
+
+// Get print ready format of callstack for errors.
+func GetCallstack() string {
+	if len(callStack) > CallStackSize {
+		str := strings.Join(callStack[:CallStackSize], "\n")
+		return str + "\n\t..."
+	}
+
+	return strings.Join(callStack, "\n")
+}
 
 // Creates new environment, replacing the old one. Returns old environment. For
 // testing, its not necessary to get rid of the old env, hence the option to not

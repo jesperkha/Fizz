@@ -1,26 +1,45 @@
-# **Fizz**
+<br />
+<div align="center">
+  <img src=".github/logo.svg" alt="Logo" width="120">
 
-Fizz is an interpreted programming language built with Go. The main use cases for Fizz will be file management, simple http requests, and general terminal scripting. The built in libraries (not added yet) will support all of these features, including documentation with examples.
+  <h3 align="center">Fizz, the programming language</h3>
+
+  <p align="center">
+    Interpreted dynamic programming language built with Go.
+    <br />
+    <a href="https://github.com/jesperkha/Fizz/blob/main/docs/lang.md"><strong>Documentation »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/jesperkha/Fizz/tree/main/examples">Examples</a>
+    ·
+    <a href="https://github.com/jesperkha/Fizz/issues">Report Bug</a>
+    ·
+    <a href="#installation">Download</a>
+  </p> 
+</div>
 
 <br>
 
-## Table of contents
-
-- [Roadmap](#roadmap)
-- [Language documentation](#language-documentation)
-- [Installation](#installation)
-  - [Pre-built binaries](#pre-built-binaries)
-  - [Building from source](#building-from-source)
-  - [Extensions](#extensions)
-- [Running a program](#running-a-program)
-
-<br>
-
----
+<details>
+  <summary>Table of Contents</summary>
+  <ul>
+  <li><a href="#about">About</a></li>
+  <li><a href="#roadmap">Roadmap</a></li>
+  <li><a href="#documentation">Documentation</a></li>
+  <li><a href="#installation">Installation</a></li>
+  <li><a href="#running-a-program">Running a program</a></li>
+  </ul>
+</details>
 
 <br>
 
-## <a id="roadmap"></a> Roadmap
+## About
+
+Fizz is a dynamic and interpreted programming language built with Go. It is strongly typed and comes with very readable, but accurate error messages. Fizz has most of the standard functionality that you would expect from modern programming languages. The library system also allows the user to implement their own features as Go functions and port them directly into Fizz. If you like this project, consider giving it a star 😉
+
+<br>
+
+## Roadmap
 
 This roadmap highlights progress for the development of Fizz:
 
@@ -30,47 +49,44 @@ This roadmap highlights progress for the development of Fizz:
 - ✔️ Functions
 - ✔️ Objects
 - ✔️ File import
-- ✔️ Go -> Fizz library support
+- ✔️ Libraries
 - ✔️ Arrays
 - ✔️ Enums
-- ❌ Full language documentation
 
 <br>
 
-## <a id="language-documentation"></a> Language documentation
+## Documentation
 
-You can find all the basic info you need about Fizz [here](./docs/lang.md). For a deeper understanding of how Fizz works its suggested to simply look at the source code.
+You can read the [full language documentation](./docs/lang.md) to learn about all of Fizz's syntax. It is also recommended to quickly skim over [the language grammar](./docs/grammar.md) to make sure you undestand the basics of how Fizz is structured (don't worry, it's _very_ similar to most modern programming languages).
+
+Make sure to check out [the command line basics](./docs/cmd.md) too so you know how to run your code and also which configurations you can apply.
 
 <br>
 
-## <a id="installation"></a> Installation
+## Installation
 
-<a id="pre-built-binaries"></a> Pre-built binaries:
+Prebuilt binary of the [latest release (v0.6.0)](https://github.com/jesperkha/Fizz/releases/tag/v0.6.0).
 
-- [Latest Release v0.6.0](https://github.com/jesperkha/Fizz/releases/tag/v0.6.0)
-
-<a id="building-from-source"></a> Build from source:
+You can also build from source. However, building from source from a non-release branch does not gurantee that everything works as expected as some things may be undergoing changes.
 
 1. Clone repo
 2. Run the `build.sh` file
 
-<a id="extensions"></a> Extensions:
-
-- [Syntax highlighting](https://github.com/jesperkha/fizz-extensions)
+Finally, there is also optional, but recommended, [syntax highlighting](https://github.com/jesperkha/fizz-extensions) extensions for both Visual Studio Code and micro.
 
 <br>
 
-## <a id="running-a-program"></a> Running a program
+## Running a program
 
-**Terminal mode**
+[Full documentation on command line basics](./docs/cmd.md)
+
+### Terminal mode
 
 Running the interpreter without giving a filename will run the terminal mode where you can run any valid Fizz code live. Errors are printed but the program is not terminated. Newlines are supported for blocks and the code will not be executed until the block is closed.
 
-**Run file**
+### Run file
 
-Running the interpreter and giving a filename simply runs the code in the file and halts if an error occurs. Fizz files must end in the `.fizz` suffix.
-
-Both of these are valid:
+Running the interpreter and giving a filename simply runs the code in the file and halts if an error occurs. Fizz files must end in the `.fizz` suffix. Both of the following are valid:
 
 ```console
 $ ./fizz myFile.fizz

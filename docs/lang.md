@@ -98,7 +98,7 @@ Operators:
 - Binary operators:
   ```go
   +   -   *   /   %   ^   <
-  >   ==  !=  >=  <=  &   :
+  >   ==  !=  >=  <=  &   : in
   ```
 - Unary operators:
   ```go
@@ -343,6 +343,12 @@ print names; // ["John", "Susan", "Timmy"]
 print len(name); // 3
 ```
 
+You can use the `in` operator to check if an element is present in an array:
+
+```js
+print "dog" in ["cat", "dog", "fox"]; // true
+```
+
 ### Push
 
 To push elements into an array use the built-in `push` function:
@@ -454,7 +460,7 @@ meters := io.input("Enter height in meters: ");
 
 feet := str.toNumber(meters) * 3.281;
 print "You are: " + str.toString(feet) + " feet tall";
-// Built in string formatting will come soon dont worry ;)
+// Built in string formatting will come soon don't worry ;)
 ```
 
 <br>

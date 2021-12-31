@@ -26,6 +26,7 @@ var (
 	ErrExpectedInteger    = errors.New("expected expression to be integer, line %d")
 	ErrExpectedNumber     = errors.New("expected expression to be number, line %d")
 	ErrInfiniteLoop       = errors.New("infinite loop in range statement not allowed, line %d")
+	ErrMaximumRecursion   = errors.New("maximum recursion depth exceeded, line %d")
 	ErrProgramExit        = errors.New("")
 
 	ErrReturnOutsideFunc = ConditionalError{Msg: "cannot use return outside of a function, line %d", Type: RETURN}

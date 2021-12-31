@@ -12,6 +12,8 @@
 
 - Changed env to allow acces to definitions / reassignments _after_ a closure was formed
 - Added new recursive equality check for objects and arrays
+- Implemented callstack and -f flag to show it
+- Error for exceeding recursion limit
 
 ## Version 0.6.0
 
