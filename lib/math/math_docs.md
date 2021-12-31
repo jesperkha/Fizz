@@ -146,3 +146,13 @@ func deg(rad float64) float64
 
 <br>
 
+## **`rand`**
+
+Gets random number bewteen 0 and 1
+
+```go
+func rand() float64
+```
+
+<br>
+

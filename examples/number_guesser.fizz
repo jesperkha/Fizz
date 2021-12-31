@@ -1,0 +1,20 @@
+include "io";
+include "math";
+include "str";
+
+number := math.floor(math.random() * 10);
+
+while {
+    input := io.input("Enter guess: ");
+    num := str.toNumber(input);
+
+    if num == number {
+        exit "You win!";
+    }
+
+    if num > number {
+        print "Too high";
+    } else {
+        print "Too low";
+    }
+}

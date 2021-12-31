@@ -1,0 +1,11 @@
+include "io";
+
+filename := "users.txt";
+
+func createEntry(item) {
+    if !io.exists(filename) {
+        io.newFile(filename);
+    }
+
+    io.appendFile(filename, item);
+}

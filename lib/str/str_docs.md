@@ -10,6 +10,16 @@ func toString(value interface{}) string
 
 <br>
 
+## **`format`**
+
+Formats value to default Fizz print formatting.
+
+```go
+func format(value interface{}) string
+```
+
+<br>
+
 ## **`lower`**
 
 Converts all letters in string to lower case.

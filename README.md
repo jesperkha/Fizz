@@ -35,11 +35,7 @@
 
 ## About
 
-Fizz is a dynamic and interpreted programming language built with Go. It is strongly typed and comes with very readable, but accurate error messages.
-
-Fizz has most of the standard functionality that you would expect from modern programming languages. The library system also allows the user to implement their own features as Go functions and port them directly into Fizz.
-
-If you like this project, consider giving it a star 😉
+Fizz is a dynamic and interpreted programming language built with Go. It is strongly typed and comes with very readable, but accurate error messages. Fizz has most of the standard functionality that you would expect from modern programming languages. The library system also allows the user to implement their own features as Go functions and port them directly into Fizz. If you like this project, consider giving it a star 😉
 
 <br>
 

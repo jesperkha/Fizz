@@ -21,7 +21,7 @@ type valueMap map[string]interface{}
 // order will be from low to high level scopes.
 type Environment []valueMap
 
-var currentEnv = StandardEnvironment
+var currentEnv = CopyEnvironment(StandardEnvironment)
 var tempEnv = currentEnv
 
 // Callstack is slice of names/origins of functions. It is only appended to from
@@ -53,7 +53,7 @@ func NewEnvironment() Environment {
 	}
 
 	oldEnv := currentEnv
-	currentEnv = StandardEnvironment
+	currentEnv = CopyEnvironment(StandardEnvironment)
 	return oldEnv
 }
 
@@ -155,4 +155,14 @@ func PushTempEnv(env Environment) {
 // hardcoded and will not be called when there is no temporary environment.
 func PopTempEnv() {
 	currentEnv = tempEnv
+}
+
+// Copies environment to not use a reference of the old one.
+func CopyEnvironment(env Environment) Environment {
+	temp := Environment{{}}
+	for k, v := range env[0] {
+		temp[0][k] = v
+	}
+
+	return temp
 }

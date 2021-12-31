@@ -45,10 +45,10 @@ func init() {
 	}
 
 	Includes = map[string]interface{}{
-		"max": max,
-		"min": min,
-		"deg": deg,
-		"rad": rad,
+		"max":    max,
+		"min":    min,
+		"deg":    deg,
+		"rad":    rad,
 		"random": random,
 	}
 

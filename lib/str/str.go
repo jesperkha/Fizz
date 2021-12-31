@@ -24,7 +24,7 @@ var (
 func init() {
 	Includes = map[string]interface{}{
 		"toString": toString,
-		"format": format,
+		"format":   format,
 		"lower":    lower,
 		"upper":    upper,
 		"capital":  capital,

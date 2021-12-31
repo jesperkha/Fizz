@@ -100,7 +100,7 @@ Operators:
 - Binary operators:
   ```go
   +   -   *   /   %   ^   <
-  >   ==  !=  >=  <=  &   : in
+  >   ==  !=  >=  <=  &   :  in
   ```
 - Unary operators:
   ```go
