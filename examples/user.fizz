@@ -1,0 +1,21 @@
+include "io";
+include "str";
+
+users := [];
+
+define User {
+    name
+    age
+}
+
+func createNewUser() {
+    name := io.input("Enter name: ");
+    age := io.input("Enter age: ");
+
+    newUser := User(name, str.toNumber(age));
+    push(users, newUser);
+    
+    print users;
+}
+
+createNewUser();
