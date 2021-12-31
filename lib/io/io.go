@@ -48,7 +48,6 @@ func input(prompt string) (input i, err error) {
 
 /*
 	Reads file and returns text.
-	This is some extra line
 	func readFile(filename string) string
 */
 func readFile(filename string) (str i, err error) {

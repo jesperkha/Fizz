@@ -13,7 +13,6 @@ func input(prompt string) string
 ## **`readFile`**
 
 Reads file and returns text.
-This is some extra line
 
 ```go
 func readFile(filename string) string

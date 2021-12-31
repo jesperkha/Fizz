@@ -1,15 +1,15 @@
 # **Fizz libraries**
 
 - [Overview](#overview)
-- [Make your own](#create)
+- [Make your own](#making-your-own-library)
   - [Setup](#setup)
   - [Content](#content)
-  - [Build](#build)
-  - [Docs](#docs)
+  - [Build](#building)
+  - [Docs](#automatic-documentation)
 
 <br>
 
-## <a id="overview"></a> **Overview**
+## Overview
 
 Fizz allows for Go libraries to be included in your Fizz code. Use the `include` statement followed by the library name to use it:
 
@@ -21,7 +21,7 @@ name := io.input("Enter name: ");
 
 <br>
 
-## <a id="create"></a> **Making your own library**
+## Making your own library
 
 You can easily create your own library for Fizz. The only requirements are:
 
@@ -30,7 +30,7 @@ You can easily create your own library for Fizz. The only requirements are:
 
 <br>
 
-### <a id="setup"></a> Setup
+### Setup
 
 Create a new folder in the `lib` directory and name it after your library. The main file in your library **must** have the same name as the folder its in. Here is an example structure:
 
@@ -42,7 +42,7 @@ lib/
 
 <br>
 
-### <a id="content"></a> Content
+### Content
 
 To get started, add the following to your main file:
 
@@ -80,7 +80,7 @@ The values of the arguments given are checked before trying to call the function
 
 <br>
 
-## <a id="build"></a> Building with the new library
+## Building
 
 To actually add your new library to Fizz you need to recompile with the `build.sh` file. This will run a python script which will add an import to your library package.
 
@@ -102,7 +102,7 @@ Hello, John
 
 <br>
 
-## <a id="docs"></a> Automatic documentation
+## Automatic documentation
 
 Additionally, you can make simple documentation for your library. Use the following format to add documentation to your functions:
 

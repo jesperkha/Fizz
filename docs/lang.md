@@ -1,4 +1,4 @@
-# <a id="top"></a> **Fizz language documentation**
+# <a id="top"></a> Fizz language documentation
 
 **Language specifics:**
 
@@ -6,33 +6,33 @@
 - [Grammar](#grammar)
 - [Types](#types)
 - [Keywords](#keywords)
-- [Expressions and operators](#expr)
+- [Expressions and operators](#expressions-and-operators)
 
 **Variables and printing:**
 
-- [Print and Type](#prt)
-- [Error and Exit](#error)
-- [Variables](#var)
+- [Print and Type](#print-and-type)
+- [Error and Exit](#error-and-exit)
+- [Variables](#variables)
 - [Enums](#enums)
 
 **Conditionals and loops:**
 
-- [If statements and logic](#if)
-- [While loop](#while)
-- [Repeat loop](#repeat)
-- [Range loop](#range)
-- [Break and skip](#break)
+- [If statements and logic](#if-statements-and-logic)
+- [While loop](#while-loop)
+- [Repeat loop](#repeat-loop)
+- [Range loop](#range-loop)
+- [Break and skip](#break-and-skip)
 
 **Objects:**
 
-- [Functions](#func)
-- [Objects](#obj)
+- [Functions](#functions)
+- [Objects](#objects)
 - [Arrays](#arrays)
-- [Reference](#ref)
+- [Reference](#reference)
 
 **Files and imports**
 
-- [File imports](#import)
+- [File imports](#file-imports)
 - [Libraries](#libraries)
 
 <br>
@@ -42,7 +42,7 @@
 
 <br>
 
-## <a id="overview"></a> **Language overview**
+## Overview
 
 - Fizz is dynamically typed, meaning type checks are only performed at runtime
 - Comments are created with a hashtag `#` (as mentioned above) and end at the first found newline
@@ -50,13 +50,13 @@
 
 <br>
 
-## <a id="grammar"></a> **Grammar**
+## Grammar
 
 A definitive grammar sheet can be found [here](./grammar.md).
 
 <br>
 
-## <a id="types"></a> **Types**
+## Types
 
 Fizz is strongly typed, meaning unmatched types in certain expressions will cause a runtime error.
 
@@ -76,7 +76,7 @@ Fizz is strongly typed, meaning unmatched types in certain expressions will caus
 
 <br>
 
-## <a id="keywords"></a> **Keywords**
+## Keywords
 
 Keyword names are reserved and cannot be used for variable names. Here is a list of all keywords in Fizz:
 
@@ -89,7 +89,7 @@ import    define    true       while
 
 <br>
 
-## <a id="expr"></a> **Expressions and operators**
+## Expressions and operators
 
 Fizz features a lot of standard syntax similar to other languages. For example, all normal expressions using the basic arithmetic and logic operators will work in Fizz, including the modulo operator and the hat operator. Plus can also be used for joining strings.
 
@@ -111,7 +111,7 @@ Operators:
 
 <br>
 
-## <a id="prt"></a> **Print and Type**
+## Print and Type
 
 In Fizz, `print` is a _statement_, not a function. However, `type` is an _operator_, not a function, and gives a string value.
 
@@ -122,7 +122,7 @@ print type "World";
 
 <br>
 
-## <a id="error"></a> **Error and Exit**
+## Error and Exit
 
 The `error` statement prints out a message (or value) as an error and exits the program.
 
@@ -138,7 +138,7 @@ exit "goodbye"; // prints message and exits
 
 <br>
 
-## <a id="var"></a> **Variables**
+## Variables
 
 You can declare a variable using the `:=` operator. The value can be re-assigned later and even change type.
 
@@ -176,7 +176,7 @@ You can also use the `+=` operator with strings.
 
 <br>
 
-## <a id="enums"></a> **Enums**
+## Enums
 
 Fizz also has enums to quickly create a lot a variables with unique values.
 
@@ -198,7 +198,7 @@ print pear;   // 0
 
 <br>
 
-## <a id="if"></a> **If statements and logic**
+## If statements and logic
 
 Fizz features simple if and else statements, but not else-if. The 'and' operator is `&` and 'or' is `:`.
 
@@ -214,7 +214,7 @@ if height > 158.8 {
 
 <br>
 
-## <a id="while"></a> **While loop**
+## While loop
 
 Fizz has a while statement similar to most other languages. If you leave the expression field empty it will just run forever.
 
@@ -230,7 +230,7 @@ while {
 
 <br>
 
-## <a id="repeat"></a> **Repeat loop**
+## Repeat loop
 
 A repeat loop is another basic flow controller that just executes a block n times.
 
@@ -243,7 +243,7 @@ repeat 5 {
 
 <br>
 
-## <a id="range"></a> **Range loop**
+## Range loop
 
 The range loop is a more advanced form of loop, kind of a hybrid bewteen pythons `for _ in _` statements and other languages `for` loops. The simplest use case is to just give one argument to the right side of `in`. This will just loop with `n` going from 0 to 9:
 
@@ -287,14 +287,14 @@ range day in days {
 
 <br>
 
-## <a id="break"></a> **Break and skip**
+## Break and skip
 
 - `skip` skips to next iteration in loop
 - `break` breaks out of loop
 
 <br>
 
-## <a id="func"></a> **Functions**
+## Functions
 
 You can declare a function using the `func` keyword. Functions will return `nil` if no other return value is specified. Passing an incorrect argument number will cause a runtime error.
 
@@ -308,7 +308,7 @@ print add(5, 2); // 7
 
 <br>
 
-## <a id="obj"></a> **Objects**
+## Objects
 
 Object structures can be defined with the `define` keyword. This creates a object template which you can use to make your own structured data. The fields of the object do not have a specific type, unlike languages like C and Go. Object values support reassignment too.
 
@@ -329,7 +329,7 @@ Under the hood, the `define` statement creates a function that returns an object
 
 <br>
 
-## <a id="arrays"></a> **Arrays**
+## Arrays
 
 Arrays in Fizz are just an array of values, of which can be any type. You get get the value of a specific index in an array by using the index getter syntax. Indexes begin at 0. Additionally, you can get the length of an array with the built in `len` function.
 
@@ -372,7 +372,7 @@ print arr;      // [1, 2]
 
 <br>
 
-## <a id="ref"></a> **Reference**
+## Reference
 
 In Fizz, objects and arrays are passed by reference. This means you can modify them directly when passing them as a function argument:
 
@@ -405,7 +405,7 @@ print iphone.version; // 2
 
 <br>
 
-## <a id="import"></a> **File imports**
+## File imports
 
 You can import files by using the `import` statement. The given path, or name, is always relative to the file that the program started in. Circular imports are not allowed and an error will be raised if one is found. The imported object name is the filename, so files with the same names cannot be imported in the same file. (in the future `import x as y` syntax will be added to fix this)
 
@@ -436,7 +436,7 @@ John
 
 <br>
 
-## <a id="libraries"></a> **Libraries**
+## Libraries
 
 Fizz libraries are different from imports. They are not other Fizz files, but rather Go files. This is to make it possible for functionality to be added to Fizz without baking it straight in. You can read the [library documentation](./libraries.md) to find out how they work and how to create your own.
 
