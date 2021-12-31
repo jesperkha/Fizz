@@ -52,6 +52,7 @@ This roadmap highlights progress for the development of Fizz:
 - ✔️ Libraries
 - ✔️ Arrays
 - ✔️ Enums
+- ❌ 100% complete standard library
 
 <br>
 
