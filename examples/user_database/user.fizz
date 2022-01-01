@@ -1,0 +1,20 @@
+include "str";
+include "io";
+
+import "entries";
+
+define User {
+    name
+    age
+}
+
+func createNewUser() {
+    name := io.input("Enter name: ");
+    age := io.input("Enter age: ");
+
+    newUser := User(name, str.toNumber(age));
+    return newUser;
+}
+
+user := createNewUser();
+entries.createEntry(str.format(user));
