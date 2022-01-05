@@ -60,7 +60,7 @@ This roadmap highlights progress for the development of Fizz:
 
 You can read the [full language documentation](./docs/lang.md) to learn about all of Fizz's syntax. It is also recommended to quickly skim over [the language grammar](./docs/grammar.md) to make sure you undestand the basics of how Fizz is structured (don't worry, it's _very_ similar to most modern programming languages).
 
-Make sure to check out [the command line basics](./docs/cmd.md) too so you know how to run your code and also which configurations you can apply.
+Make sure to check out [the command-line basics](./docs/cmd.md) too so you know how to run your code and also which configurations you can apply.
 
 <br>
 

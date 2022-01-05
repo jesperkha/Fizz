@@ -52,7 +52,7 @@
 
 ## Grammar
 
-A definitive grammar sheet can be found [here](./grammar.md).
+[A definitive grammar sheet](./grammar.md)
 
 <br>
 
@@ -83,7 +83,7 @@ Fizz is strongly typed, meaning unmatched types in certain expressions will caus
 Keyword names are reserved and cannot be used for variable names. Here is a list of all keywords in Fizz:
 
 ```
-var       print     type       func      range
+var       print     type       func      range     error
 exit      skip      break      return    in
 false     nil       include    if        enum
 import    define    true       while     repeat
@@ -118,8 +118,8 @@ Operators:
 In Fizz, `print` is a _statement_, not a function. However, `type` is an _operator_, not a function, and gives a string value.
 
 ```go
-print "Hello";
-print type "World";
+print "Hello";      // Hello
+print type "World"; // string
 ```
 
 <br>
@@ -194,6 +194,7 @@ enum {
 }
 
 print banana; // 0
+print apple;  // 1
 print orange; // 2
 print pear;   // 0
 ```
@@ -202,7 +203,7 @@ print pear;   // 0
 
 ## If statements and logic
 
-Fizz features simple if and else statements, but not else-if. The 'and' operator is `&` and 'or' is `:`.
+Fizz features simple `if` and `else` statements, but not `else if`. The 'and' operator is `&` and 'or' is `:`.
 
 ```go
 height := 172;
@@ -247,7 +248,9 @@ repeat 5 {
 
 ## Range loop
 
-The range loop is a more advanced form of loop, kind of a hybrid bewteen pythons `for _ in _` statements and other languages `for` loops. The simplest use case is to just give one argument to the right side of `in`. This will just loop with `n` going from 0 to 9:
+The range loop is a more advanced form of loop, kind of a hybrid bewteen pythons `for _ in _` statements and other languages `for` loops. The simplest use case is to just give one argument to the right side of `in`.
+
+In this case it will just loop with `n` going from 0 to 9 as the default starting number is 0:
 
 ```go
 range n in 10 {
@@ -255,7 +258,7 @@ range n in 10 {
 }
 ```
 
-Providing two arguments defines a start and end for the loop:
+Providing two arguments defines both the start and end for the loop:
 
 ```go
 // Goes from 3 to 7
@@ -264,7 +267,7 @@ range n in 3, 8 {
 }
 ```
 
-Three arguments define start, end, and iteration:
+Three arguments define start, end, and iteration amount. The amount can be negative and make the loop count down, but if the conditions are set in a way where the loop will never end, an error is raised:
 
 ```go
 range n in 0, 5, 0.5 {
@@ -312,7 +315,7 @@ print add(5, 2); // 7
 
 ## Objects
 
-Object structures can be defined with the `define` keyword. This creates a object template which you can use to make your own structured data. The fields of the object do not have a specific type, unlike languages like C and Go. Object values support reassignment too.
+Object structures can be defined with the `define` keyword. This creates an object template which you can use to make your own structured data. The field names can be separated by a line break, comma, or space. The fields of the object do not have a specific type, unlike languages like C and Go. Object values support reassignment too.
 
 ```go
 define Person {
@@ -327,13 +330,18 @@ john.age = 99;
 print john.age; // 99
 ```
 
-Under the hood, the `define` statement creates a function that returns an object with the specified values. That means `Person` is a function type and `john` is an object type.
+Under the hood, the `define` statement creates a function that returns an object with the specified values. That means `Person` is a `function` type and `john` is an `object` type:
+
+```go
+print type Person // function
+print type john   // object
+```
 
 <br>
 
 ## Arrays
 
-Arrays in Fizz are just an array of values, of which can be any type. You get get the value of a specific index in an array by using the index getter syntax. Indexes begin at 0. Additionally, you can get the length of an array with the built in `len` function.
+Arrays in Fizz are just an array of values, of which can be any type. You get the value of a specific index in an array by using the index getter syntax. Indexes begin at 0. Additionally, you can get the length of an array with the built in `len` function.
 
 ```go
 names := ["John", "Susan", "Carl"];
@@ -409,7 +417,7 @@ print iphone.version; // 2
 
 ## File imports
 
-You can import files by using the `import` statement. The given path, or name, is always relative to the file that the program started in. Circular imports are not allowed and an error will be raised if one is found. The imported object name is the filename, so files with the same names cannot be imported in the same file. (in the future `import x as y` syntax will be added to fix this)
+You can import files by using the `import` statement. The given path, or name, is always relative to the file that the program started in. Circular imports are not allowed and an error will be raised if one is found. Importing creates an object with all the values of the imported file. The object is declared with the name of the file that was imported, so files with the same names cannot be imported in the same file. (in the future `import x as y` syntax will be added to fix this)
 
 ```go
 // other.fizz
@@ -442,7 +450,7 @@ John
 
 Fizz libraries are different from imports. They are not other Fizz files, but rather Go files. This is to make it possible for functionality to be added to Fizz without baking it straight in. You can read the [library documentation](./libraries.md) to find out how they work and how to create your own.
 
-Fizz has a standard library built in. To use it, use the `include` keyword.
+Fizz has a standard library built in. To use it, use the `include` keyword. The functions of each module is documented in the `lib/<module_name>` directory.
 
 ```go
 include "str";

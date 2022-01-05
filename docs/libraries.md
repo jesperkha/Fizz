@@ -32,7 +32,7 @@ You can easily create your own library for Fizz. The only requirements are:
 
 ### Setup
 
-Create a new folder in the `lib` directory and name it after your library. The main file in your library **must** have the same name as the folder its in. Here is an example structure:
+Create a new folder in the `lib` directory and name it after your library. The main file in your library **must** have the same name as the folder it's in. Here is an example structure:
 
 ```
 lib/
@@ -70,13 +70,14 @@ func init() {
 
 // All functions in this package must return a value (interface) and error.
 // If the error returned is not nil, it will be raised as a fizz error and
-// terminate the program.
+// terminate the program. The value returned is the value the funciton returns
+// when calling it from Fizz, so it must be a valid Fizz type.
 func sayHello(name string) (val interface{}, err error) {
     return "Hello, " + name, err
 }
 ```
 
-The values of the arguments given are checked before trying to call the function, so if the types do not match an error is raised. The return value will always be as shown.
+The values of the arguments given are checked before trying to call the function, so if the types do not match an error is raised. The return types will always be interface and error.
 
 <br>
 
@@ -118,10 +119,12 @@ func sayHello(name string) (val interface{}, err error) {
 
 This will automatically be added to a markdown file in the same directory by running the `autodocs.py` file. It will result in this:
 
-> ## **`sayHello`**
->
-> Returns a greeting to the name given.
->
-> ```go
-> func sayHello(name string) string
-> ```
+<br>
+
+## **`sayHello`**
+
+Returns a greeting to the name given.
+
+```go
+func sayHello(name string) string
+```

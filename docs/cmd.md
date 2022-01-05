@@ -10,7 +10,6 @@ As also mentioned in the readme, running `fizz` with no arguments runs the termi
 
 ```console
 $ fizz
-
 type 'exit' to terminate session
 1 : print "hello";
 hello
@@ -20,7 +19,6 @@ Creating a new line after an opening brace `{` will auto indent for you and not 
 
 ```console
 $ fizz
-
 type 'exit' to terminate session
 1 : func main() {
 2 :     print "hello";
