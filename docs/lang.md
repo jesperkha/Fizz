@@ -159,8 +159,8 @@ Local variables override higher level scopes:
 age := 10;
 
 {
-	// Overrides global 'age' variable
-	age := 20;
+  // Overrides global 'age' variable
+  age := 20;
 }
 ```
 
@@ -250,7 +250,7 @@ repeat 5 {
 
 The range loop is a more advanced form of loop, kind of a hybrid bewteen pythons `for _ in _` statements and other languages `for` loops. The simplest use case is to just give one argument to the right side of `in`.
 
-In this case it will just loop with `n` going from 0 to 9 as the default starting number is 0:
+In this case, it will just loop with `n` going from 0 to 9, as the default starting number is 0:
 
 ```go
 range n in 10 {

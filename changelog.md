@@ -8,6 +8,8 @@
 
 **Bug fixes and more:**
 
+<br>
+
 ## Version 1.0.0
 
 **Whats new:**
@@ -23,6 +25,8 @@
 - Implemented callstack and -f flag to show it
 - Error for exceeding recursion limit
 - Fixed bug where environments would be referenced and not copied
+
+<br>
 
 ## Version 0.6.0
 
