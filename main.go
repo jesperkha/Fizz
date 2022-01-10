@@ -7,5 +7,5 @@ const (
 )
 
 func main() {
-	RunInterpeter(os.Args)
+	RunInterpreter(os.Args)
 }

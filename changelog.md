@@ -1,5 +1,13 @@
 # Fizz update changelog
 
+## Version 1.1.0
+
+**Whats new:**
+
+- Newline and tab characters
+
+**Bug fixes and more:**
+
 ## Version 1.0.0
 
 **Whats new:**

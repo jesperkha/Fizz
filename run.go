@@ -30,7 +30,7 @@ func init() {
 	})
 }
 
-func RunInterpeter(args []string) {
+func RunInterpreter(args []string) {
 	filename, err := parser.Parse()
 	if err != nil {
 		util.ErrorAndExit(err)

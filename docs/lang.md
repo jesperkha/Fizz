@@ -60,7 +60,7 @@
 
 Fizz is strongly typed, meaning unmatched types in certain expressions will cause a runtime error.
 
-- `string` Any string of text with a starting and ending quote `"` symbol.
+- `string` Any string of text with a starting and ending quote `"` symbol. Can span over multiple lines. Can also include `\n` for a new line, or `\t` for a tab.
 
 - `number` Any number, including floats.
 

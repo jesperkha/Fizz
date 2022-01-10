@@ -1,0 +1,42 @@
+# Linked list example
+
+include "str";
+
+define Node {
+    next
+    value
+}
+
+func newList(value) {
+    return Node(nil, value);
+}
+
+func add(head, value) {
+    if !head.next {
+        head.next = Node(nil, value);
+        return;
+    }
+
+    add(head.next, value);
+}
+
+func printList(head) {
+    t := "";
+    current := head;
+    while {
+        t += str.toString(current.value) + " -> ";
+        if !current.next {
+            break;
+        }
+
+        current = current.next;
+    }
+
+    return t;
+}
+
+a := newList(10);
+add(a, 20);
+add(a, 30);
+
+print printList(a); # 10 -> 20 -> 30 ->

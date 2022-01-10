@@ -2,17 +2,19 @@ include "io";
 include "math";
 include "str";
 
+# Number guessing game example
+
 number := math.floor(math.random() * 10);
 
 while {
     input := io.input("Enter guess: ");
-    num := str.toNumber(input);
+    guess := str.toNumber(input);
 
-    if num == number {
+    if guess == number {
         exit "You win!";
     }
 
-    if num > number {
+    if guess > number {
         print "Too high";
     } else {
         print "Too low";

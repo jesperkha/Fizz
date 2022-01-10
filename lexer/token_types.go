@@ -77,9 +77,9 @@ const (
 )
 
 var tokenLookup = map[rune]int{
-	'\n': NEWLINE,
 	'\t': WHITESPACE,
 	'\r': WHITESPACE,
+	'\n': NEWLINE,
 	' ':  WHITESPACE,
 
 	')': RIGHT_PAREN,

@@ -199,7 +199,24 @@ func seekCharacter(input string, curIdx *int, target rune) (eof bool) {
 func intervalToString(input string, startIdx int, endIdx int) string {
 	result := ""
 	for i := startIdx; i <= endIdx; i++ {
-		result += string(input[i])
+		cur := input[i]
+
+		// Check for special characters
+		if cur == '\\' && len(input) > i+1 {
+			char := ""
+			switch input[i+1] {
+			case 'n':
+				char = "\n"
+			case 't':
+				char = "\t"
+			}
+
+			i++
+			result += char
+			continue
+		}
+
+		result += string(cur)
 	}
 
 	return result
