@@ -28,8 +28,11 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return Expression{Type: Args, Exprs: args, Line: line}, err
 	}
 
+	// Todo: fix bug where unary expressions are parsed instead of binary ones
+	// example: print type 1 == type "hello" (prints bool)
+
 	// UNARY
-	// Check if first token is a valid unary token type, if not skip to binary
+	// Check if first token is a valid unary token type
 	unaryOperators := []int{lexer.MINUS, lexer.TYPE, lexer.NOT}
 	if util.Contains(unaryOperators, tokens[0].Type) {
 		right, err := ParseExpression(tokens[1:])

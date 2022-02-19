@@ -273,6 +273,7 @@ func execFunction(stmt Statement) (err error) {
 				lastFunction = name
 			}
 
+			// Todo: better recursive checks for recursive limit
 			if recursionDepth > MaxRecursionDepth {
 				return nil, util.WrapFilename(originCache, ErrMaximumRecursion)
 			}
