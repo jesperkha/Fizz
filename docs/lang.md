@@ -180,7 +180,7 @@ You can also use the `+=` operator with strings.
 
 ## Enums
 
-Fizz also has enums to quickly create a lot a variables with unique values.
+Fizz also has enums to quickly create a lot of variables with unique values.
 
 ```go
 enum {
@@ -341,7 +341,7 @@ print type john   // object
 
 ## Arrays
 
-Arrays in Fizz are just an array of values, of which can be any type. You get the value of a specific index in an array by using the index getter syntax. Indexes begin at 0. Additionally, you can get the length of an array with the built in `len` function.
+Arrays in Fizz are just an array of values, of which can be any type. You get the value of a specific index in an array by using the index getter syntax. Indexes begin at 0. Additionally, you can get the length of an array with the built-in `len` function.
 
 ```go
 names := ["John", "Susan", "Carl"];
@@ -350,7 +350,7 @@ print names[0]; // John
 names[2] = "Timmy";
 print names; // ["John", "Susan", "Timmy"]
 
-print len(name); // 3
+print len(names); // 3
 ```
 
 You can use the `in` operator to check if an element is present in an array:
@@ -450,7 +450,7 @@ John
 
 Fizz libraries are different from imports. They are not other Fizz files, but rather Go files. This is to make it possible for functionality to be added to Fizz without baking it straight in. You can read the [library documentation](./libraries.md) to find out how they work and how to create your own.
 
-Fizz has a standard library built in. To use it, use the `include` keyword. The functions of each module is documented in the `lib/<module_name>` directory.
+Fizz has a standard library built in. Include it with the `include` keyword. The functions are documented in the `lib/<module_name>` directory.
 
 ```go
 include "str";
@@ -470,7 +470,7 @@ meters := io.input("Enter height in meters: ");
 
 feet := str.toNumber(meters) * 3.281;
 print "You are: " + str.toString(feet) + " feet tall";
-// Built in string formatting will come soon don't worry ;)
+// Built-in string formatting is on the todo list, don't worry ;)
 ```
 
 <br>

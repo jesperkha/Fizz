@@ -1,5 +1,5 @@
 use:
-    fizz [flags?] [filename?]
+    fizz [flags] [filename]
 
 flags:
     -e          print global env after finish
