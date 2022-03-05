@@ -49,3 +49,15 @@ There are multiple flags you can use, however, some will only take effect when r
 
 - `-f` print function callstack upon error
 - `-e` print the global environment after program finish
+
+<br>
+
+## Subcommands
+
+Currently, Fizz only has one subcommand; `docs`. To use it run:
+
+```console
+$ fizz docs [lib name]
+```
+
+When given a name of a valid library (`str`, `io` etc), it will print out all of the functions defined in that library. If you have made your own library and some functions are not showing up make sure to re-run `autodocs.py`.
