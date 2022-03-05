@@ -1,15 +1,3 @@
-<!--
-func input(prompt string) string
-func readFile(filename string) string
-func writeFile(filename string, content string)
-func appendFile(filename string, content string)
-func readDir(dir string) []string
-func curDir() string
-func exists(filename string) bool
-func newDir(name string)
-func newFile(name string)
--->
-
 # Methods in io library
 
 ## **`input`**
