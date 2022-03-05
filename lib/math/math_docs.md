@@ -1,3 +1,23 @@
+<!--
+func sin(num float64) float64 
+func asin(num float64) float64 
+func cos(num float64) float64 
+func acos(num float64) float64 
+func tan(num float64) float64 
+func atan(num float64) float64 
+func floor(num float64) float64 
+func ceil(num float64) int 
+func abs(num float64) int 
+func ln(num float64) int 
+func log10(num float64) float64 
+func sqrt(num float64) float64 
+func max(a float64, b float64) float64 
+func min(a float64, b float64) float64 
+func rad(deg float64) float64
+func deg(rad float64) float64
+func rand() float64
+-->
+
 # Methods in math library
 
 ## **`sin`**

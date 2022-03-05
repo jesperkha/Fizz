@@ -4,9 +4,12 @@
 
 **Whats new:**
 
-- Newline and tab characters
+- New `docs` subcommand to view functions in a given library
+- Newline and tab characters for strings
 
 **Bug fixes and more:**
+
+- New terminal argument parser
 
 <br>
 

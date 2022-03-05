@@ -1,3 +1,15 @@
+<!--
+func toString(value interface{}) string
+func format(value interface{}) string
+func lower(str string) string
+func upper(str string) string
+func capital(str string) string
+func split(str string, split string) []string
+func join(strings []string, sub string) string
+func replace(str string, old string, new string) string
+func toNumber(str string) float64
+-->
+
 # Methods in str library
 
 ## **`toString`**

@@ -2,69 +2,76 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/jesperkha/Fizz/env"
 	"github.com/jesperkha/Fizz/interp"
+	"github.com/jesperkha/Fizz/lib"
 	"github.com/jesperkha/Fizz/stmt"
 	"github.com/jesperkha/Fizz/term"
 	"github.com/jesperkha/Fizz/util"
 )
 
-var parser = term.NewFlagParser(
-	[]string{"e", "f"},
-	[]string{"version", "help"},
+var (
+	ErrOneArgOnly = errors.New("expected a single argument, got %d")
 )
 
-func init() {
-	parser.Assign("--version", func() {
-		fmt.Printf("Fizz %s\n", VERSION)
-		os.Exit(0)
-	})
-
-	parser.Assign("--help", func() {
-		fmt.Printf(term.HELP)
-		os.Exit(0)
-	})
-}
-
-func RunInterpreter(args []string) {
-	filename, err := parser.Parse()
-	if err != nil {
-		util.ErrorAndExit(err)
+func RunInterpreter() {
+	parser, _ := term.Parse() // ignore error until validator is added
+	args := parser.Args()
+	if len(args) == 0 {
+		RunTerminal()
+		return
 	}
 
-	if filename != "" {
-		// Goto directory of file specified
-		split := strings.Split(filename, "/")
-		path := strings.Join(split[:len(split)-1], "/")
-		name := split[len(split)-1]
-		os.Chdir(path)
+	if len(args) > 1 {
+		util.ErrorAndExit(fmt.Errorf(ErrOneArgOnly.Error(), len(args)))
+	}
 
-		// Run file
-		e, err := interp.RunFile(name)
+	// Early exit options
+	if parser.HasOption("help") {
+		fmt.Println(term.HELP)
+		return
+	} else if parser.HasOption("version") {
+		fmt.Printf("Fizz %s\n", VERSION)
+		return
+	}
 
-		// Print global environment if flag is set first
-		if parser.Flags["-e"] {
-			fmt.Println(util.FormatPrintValue(e))
-		}
-
-		// Handle error
-		if err != nil && err != stmt.ErrProgramExit {
-			util.PrintError(err)
-			if c := env.GetCallstack(); parser.Flags["-f"] && len(c) > 0 {
-				util.PrintError(fmt.Errorf(c))
-			}
-
-			os.Exit(1)
+	// Subcommands
+	if parser.SubCommand() == "docs" {
+		if err := lib.PrintDocs(args[0]); err != nil {
+			util.ErrorAndExit(err)
 		}
 
 		return
 	}
 
-	RunTerminal()
+	// Goto directory of file specified
+	split := strings.Split(args[0], "/")
+	path := strings.Join(split[:len(split)-1], "/")
+	name := split[len(split)-1]
+	os.Chdir(path)
+
+	// Run file
+	e, err := interp.RunFile(name)
+
+	// Print global environment if flag is set first
+	if parser.HasFlag("e") {
+		fmt.Println(util.FormatPrintValue(e))
+	}
+
+	// Handle error
+	if err != nil && err != stmt.ErrProgramExit {
+		util.PrintError(err)
+		if c := env.GetCallstack(); parser.HasFlag("f") && len(c) > 0 {
+			util.PrintError(fmt.Errorf(c))
+		}
+
+		os.Exit(1)
+	}
 }
 
 // Leaves the interpreter running as the user inputs code to the terminal.

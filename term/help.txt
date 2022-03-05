@@ -1,5 +1,8 @@
 use:
+    fizz
+    fizz [filename]
     fizz [flags] [filename]
+    fizz [command] [args]
 
 flags:
     -e          print global env after finish

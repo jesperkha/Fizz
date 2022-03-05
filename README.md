@@ -52,7 +52,6 @@ This roadmap highlights progress for the development of Fizz:
 - ✔️ Libraries
 - ✔️ Arrays
 - ✔️ Enums
-- ❌ 100% complete standard library
 
 <br>
 
@@ -66,7 +65,7 @@ Make sure to check out [the command-line basics](./docs/cmd.md) too so you know 
 
 ## Installation
 
-Prebuilt binary of the [latest release (v1.0.0)](https://github.com/jesperkha/Fizz/releases/tag/v1.0.0).
+Prebuilt binary of the [latest release (v1.0.0)](https://github.com/jesperkha/Fizz/releases/tag/v1.1.0).
 
 You can also build from source. However, building from source from a non-release branch does not guarantee that everything works as expected as some things may be undergoing changes.
 

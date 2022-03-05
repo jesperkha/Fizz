@@ -1,6 +1,9 @@
 import os
 
-# Generates docs for libraries from the function docstrings.
+# Generates documentation for libraries from the function docstrings
+# and definitions. The documentation is created as a markdown document.
+# Also creates a function 'dump' section in the markdown file (commented
+# out). It is used when running the fizz 'docs' subommand.
 
 def main():
     libraries = os.listdir("./lib")
@@ -64,6 +67,13 @@ def create_file(path: str, libname: str, docs: list):
 
     # Open and write formatted with markdown
     with open(filename, "w+") as f:
+        # Write function 'dump'
+        f.write("<!--\n")
+        for func in docs:
+            f.write(f"{func[1]}")
+        f.write("-->\n\n")
+
+        # Write formatted function documentation
         f.write(f"# Methods in {libname} library\n\n")
         for func in docs:
             name = func[1].split(" ")[1].split("(")[0]
