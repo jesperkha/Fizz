@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
         contents = os.listdir("lib")
         for dirname in contents:
-            if not isdir(f"lib/{dirname}"):
+            if not isdir(f"lib/{dirname}") or dirname == "_libdump":
                 continue
                 
             # Go will raise error at compile time if there is something wrong here
