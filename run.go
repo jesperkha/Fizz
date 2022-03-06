@@ -22,15 +22,10 @@ var (
 func RunInterpreter() {
 	parser, _ := term.Parse() // ignore error until validator is added
 	args := parser.Args()
-	if len(args) == 0 {
-		RunTerminal()
-		return
-	}
-
 	if len(args) > 1 {
 		util.ErrorAndExit(fmt.Errorf(ErrOneArgOnly.Error(), len(args)))
 	}
-
+	
 	// Early exit options
 	if parser.HasOption("help") {
 		fmt.Println(term.HELP)
@@ -39,13 +34,19 @@ func RunInterpreter() {
 		fmt.Printf("Fizz %s\n", VERSION)
 		return
 	}
-
+		
 	// Subcommands
 	if parser.SubCommand() == "docs" {
 		if err := lib.PrintDocs(args[0]); err != nil {
 			util.ErrorAndExit(err)
 		}
 
+		return
+	}
+
+	// Run terminal mode if no other args are given
+	if len(args) == 0 {
+		RunTerminal()
 		return
 	}
 
