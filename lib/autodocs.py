@@ -62,6 +62,8 @@ def add_doc(c: str):
 # Write docs to file (create file)
 def create_file(path: str, libname: str, docs: list):
     # Create dump file if it doesnt exist
+    try: os.mkdir("lib/_libdump")
+    except: pass
     filename = f"lib/_libdump/{libname}.txt"
     os.open(filename, os.O_CREAT)
 
