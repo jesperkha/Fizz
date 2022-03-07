@@ -24,10 +24,10 @@
   <summary>Table of Contents</summary>
   <ul>
   <li><a href="#about">About</a></li>
-  <li><a href="#roadmap">Roadmap</a></li>
-  <li><a href="#documentation">Documentation</a></li>
   <li><a href="#installation">Installation</a></li>
+  <li><a href="#documentation">Documentation</a></li>
   <li><a href="#running-a-program">Running a program</a></li>
+  <li><a href="#code-examples">Code examples</a></li>
   </ul>
 </details>
 
@@ -37,29 +37,12 @@
 
 Fizz is a dynamic and interpreted programming language built with Go. It is strongly typed and comes with very readable and accurate error messages. Fizz has most of the standard functionality that you would expect from modern programming languages. The library system also allows the user to implement their own features as Go functions and port them directly into Fizz. If you like this project, consider giving it a star 😉
 
-<br>
+### Features
 
-## Roadmap
-
-This roadmap highlights progress for the development of Fizz:
-
-- ✔️ Expression parsing
-- ✔️ Conditional statements
-- ✔️ Loops
-- ✔️ Functions
-- ✔️ Objects
-- ✔️ File import
-- ✔️ Libraries
-- ✔️ Arrays
-- ✔️ Enums
-
-<br>
-
-## Documentation
-
-You can read the [full language documentation](./docs/lang.md) to learn about all of Fizz's syntax. It is also recommended to quickly skim over [the language grammar](./docs/grammar.md) to make sure you undestand the basics of how Fizz is structured (don't worry, it's _very_ similar to most modern programming languages).
-
-Make sure to check out [the command-line basics](./docs/cmd.md) too so you know how to run your code and also which configurations you can apply.
+- Variables, conditionals, and loops
+- Functions, arrays, and objects
+- File imports and libraries
+- Clean syntax and simple grammar
 
 <br>
 
@@ -72,7 +55,17 @@ You can also build from source. However, building from source from a non-release
 1. Clone repo
 2. Run the `build.sh` file
 
+### Syntax highlighting
+
 Finally, there is also optional, but recommended, [syntax highlighting](https://github.com/jesperkha/fizz-extensions) extensions for both Visual Studio Code and micro.
+
+<br>
+
+## Documentation
+
+You can read the [full language documentation](./docs/lang.md) to learn about all of Fizz's syntax. It is also recommended to quickly skim over [the language grammar](./docs/grammar.md) to make sure you undestand the basics of how Fizz is structured (don't worry, it's _very_ similar to most modern programming languages).
+
+Make sure to check out [the command-line basics](./docs/cmd.md) too so you know how to run your code and also which configurations you can apply.
 
 <br>
 
@@ -91,4 +84,58 @@ Running the interpreter and giving a filename simply runs the code in the file a
 ```console
 $ ./fizz myFile.fizz
 $ ./fizz myFile
+```
+
+<br>
+
+## Code examples
+
+Some simple code examples written in Fizz. There are more and bigger examples in the `examples` directory. All of the features used here and many more are thoroughly documented in the [documentation page](./docs/lang.md).
+
+<br>
+
+Write to a file:
+
+```go
+include "io";
+include "str";
+
+define Person {
+  name, age
+}
+
+func writePerson(person) {
+  if person == nil : person.name == "" {
+    error "Please enter valid person";
+  }
+
+  io.appendFile("names.txt", str.format(person));
+}
+
+john := Person("John", 59);
+writeName(john);
+```
+
+<br>
+
+Find max and min numbers in array:
+
+```go
+include "str";
+
+arr := [5, 3, 7.5, 8, 2];
+max := 0;
+min := 999;
+
+range n in arr {
+  if n > max {
+    max = n;
+  }
+  if n < min {
+    min = n;
+  }
+}
+
+print "Max: " + str.toString(max);
+print "Min: " + str.toString(min);
 ```
