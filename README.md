@@ -106,14 +106,14 @@ define Person {
 
 func writePerson(person) {
   if person == nil : person.name == "" {
-    error "Please enter valid person";
+    error "Please enter a valid person";
   }
 
   io.appendFile("names.txt", str.format(person));
 }
 
 john := Person("John", 59);
-writeName(john);
+writePerson(john);
 ```
 
 <br>
