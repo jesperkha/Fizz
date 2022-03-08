@@ -83,7 +83,7 @@ Fizz is strongly typed, meaning unmatched types in certain expressions will caus
 Keyword names are reserved and cannot be used for variable names. Here is a list of all keywords in Fizz:
 
 ```
-var       print     type       func      range     error
+print     type       func      range     error
 exit      skip      break      return    in
 false     nil       include    if        enum
 import    define    true       while     repeat
