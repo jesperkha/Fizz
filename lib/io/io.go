@@ -106,7 +106,7 @@ func readDir(dir string) (val i, err error) {
 		names = append(names, d.Name())
 	}
 
-	return &env.Array{Values: names, Length: len(names)}, err
+	return env.NewArray(names), err
 }
 
 /*

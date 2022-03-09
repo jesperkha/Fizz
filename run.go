@@ -25,7 +25,7 @@ func RunInterpreter() {
 	if len(args) > 1 {
 		util.ErrorAndExit(fmt.Errorf(ErrOneArgOnly.Error(), len(args)))
 	}
-	
+
 	// Early exit options
 	if parser.HasOption("help") {
 		fmt.Println(term.HELP)
@@ -34,7 +34,7 @@ func RunInterpreter() {
 		fmt.Printf("Fizz %s\n", VERSION)
 		return
 	}
-		
+
 	// Subcommands
 	if parser.SubCommand() == "docs" {
 		if err := lib.PrintDocs(args[0]); err != nil {

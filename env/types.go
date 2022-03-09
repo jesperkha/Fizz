@@ -44,13 +44,15 @@ type FizzObject interface {
 	Type() string
 }
 
+type CallFunction func(...interface{}) (interface{}, error)
+
 // Callable object is a function. The origin is the name of the file it
 // was defined in. Error returned from Call() is printed as a Fizz error
 // and is not a return value.
 type Callable struct {
 	Name    string
 	Origin  string
-	Call    func(...interface{}) (interface{}, error)
+	Call    CallFunction
 	NumArgs int
 }
 

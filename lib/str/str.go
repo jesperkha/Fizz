@@ -85,7 +85,7 @@ func split(str string, split string) (val i, err error) {
 		splits = append(splits, s)
 	}
 
-	return &env.Array{Values: splits}, err
+	return env.NewArray(splits), err
 }
 
 /*
