@@ -48,12 +48,12 @@ func TestAll(t *testing.T) {
 			// Valid case first
 			if err != nil && testType == validCaseFile {
 				// Case number is line number in case file
-				t.Errorf("valid case %d got error: %s", idx+1, err)
+				t.Errorf("%s, valid case %d got error: %s", filename, idx+1, err)
 			}
 
 			// Invalid cases
 			if err == nil && testType == invalidCaseFile {
-				t.Errorf("invalid case %d got no error: %s", idx+1, c)
+				t.Errorf("%s, invalid case %d got no error: %s", filename, idx+1, c)
 			}
 		}
 	}

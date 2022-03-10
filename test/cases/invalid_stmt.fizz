@@ -12,7 +12,6 @@ enum { 1 two }
 # Functions
 func(){}
 func main(a) {} main();
-func a() {a();} a();
 
 # Conditionals and loops
 if {}
