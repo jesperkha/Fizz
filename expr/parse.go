@@ -12,6 +12,16 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 
 	line := tokens[0].Line
 
+	// Safeguard against unmatched parens/brackets later on. This means the bracket seek functions dont
+	// need to check for eof (unless they are seek in a sliced off token list)
+	if eofParens, eofBrackets := util.HasMatchedParens(tokens); eofParens || eofBrackets {
+		if eofParens {
+			return expr, ErrParenError
+		} else {
+			return expr, ErrBracketError
+		}
+	}
+
 	if len(tokens) == 1 {
 		// VARIABLE
 		// Variables have a different expression type
@@ -78,40 +88,21 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	// Binary is already parsed so there can either be a single group or a chained call / getter.
 	// First gets the endIdx of the first group. Its a single group expression is the closing paren
 	// is the last token in the list. Paren error if eof, doesnt matter how many calls come after.
-	endIdx, eof := util.SeekClosingBracket(tokens, 0, lexer.LEFT_PAREN, lexer.RIGHT_PAREN)
-	if eof {
-		return expr, ErrParenError
-	}
-
-	if tokens[0].Type == lexer.LEFT_PAREN {
-		// Must be a comlete group because binary and unary are already parsed
-		if endIdx != len(tokens)-1 {
-			return expr, ErrParenError
-		}
-
+	endIdx, _ := util.SeekClosingBracket(tokens, 0, lexer.LEFT_PAREN, lexer.RIGHT_PAREN)
+	if tokens[0].Type == lexer.LEFT_PAREN && endIdx == len(tokens)-1 {
 		inner, err := ParseExpression(tokens[1 : len(tokens)-1])
 		return Expression{Type: Group, Inner: &inner, Line: line}, err
 	}
 
-	// ARRAY
+	// ARRAY LITERAL
 	// Same as group parsing but with square bracket.
-	endIdx, eof = util.SeekClosingBracket(tokens, 0, lexer.LEFT_SQUARE, lexer.RIGHT_SQUARE)
-	if eof {
-		return expr, ErrBracketError
-	}
-
+	endIdx, _ = util.SeekClosingBracket(tokens, 0, lexer.LEFT_SQUARE, lexer.RIGHT_SQUARE)
 	if tokens[0].Type == lexer.LEFT_SQUARE && endIdx == len(tokens)-1 {
 		inner, err := ParseExpression(tokens[1 : len(tokens)-1])
 		return Expression{Type: Array, Inner: &inner, Line: line}, err
 	}
 
-	// CALL
-	// Search for left paren, then parse the left part of the expression. Also parse the args of the caller.
-	// Start cannot be set to 0 in loop because that would be a group expression
-	targetCall, eofCall := util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
-		return t.Type == lexer.LEFT_PAREN
-	})
-
+	// ARRAY GETTER
 	// Array index getter has same priority as call
 	targetIndex, eofIndex := util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
 		return t.Type == lexer.LEFT_SQUARE
@@ -129,14 +120,17 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 			return expr, err
 		}
 
-		endIdx, eof := util.SeekClosingBracket(tokens, targetIndex, lexer.LEFT_SQUARE, lexer.RIGHT_SQUARE)
-		if eof {
-			return expr, ErrBracketError
-		}
-
+		endIdx, _ := util.SeekClosingBracket(tokens, targetIndex, lexer.LEFT_SQUARE, lexer.RIGHT_SQUARE)
 		arg, err := ParseExpression(tokens[targetIndex+1 : endIdx])
 		return Expression{Type: Index, Left: &array, Right: &arg, Line: line}, err
 	}
+
+	// FUNCTION CALL
+	// Search for left paren, then parse the left part of the expression. Also parse the args of the caller.
+	// Start cannot be set to 0 in loop because that would be a group expression
+	targetCall, eofCall := util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
+		return t.Type == lexer.LEFT_PAREN
+	})
 
 	if !eofCall && targetCall > targetDot {
 		callee, err := ParseExpression(tokens[:targetCall])
@@ -148,7 +142,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return Expression{Type: Call, Left: &callee, Inner: &args, Line: line}, err
 	}
 
-	// GETTER
+	// OBJECT GETTER
 	// Splits by dot and parses the left side recursively
 	if !eofDot {
 		left, err := ParseExpression(tokens[:targetDot])
