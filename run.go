@@ -81,7 +81,7 @@ func RunTerminal() {
 	fmt.Println("type 'exit' to terminate session")
 	scanner := bufio.NewScanner(os.Stdin)
 	numBlocks, line := 0, 1
-	totalString, space := "", ""
+	totalString, space := "", " "
 	env.ThrowEnvironment = false
 
 	for {
