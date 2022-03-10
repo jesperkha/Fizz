@@ -88,7 +88,7 @@ func deg(num float64) (val i, err error) {
 
 /*
 	Gets random number bewteen 0 and 1
-	func rand() float64
+	func random() float64
 */
 func random() (val i, err error) {
 	return rand.Float64(), err
