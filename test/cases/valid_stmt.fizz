@@ -1,0 +1,28 @@
+# Expression statements
+type 1;
+
+# Assignment
+a := 20;
+a := 0; a += 1;
+define object{n} a := object(2); a.n = 2;
+define object{n} a := object(object(object(1))); a.n.n.n = 1;
+[1, 2, 3][0] = 4;
+([1, 2, 3])[0] = 4;
+[[1, 2, 3]][0][0] = 4;
+
+# Conditionals and loops
+if true { 1 + 1; }
+while { break; }
+repeat (20 - 1) {}
+arr := [2, 3, 4]; range n in arr {}
+range n in 5 - 1 {}
+range n in (5 - (4 + 1)), 1 {}
+range n in 3, (5 + 5), 3 {}
+
+# Functions
+func main(a, b) { return 1; } main(1, 2);
+func closure() { i := 0; func add() {i += 1;} return add; } f := closure(); f();
+
+# Other
+enum { one two three } 1 + one;
+include "str"; str.toString(1);

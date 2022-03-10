@@ -12,6 +12,18 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 
 	line := tokens[0].Line
 
+	if len(tokens) == 1 {
+		// VARIABLE
+		// Variables have a different expression type
+		if tokens[0].Type == lexer.IDENTIFIER {
+			return Expression{Type: Variable, Name: tokens[0].Lexeme, Line: line}, err
+		}
+
+		// LITERAL
+		// Only other option is a literal, the only error this can cause is an undefined variable
+		return Expression{Type: Literal, Value: tokens[0], Line: line}, err
+	}
+
 	// ARGUMENTS
 	// Argument list for function calls. If the arg list is empty it is handled as an empty group.
 	if splits := util.SplitByToken(tokens, lexer.COMMA); len(splits) != 1 {
@@ -71,7 +83,12 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return expr, ErrParenError
 	}
 
-	if tokens[0].Type == lexer.LEFT_PAREN && endIdx == len(tokens)-1 {
+	if tokens[0].Type == lexer.LEFT_PAREN {
+		// Must be a comlete group because binary and unary are already parsed
+		if endIdx != len(tokens)-1 {
+			return expr, ErrParenError
+		}
+
 		inner, err := ParseExpression(tokens[1 : len(tokens)-1])
 		return Expression{Type: Group, Inner: &inner, Line: line}, err
 	}
@@ -95,7 +112,7 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return t.Type == lexer.LEFT_PAREN
 	})
 
-	// Array index getter has same pritority as call
+	// Array index getter has same priority as call
 	targetIndex, eofIndex := util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
 		return t.Type == lexer.LEFT_SQUARE
 	})
@@ -147,18 +164,5 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return Expression{Type: Getter, Left: &left, Right: &right, Line: line}, err
 	}
 
-	// All expression types below only require one token. If more are found its and error.
-	if len(tokens) != 1 {
-		return expr, ErrInvalidExpression
-	}
-
-	// VARIABLE
-	// Variables have a different expression type
-	if tokens[0].Type == lexer.IDENTIFIER {
-		return Expression{Type: Variable, Name: tokens[0].Lexeme, Line: line}, err
-	}
-
-	// LITERAL
-	// Only other option is a literal, the only error this can cause is an undefined variable
-	return Expression{Type: Literal, Value: tokens[0], Line: line}, err
+	return expr, ErrInvalidExpression
 }

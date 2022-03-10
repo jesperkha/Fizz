@@ -1,0 +1,23 @@
+# Variables and values
+prt 30;
+a a = 0;
+c := p(1); c.n.n;
+b.n();
+.b.n;
+b.n.;
+[1, 2, 3][0][0] = 4;
+(1, 2, 3)[0] = 4;
+enum { 1 two }
+
+# Functions
+func(){}
+func main(a) {} main();
+func a() {a();} a();
+
+# Conditionals and loops
+if {}
+while a + 2 {}
+repeat (1, 2) {}
+range 2 in 10 {}
+range 1, 2, 3, 4 {}
+range 0, 10, -1 {}
