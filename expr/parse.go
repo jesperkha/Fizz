@@ -10,17 +10,36 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 		return Expression{Type: EmptyExpression}, err
 	}
 
-	line := tokens[0].Line
-
 	// Safeguard against unmatched parens/brackets later on. This means the bracket seek functions dont
 	// need to check for eof (unless they are seek in a sliced off token list)
-	if eofParens, eofBrackets := util.HasMatchedParens(tokens); eofParens || eofBrackets {
-		if eofParens {
-			return expr, ErrParenError
-		} else {
-			return expr, ErrBracketError
+	paren, bracket := 0, 0
+	for _, t := range tokens {
+		if bracket == 0 {
+			switch t.Type {
+			case lexer.LEFT_PAREN:
+				paren++
+			case lexer.RIGHT_PAREN:
+				paren--
+			}
+		}
+
+		if paren == 0 {
+			switch t.Type {
+			case lexer.LEFT_SQUARE:
+				bracket++
+			case lexer.RIGHT_SQUARE:
+				bracket--
+			}
 		}
 	}
+
+	if paren != 0 {
+		return expr, ErrParenError
+	} else if bracket != 0 {
+		return expr, ErrBracketError
+	}
+
+	line := tokens[0].Line
 
 	if len(tokens) == 1 {
 		// VARIABLE

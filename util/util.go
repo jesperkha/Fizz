@@ -136,32 +136,6 @@ func SeekClosingBracket(tokens []lexer.Token, start int, beginT, endT int) (endI
 	return endIdx, true
 }
 
-// Checks if opening and closing parens and brackets are matched. Eof is true if not.
-func HasMatchedParens(tokens []lexer.Token) (eofParen bool, eofBracket bool) {
-	paren, bracket := 0, 0
-	for _, t := range tokens {
-		if bracket == 0 {
-			switch t.Type {
-			case lexer.LEFT_PAREN:
-				paren++
-			case lexer.RIGHT_PAREN:
-				paren--
-			}
-		}
-
-		if paren == 0 {
-			switch t.Type {
-			case lexer.LEFT_SQUARE:
-				bracket++
-			case lexer.RIGHT_SQUARE:
-				bracket--
-			}
-		}
-	}
-
-	return paren != 0, bracket != 0
-}
-
 // Skips token check if in group or array expression. Returns index of ending token or eof.
 func SeekBreakPoint(tokens []lexer.Token, verifier func(int, lexer.Token) bool) (targetIdx int, eof bool) {
 	parens := 0

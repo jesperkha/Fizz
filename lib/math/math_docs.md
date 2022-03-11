@@ -2,112 +2,126 @@
 
 ## **`sin`**
 
+
 ```go
-func sin(num float64) float64
+func sin(num float64) float64 
 ```
 
 <br>
 
 ## **`asin`**
 
+
 ```go
-func asin(num float64) float64
+func asin(num float64) float64 
 ```
 
 <br>
 
 ## **`cos`**
 
+
 ```go
-func cos(num float64) float64
+func cos(num float64) float64 
 ```
 
 <br>
 
 ## **`acos`**
 
+
 ```go
-func acos(num float64) float64
+func acos(num float64) float64 
 ```
 
 <br>
 
 ## **`tan`**
 
+
 ```go
-func tan(num float64) float64
+func tan(num float64) float64 
 ```
 
 <br>
 
 ## **`atan`**
 
+
 ```go
-func atan(num float64) float64
+func atan(num float64) float64 
 ```
 
 <br>
 
 ## **`floor`**
 
+
 ```go
-func floor(num float64) float64
+func floor(num float64) float64 
 ```
 
 <br>
 
 ## **`ceil`**
 
+
 ```go
-func ceil(num float64) int
+func ceil(num float64) int 
 ```
 
 <br>
 
 ## **`abs`**
 
+
 ```go
-func abs(num float64) int
+func abs(num float64) int 
 ```
 
 <br>
 
 ## **`ln`**
 
+
 ```go
-func ln(num float64) int
+func ln(num float64) int 
 ```
 
 <br>
 
 ## **`log10`**
 
+
 ```go
-func log10(num float64) float64
+func log10(num float64) float64 
 ```
 
 <br>
 
 ## **`sqrt`**
 
+
 ```go
-func sqrt(num float64) float64
+func sqrt(num float64) float64 
 ```
 
 <br>
 
 ## **`max`**
 
+
 ```go
-func max(a float64, b float64) float64
+func max(a float64, b float64) float64 
 ```
 
 <br>
 
 ## **`min`**
 
+
 ```go
-func min(a float64, b float64) float64
+func min(a float64, b float64) float64 
 ```
 
 <br>
@@ -132,12 +146,13 @@ func deg(rad float64) float64
 
 <br>
 
-## **`rand`**
+## **`random`**
 
 Gets random number bewteen 0 and 1
 
 ```go
-func rand() float64
+func random() float64
 ```
 
 <br>
+
