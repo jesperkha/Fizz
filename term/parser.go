@@ -2,8 +2,12 @@ package term
 
 import (
 	_ "embed"
+	"errors"
+	"fmt"
 	"os"
 	"strings"
+
+	"github.com/jesperkha/Fizz/util"
 )
 
 // Terminal argument parser
@@ -11,6 +15,8 @@ import (
 var (
 	//go:embed help.txt
 	HELP string
+
+	ErrUnknownOption = errors.New("uknown option '%s'")
 )
 
 type ArgList interface {
@@ -30,17 +36,23 @@ type ArgList interface {
 }
 
 // Parses arguments into ArgList. Raises error if an unknown flag, option, or
-// subcommand is found. Todo: make flag validator (pass in valid arg list)
-func Parse() (list ArgList, err error) {
+// subcommand is found.
+func Parse(valid []string) (list ArgList, err error) {
 	args := os.Args[1:]
 	handler := ArgHandler{}
 
 	for idx, arg := range args {
 		if strings.HasPrefix(arg, "--") {
 			// Check if option
+			if !util.SContains(valid, arg) {
+				return list, fmt.Errorf(ErrUnknownOption.Error(), arg)
+			}
 			handler.options = append(handler.options, strings.TrimLeft(arg, "-"))
 		} else if strings.HasPrefix(arg, "-") {
 			// Check if flag (after to avoid false positive)
+			if !util.SContains(valid, arg) {
+				return list, fmt.Errorf(ErrUnknownOption.Error(), arg)
+			}
 			handler.flags = append(handler.flags, strings.TrimLeft(arg, "-"))
 		} else if idx == 0 && len(args) != 1 {
 			// Check for valid subcommand

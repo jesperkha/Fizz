@@ -17,10 +17,14 @@ import (
 
 var (
 	ErrOneArgOnly = errors.New("expected a single argument, got %d")
+	validArgs     = []string{"--help", "--version", "-f", "-e"}
 )
 
 func RunInterpreter() {
-	parser, _ := term.Parse() // ignore error until validator is added
+	parser, err := term.Parse(validArgs)
+	if err != nil {
+		util.ErrorAndExit(err)
+	}
 	args := parser.Args()
 	if len(args) > 1 {
 		util.ErrorAndExit(fmt.Errorf(ErrOneArgOnly.Error(), len(args)))
