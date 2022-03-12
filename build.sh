@@ -14,5 +14,5 @@ echo "done"
 
 echo -ne "Building binary \t"
 [ ! -d "./bin" ] && mkdir bin
-go build -o ./bin/fizz.exe .
+go build -ldflags="-s -w" -o bin/fizz.exe .
 echo "done"
