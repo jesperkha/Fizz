@@ -62,20 +62,16 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 			if err != nil {
 				return expr, err
 			}
-
 			args = append(args, arg)
 		}
 
 		return Expression{Type: Args, Exprs: args, Line: line}, err
 	}
 
-	// Todo: fix bug where unary expressions are parsed instead of binary ones
-	// example: print type 1 == type "hello" (prints bool)
-
 	// UNARY
 	// Check if first token is a valid unary token type
 	unaryOperators := []int{lexer.MINUS, lexer.TYPE, lexer.NOT}
-	if util.Contains(unaryOperators, tokens[0].Type) {
+	if util.Contains(unaryOperators, tokens[0].Type) && (len(tokens) == 2 || tokens[1].Type == lexer.LEFT_PAREN) {
 		right, err := ParseExpression(tokens[1:])
 		return Expression{Type: Unary, Right: &right, Operand: tokens[0], Line: line}, err
 	}
@@ -85,15 +81,16 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	// Only check if not in a group. Then check if valid operator, skip if not.
 	lowest, lowestIdx := lexer.Token{Type: 999}, 0
 	util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
-		if t.Type < lowest.Type {
+		if t.Type < lowest.Type && i != 0 {
 			lowest, lowestIdx = t, i
 		}
-
 		return false
 	})
 
+	// Todo: order of operations is not always correct
+	// example: print -1 - -1 - 1;
 	t := lowest.Type
-	if (t >= lexer.AND && t <= lexer.MINUS) || (t >= lexer.STAR && t <= lexer.HAT) {
+	if t >= lexer.AND && t <= lexer.HAT {
 		left, err := ParseExpression(tokens[:lowestIdx])
 		if err != nil {
 			return expr, err

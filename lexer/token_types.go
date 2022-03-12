@@ -7,11 +7,9 @@ const (
 	// Expression types
 	AND
 	OR
-
 	EQUAL_EQUAL
 	NOT_EQUAL
 	IN
-
 	GREATER
 	LESS
 	GREATER_EQUAL
@@ -19,13 +17,13 @@ const (
 
 	PLUS
 	MINUS
-	TYPE
-	NOT
-
 	STAR
 	SLASH
 	MODULO
 	HAT
+
+	TYPE
+	NOT
 
 	STRING
 	NUMBER
