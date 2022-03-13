@@ -12,3 +12,4 @@ main.fizz
 # Buildable
 lib/include.go
 lib/_libdump
+lib/*/export.go

@@ -16,31 +16,15 @@ import (
 type i interface{}
 
 var (
-	Includes = map[string]interface{}{}
-	scanner  = bufio.NewScanner(os.Stdin)
-
+	scanner        = bufio.NewScanner(os.Stdin)
 	ErrInvalidPath = errors.New("invalid path, line %d")
 )
-
-func init() {
-	Includes = map[string]interface{}{
-		"input":      input,
-		"readFile":   readFile,
-		"writeFile":  writeFile,
-		"appendFile": appendFile,
-		"readDir":    readDir,
-		"curDir":     curDir,
-		"exists":     exists,
-		"newDir":     newDir,
-		"newFile":    newFile,
-	}
-}
 
 /*
 	Gets user input from stdin.
 	func input(prompt string) string
 */
-func input(prompt string) (input i, err error) {
+func Input(prompt string) (input i, err error) {
 	fmt.Print(prompt)
 	scanner.Scan()
 	return scanner.Text(), nil
@@ -50,7 +34,7 @@ func input(prompt string) (input i, err error) {
 	Reads file and returns text.
 	func readFile(filename string) string
 */
-func readFile(filename string) (str i, err error) {
+func ReadFile(filename string) (str i, err error) {
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return str, ErrInvalidPath
@@ -63,7 +47,7 @@ func readFile(filename string) (str i, err error) {
 	Writes content to file. Overwrites previous file content.
 	func writeFile(filename string, content string)
 */
-func writeFile(filename string, content string) (val i, err error) {
+func WriteFile(filename string, content string) (val i, err error) {
 	err = ioutil.WriteFile(filename, []byte(content), fs.ModeAppend)
 	if err != nil {
 		return val, ErrInvalidPath
@@ -76,7 +60,7 @@ func writeFile(filename string, content string) (val i, err error) {
 	Appends content to file.
 	func appendFile(filename string, content string)
 */
-func appendFile(filename string, content string) (val i, err error) {
+func AppendFile(filename string, content string) (val i, err error) {
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, fs.ModeAppend)
 	if err != nil {
 		return val, ErrInvalidPath
@@ -95,7 +79,7 @@ func appendFile(filename string, content string) (val i, err error) {
 	Returns list of files/directories in dir.
 	func readDir(dir string) []string
 */
-func readDir(dir string) (val i, err error) {
+func ReadDir(dir string) (val i, err error) {
 	dirs, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, ErrInvalidPath
@@ -113,7 +97,7 @@ func readDir(dir string) (val i, err error) {
 	Returns current working directory
 	func curDir() string
 */
-func curDir() (str i, err error) {
+func CurDir() (str i, err error) {
 	return os.Getwd()
 }
 
@@ -121,7 +105,7 @@ func curDir() (str i, err error) {
 	Returns true if file exists.
 	func exists(filename string) bool
 */
-func exists(filename string) (val i, err error) {
+func Exists(filename string) (val i, err error) {
 	_, e := os.Open(filename)
 	return e == nil, err
 }
@@ -130,7 +114,7 @@ func exists(filename string) (val i, err error) {
 	Creates new directory.
 	func newDir(name string)
 */
-func newDir(dirname string) (val i, err error) {
+func NewDir(dirname string) (val i, err error) {
 	os.Mkdir(dirname, os.ModeAppend)
 	return nil, err
 }
@@ -139,7 +123,7 @@ func newDir(dirname string) (val i, err error) {
 	Creates new file. If the file already exists it will be overwritten.
 	func newFile(name string)
 */
-func newFile(filename string) (val i, err error) {
+func NewFile(filename string) (val i, err error) {
 	f, err := os.Create(filename)
 	f.Close()
 	return val, err
