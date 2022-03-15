@@ -40,7 +40,7 @@ There are multiple flags you can use, however, some will only take effect when r
 
 **Info flags**
 
-- `--help` to print information on how to use the program and also all available flags
+- `--help` print information on how to use the program and also all available flags
 - `--version` print the version of the program
 
 <br>
@@ -54,10 +54,18 @@ There are multiple flags you can use, however, some will only take effect when r
 
 ## Subcommands
 
-Currently, Fizz only has one subcommand; `docs`. To use it run:
+- **`help`**
 
-```console
-$ fizz docs [lib name]
-```
+  ```console
+  $ fizz help [command]
+  ```
 
-When given a name of a valid library (`str`, `io` etc), it will print out all of the functions defined in that library. If you have made your own library and some functions are not showing up make sure to re-run `autodocs.py`.
+  Prints out a help message for the given command.
+
+- **`docs`**
+
+  ```console
+  $ fizz docs [lib name]
+  ```
+
+  When given a name of a valid library (`str`, `io` etc), it will print out all of the functions defined in that library. If you have made your own library and some functions are not showing up make sure to re-run `autodocs.py`.

@@ -26,71 +26,52 @@ name := io.input("Enter name: ");
 You can easily create your own library for Fizz. The only requirements are:
 
 - A unique library name as duplicates are not allowed
-- That you follow the steps below to make sure your library is valid
+- That you follow the steps below to make sure your library is created properly
 
 <br>
 
 ### Setup
 
-Create a new folder in the `lib` directory and name it after your library. The main file in your library **must** have the same name as the folder it's in. Here is an example structure:
+Create a new folder in the `lib` directory and name it after your library. Here is an example structure:
 
 ```
 lib/
     mylib/
-        mylib.go
+        main.go
 ```
 
 <br>
 
 ### Content
 
-To get started, add the following to your main file:
+Here is an example for a simple library with a single function; `SayHello()`. Notice how the first letter is capitilized, declaring it as an exported function. However, when used in a Fizz program it will have the first letter lowercased to follow Fizz naming conventions.
 
 ```go
 package mylib
 
-var Includes = map[string]interface{}{}
-
-func init() {
-
-}
-```
-
-This is technically all you need to make a valid library. The name and type of `Includes` **must** be as shown. The `init()` function is where you add the functions you want to include in your library.
-
-```go
-package mylib
-
-var Includes = map[string]interface{}{}
-
-func init() {
-    // Function will be exported with name "hello". Names do not need to match.
-    Includes["hello"] = sayHello
-}
-
-// All functions in this package must return a value (interface) and error.
-// If the error returned is not nil, it will be raised as a fizz error and
-// terminate the program. The value returned is the value the funciton returns
-// when calling it from Fizz, so it must be a valid Fizz type.
-func sayHello(name string) (val interface{}, err error) {
+// All functions in a library must return a value (interface) and error. If the
+// error returned is not nil, it will be raised as a fizz error and terminate the
+// program. The value returned is the value the function returns when calling it
+// from Fizz, so it must be a valid Fizz type.
+func SayHello(name string) (val interface{}, err error) {
     return "Hello, " + name, err
 }
 ```
 
-The values of the arguments given are checked before trying to call the function, so if the types do not match an error is raised. The return types will always be interface and error.
+The types of the arguments, as well as the argument count, is checked before trying to call the function, so if they dont match up an error is raised. The return types for library functions are always `interface` and `error`.
 
 <br>
 
 ## Building
 
-To actually add your new library to Fizz you need to recompile with the `build.sh` file. This will run a python script which will add an import to your library package.
+To add your library or update it with the new changes run either the `build.sh` script, to build a binary, or the `lib/build.py` script to just add the library.
 
-When running Fizz again after compiling you can use your new library:
+With the example library above added we can now write this simple Fizz program:
 
 ```go
 include "mylib";
 
-print mylib.hello("John");
+print mylib.sayHello("John");
 ```
 
 ```console
@@ -112,12 +93,12 @@ Additionally, you can make simple documentation for your library. Use the follow
     Returns a greeting to the name given.
     func sayHello(name string) string
 */
-func sayHello(name string) (val interface{}, err error) {
+func SayHello(name string) (val interface{}, err error) {
     return "Hello, " + name, err
 }
 ```
 
-This will automatically be added to a markdown file in the same directory by running the `autodocs.py` file. It will result in this:
+This will automatically be added to a markdown file in the same directory by running the `lib/autodocs.py` file. It will result in this:
 
 <br>
 
