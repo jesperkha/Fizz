@@ -62,6 +62,7 @@ if __name__ == "__main__":
         f.write("package lib\n")
         f.write("func init() {\n")
 
+        count = 0
         contents = os.listdir("lib")
         for dirname in contents:
             if not isdir(f"lib/{dirname}") or dirname == "_libdump":
@@ -70,8 +71,19 @@ if __name__ == "__main__":
             # Go will raise error at compile time if there is something wrong here
             if isfile(f"lib/{dirname}/export.go"):
                 f.write(f'Add("{dirname}", {dirname}.Includes)\n')
+                count += 1
+            else:
+                print(f"[WARNING] Library '{dirname}' doesnt export any functions")
         
         f.write("}")
 
     # Finally add the imports
-    subprocess.call("goimports -w lib")
+    cmd_imports = "goimports -w lib"
+    print(f"[CMD] {cmd_imports}")
+    try:
+        subprocess.call(cmd_imports)
+    except:
+        print("[FATAL] Failed to run goimports. Install:\ngo install golang.org/x/tools/cmd/goimports@latest")
+        exit(1)
+        
+    print(f"[INFO] Included {count} libraries")

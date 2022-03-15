@@ -1,18 +1,16 @@
 set -e
 
-echo -ne "Adding libraries\t"
+echo "[INFO] Adding libraries"
 python lib/build.py
-echo "done"
 
-echo -ne "Generating docs \t"
+echo "[INFO] Generating library docs"
 python lib/autodocs.py
-echo "done"
 
-echo -ne "Linting code    \t"
-go vet .
-echo "done"
+echo "[INFO] Building binary"
+[ ! -d "./bin" ] && mkdir bin && echo "[INFO] Created /bin directory"
 
-echo -ne "Building binary \t"
-[ ! -d "./bin" ] && mkdir bin
-go build -ldflags="-s -w" -o bin/fizz.exe .
-echo "done"
+CMD="go build -o bin/fizz.exe ."
+echo "[CMD] $CMD"
+$CMD
+
+echo "[INFO] Finished build of " && ./bin/fizz --version

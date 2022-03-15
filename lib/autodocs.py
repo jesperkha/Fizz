@@ -1,4 +1,5 @@
 import os
+from genericpath import isdir
 
 # Generates documentation for libraries from the function docstrings
 # and definitions. The documentation is created as a markdown document.
@@ -62,9 +63,12 @@ def add_doc(c: str):
 # Write docs to file (create file)
 def create_file(path: str, libname: str, docs: list):
     # Create dump file if it doesnt exist
-    try: os.mkdir("lib/_libdump")
-    except: pass
-    filename = f"lib/_libdump/{libname}.txt"
+    dump = "lib/_libdump"
+    if not isdir(dump):
+        print("[INFO] _libdump was not present, creating it now")
+        os.mkdir(dump)
+
+    filename = f"{dump}/{libname}.txt"
     os.open(filename, os.O_CREAT)
 
     # Write function dump
