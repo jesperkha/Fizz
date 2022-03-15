@@ -40,11 +40,18 @@ func RunInterpreter() {
 	}
 
 	// Subcommands
-	if parser.SubCommand() == "docs" {
+	switch parser.SubCommand() {
+	case "docs":
 		if err := lib.PrintDocs(args[0]); err != nil {
 			util.ErrorAndExit(err)
 		}
-
+		return
+	case "help":
+		if msg, ok := term.CommandDescriptions[args[0]]; ok {
+			fmt.Println(msg)
+		} else {
+			util.PrintError(fmt.Errorf(term.ErrUnknownCommand.Error(), args[0]))
+		}
 		return
 	}
 

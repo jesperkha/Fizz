@@ -1,12 +1,19 @@
-use:
+USE:
     fizz
     fizz [filename]
     fizz [flags] [filename]
     fizz [command] [args]
 
-flags:
+FLAGS:
     -e          print global env after finish
     -f          print function callstack with errors
 
     --help      what you are reading now
     --version   print fizz version
+
+COMMANDS:
+    help [command]
+        displays more information about a given command
+
+    docs [lib name]
+        prints out all functions declared in specified library

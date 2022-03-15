@@ -1,5 +1,19 @@
 # Fizz update changelog
 
+## Version 1.2.0
+
+**Whats new:**
+
+- Better library assembler
+
+**Bug fixes and more:**
+
+- Fixed bug where unary expressions would be parsed incorrectly
+- Validator for program flags
+- Added better parsing for parenthesis coupling
+
+<br>
+
 ## Version 1.1.0
 
 **Whats new:**

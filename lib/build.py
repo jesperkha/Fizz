@@ -54,10 +54,6 @@ if __name__ == "__main__":
     # are automatically added with the name of the folder. (this ofcourse means
     # that the package name should be the same). Otherwise an undefined variable
     # error will be raised.
-
-    # Todo: check if has export.go file
-    # Todo: make lib.json file for specifying which libs to include
-    
     filename = "lib/include.go"
     if not isfile(filename):
         os.open(filename, os.O_CREAT)
@@ -72,7 +68,8 @@ if __name__ == "__main__":
                 continue
                 
             # Go will raise error at compile time if there is something wrong here
-            f.write(f'Add("{dirname}", {dirname}.Includes)\n')
+            if isfile(f"lib/{dirname}/export.go"):
+                f.write(f'Add("{dirname}", {dirname}.Includes)\n')
         
         f.write("}")
 

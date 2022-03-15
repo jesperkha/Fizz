@@ -17,6 +17,7 @@ var (
 	HELP string
 
 	ErrUnknownOption = errors.New("uknown option '%s'")
+	ErrUnknownCommand = errors.New("unknown command '%s'")
 )
 
 type ArgList interface {
