@@ -9,20 +9,20 @@ func sin(num float64) float64
 
 <br>
 
-## **`asin`**
-
-
-```go
-func asin(num float64) float64 
-```
-
-<br>
-
 ## **`cos`**
 
 
 ```go
 func cos(num float64) float64 
+```
+
+<br>
+
+## **`asin`**
+
+
+```go
+func asin(num float64) float64 
 ```
 
 <br>
@@ -67,7 +67,7 @@ func floor(num float64) float64
 
 
 ```go
-func ceil(num float64) int 
+func ceil(num float64) float64 
 ```
 
 <br>
@@ -76,7 +76,7 @@ func ceil(num float64) int
 
 
 ```go
-func abs(num float64) int 
+func abs(num float64) float64 
 ```
 
 <br>
@@ -85,7 +85,7 @@ func abs(num float64) int
 
 
 ```go
-func ln(num float64) int 
+func ln(num float64) float64 
 ```
 
 <br>
