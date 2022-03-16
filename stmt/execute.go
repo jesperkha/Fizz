@@ -42,7 +42,7 @@ func executeStatement(stmt Statement) error {
 	case Print:
 		return execPrint(stmt)
 	case Variable:
-		return execVariable(stmt)
+		return nil
 	case Assignment:
 		return execAssignment(stmt)
 	case Break:
@@ -134,10 +134,6 @@ func execPrint(stmt Statement) (err error) {
 
 	fmt.Println(util.FormatPrintValue(value))
 	return nil
-}
-
-func execVariable(stmt Statement) (err error) {
-	return err
 }
 
 func assignValue(left *expr.Expression, value interface{}) error {
