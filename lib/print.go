@@ -22,8 +22,7 @@ func PrintDocs(libname string) error {
 		return fmt.Errorf(ErrNotALibrary.Error(), libname)
 	}
 
-	// Todo: add color formatting to output
 	fmt.Println()
-	fmt.Println(string(file))
+	fmt.Print(string(file))
 	return nil
 }

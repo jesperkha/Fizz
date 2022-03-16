@@ -61,7 +61,7 @@ def add_doc(c: str):
 
 
 # Write docs to file (create file)
-def create_file(path: str, libname: str, docs: list):
+def create_file(path: str, libname: str, docs: list[list[str]]):
     # Create dump file if it doesnt exist
     dump = "lib/_libdump"
     if not isdir(dump):
@@ -74,7 +74,7 @@ def create_file(path: str, libname: str, docs: list):
     # Write function dump
     with open(filename, "w+") as f:
         for func in docs:
-            f.write(f"{func[1]}")
+            f.write(f"{func[1]}\t{func[0]}\n")
 
     # Create file if it doesnt exist already
     filename = f"{path}/{libname}_docs.md"

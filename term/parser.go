@@ -16,7 +16,7 @@ var (
 	//go:embed help.txt
 	HELP string
 
-	ErrUnknownOption = errors.New("uknown option '%s'")
+	ErrUnknownOption  = errors.New("uknown option '%s'")
 	ErrUnknownCommand = errors.New("unknown command '%s'")
 )
 
