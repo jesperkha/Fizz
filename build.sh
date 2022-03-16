@@ -13,4 +13,4 @@ CMD="go build -o bin/fizz.exe ."
 echo "[CMD] $CMD"
 $CMD
 
-echo "[INFO] Finished build of " && ./bin/fizz --version
+echo -n "[INFO] Finished build of " && ./bin/fizz --version
