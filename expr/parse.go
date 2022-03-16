@@ -81,14 +81,14 @@ func ParseExpression(tokens []lexer.Token) (expr Expression, err error) {
 	// Only check if not in a group. Then check if valid operator, skip if not.
 	lowest, lowestIdx := lexer.Token{Type: 999}, 0
 	util.SeekBreakPoint(tokens, func(i int, t lexer.Token) bool {
-		if t.Type < lowest.Type && i != 0 {
+		// Checks if last token as the same, (1 - -1), and ignores if so. This means the target will
+		// always be the last splittable token: (10 / 4 * 2) splits at *
+		if t.Type <= lowest.Type && i != 0 && tokens[i-1].Type != t.Type {
 			lowest, lowestIdx = t, i
 		}
 		return false
 	})
 
-	// Todo: order of operations is not always correct
-	// example: print -1 - -1 - 1;
 	t := lowest.Type
 	if t >= lexer.AND && t <= lexer.HAT {
 		left, err := ParseExpression(tokens[:lowestIdx])

@@ -11,6 +11,7 @@
 - Fixed bug where unary expressions would be parsed incorrectly
 - Validator for program flags
 - Added better parsing for parenthesis coupling
+- Fixed incorrect parsing for binary operations
 
 <br>
 
